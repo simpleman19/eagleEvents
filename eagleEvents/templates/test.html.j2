@@ -1,0 +1,13 @@
+{% extends "layout.html.j2" %}
+{% from "_macros.html.j2" import hello %}
+{% block head_content %}
+  <title>Eagle Events Home Page</title>
+{% endblock %}
+
+{% block body_content %}
+  {{ hello("John Doe") }}
+
+  <h1>
+  This is a test page with a test H1 and a variable: {{test}}
+  </h1>
+{% endblock %}
