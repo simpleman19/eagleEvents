@@ -8,6 +8,7 @@ from livereload import Server
 
 from config import DevelopmentConfig
 from eagleEvents import create_app, db
+from database_seed import seed_db
 
 manager = Manager(create_app)
 
@@ -47,7 +48,7 @@ def resettobase():
     db.session.commit()
     db.drop_all()
     db.create_all()
-    # TODO add call for generation
+    seed_db()
 
 
 manager.add_command("livereload", LiveReloadServer)
