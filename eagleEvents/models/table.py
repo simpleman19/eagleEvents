@@ -5,8 +5,9 @@ from sqlalchemy_utils import UUIDType
 
 
 class Table(db.Model):
-    __tablename__ = 'event_table'
+    __tablename__ = 'event_table' # Turns out table is a sqlite keyword..
     id = db.Column(UUIDType(binary=False), primary_key=True, default=uuid.uuid4)
+    # Auto generated
     number = db.Column(db.Integer)
     seating_capacity = db.Column(db.Integer)
     event_id = db.Column(UUIDType(binary=False), db.ForeignKey('event.id'))
@@ -14,11 +15,11 @@ class Table(db.Model):
     guests = db.relationship('Guest', lazy=True,
                              backref=db.backref('guest', lazy='subquery'))
 
-    def __init__(self, event):
+    def __init__(self, event: 'Event'):
         self.event = event
 
 
-# This auto generates customer numbers on insert
+# This auto generates table numbers on insert
 @event.listens_for(Table, 'after_insert')
 def gen_customer_number(mapper, connection, target):
     connection.execute(

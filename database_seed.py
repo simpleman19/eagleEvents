@@ -1,4 +1,4 @@
-from eagleEvents.models import Company, Customer, Event, Table, Guest, SeatingPreferenceTable, SeatingPreference
+from eagleEvents.models import Company, Customer, Event, Table, Guest, SeatingPreferenceTable, SeatingPreference, User
 from eagleEvents import db
 import datetime
 
@@ -7,7 +7,14 @@ import datetime
 def seed_db():
     company = Company()
     company.name = "Test company"
+    company.table_sizes = [2, 4, 6]
     db.session.add(company)
+    db.session.commit()
+    user = User(company)
+    user.username = 'test'
+    user.name = 'A User'
+    user.set_password('password')
+    db.session.add(user)
     db.session.commit()
 
     for x in range(10):

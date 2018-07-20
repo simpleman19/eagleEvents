@@ -1,6 +1,7 @@
 from . import db
 import uuid
 from sqlalchemy_utils import UUIDType
+from typing import List
 
 
 class Event(db.Model):
@@ -13,6 +14,17 @@ class Event(db.Model):
     percent_extra_seats = db.Column(db.Float, nullable=False)
     customer_id = db.Column(UUIDType(binary=False), db.ForeignKey('customer.id'))
     customer = db.relationship('Customer', lazy=False)
+    company_id = db.Column(UUIDType(binary=False), db.ForeignKey('company.id'))
+    company = db.relationship('Company', lazy=False)
 
     def __init__(self, customer):
         self.customer = customer
+
+    def set_guests(self, guests: List['Event']):
+        pass
+
+    def generate_seating_chart(self):
+        pass
+
+    def _generate_genetic_algo(self):
+        pass

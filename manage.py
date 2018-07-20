@@ -44,7 +44,7 @@ def test():
 
 
 @manager.command
-def resettobase():
+def seed():
     db.session.commit()
     db.drop_all()
     db.create_all()

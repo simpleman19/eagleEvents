@@ -18,10 +18,7 @@ class SeatingPreferenceTable(db.Model):
     other_guest = db.relationship('Guest', lazy=True, foreign_keys=[other_guest_id])
     preference = db.Column(db.Enum(SeatingPreference), nullable=False)
 
-    def __init__(self):
-        return
-
-    def __init__(self, guest, other_guest, preference):
+    def __init__(self, guest: 'Guest', other_guest: 'Guest', preference: 'SeatingPreference'):
         self.guest = guest
         self.other_guest = other_guest
         self.preference = preference
@@ -44,3 +41,18 @@ class Guest(db.Model):
     def __init__(self, event):
         self.event = event
 
+    # TODO stubbed but not fully tested
+    def likes(self, guest: 'Guest') -> bool:
+        if self.seating_preferences is not None and len(self.seating_preferences > 0):
+            for p in self.seating_preferences:
+                if p.preference == SeatingPreference.LIKE and p.other_guest_id == guest.id:
+                    return True
+        return False
+
+    # TODO stubbed but not fully tested
+    def dislikes(self, guest: 'Guest') -> bool:
+        if self.seating_preferences is not None and len(self.seating_preferences > 0):
+            for p in self.seating_preferences:
+                if p.preference == SeatingPreference.DISLIKE and p.other_guest_id == guest.id:
+                    return True
+        return False
