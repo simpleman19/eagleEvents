@@ -2,21 +2,41 @@ from . import db
 import uuid
 from sqlalchemy import event
 from sqlalchemy_utils import UUIDType
+from typing import List
 
 
 class Table(db.Model):
     __tablename__ = 'event_table' # Turns out table is a sqlite keyword..
     id = db.Column(UUIDType(binary=False), primary_key=True, default=uuid.uuid4)
     # Auto generated
-    number = db.Column(db.Integer)
-    seating_capacity = db.Column(db.Integer)
+    number: int = db.Column(db.Integer)
+    seating_capacity: int = db.Column(db.Integer)
     event_id = db.Column(UUIDType(binary=False), db.ForeignKey('event.id'))
-    event = db.relationship('Event', lazy=False)
-    guests = db.relationship('Guest', lazy=True,
-                             backref=db.backref('guest', lazy='subquery'))
+    event: List['Event'] = db.relationship('Event', lazy=False)
+    guests: List['Guest'] = db.relationship('Guest', lazy=True,
+                                            backref=db.backref('guest', lazy='subquery'))
 
     def __init__(self, event: 'Event'):
         self.event = event
+
+    def num_open_seats(self) -> int:
+        # Assumed guests is never None, change if causes problems later
+        return self.seating_capacity - len(self.guests)
+
+    def num_guests_likes(self, guest: 'Guest') -> int:
+        likes = 0
+        for g in self.guests:
+            if g.likes(guest):
+                likes += 1
+        return likes
+
+    def num_guests_dislikes(self, guest: 'Guest') -> int:
+        # TODO is there a better algo for this?  Kinda nasty..
+        dislikes = 0
+        for g in self.guests:
+            if g.dislikes(guest):
+                dislikes += 1
+        return dislikes
 
 
 # This auto generates table numbers on insert

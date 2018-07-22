@@ -21,9 +21,16 @@ def create_app(config_name=None):
     db.init_app(app)
 
     # Register web application routes
-    from .routes import main as main_blueprint
+    from .routes import main_blueprint
+    from .routes.event_planners import event_planners_blueprint
+    from .routes.customers import customers_blueprint
+    from .routes.events import events_blueprint
     from .auth import auth_blueprint
+
     app.register_blueprint(main_blueprint)
+    app.register_blueprint(event_planners_blueprint)
+    app.register_blueprint(customers_blueprint)
+    app.register_blueprint(events_blueprint)
     app.register_blueprint(auth_blueprint, url_prefix='/auth')
 
     return app
