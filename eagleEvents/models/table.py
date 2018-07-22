@@ -12,7 +12,7 @@ class Table(db.Model):
     number: int = db.Column(db.Integer)
     seating_capacity: int = db.Column(db.Integer)
     event_id = db.Column(UUIDType(binary=False), db.ForeignKey('event.id'))
-    event: List['Event'] = db.relationship('Event', lazy=False)
+    event: 'Event' = db.relationship('Event', lazy=False)
     guests: List['Guest'] = db.relationship('Guest', lazy=True,
                                             backref=db.backref('guest', lazy='subquery'))
 
