@@ -31,7 +31,6 @@ class Table(db.Model):
         return likes
 
     def num_guests_dislikes(self, guest: 'Guest') -> int:
-        # TODO is there a better algo for this?  Kinda nasty..
         dislikes = 0
         for g in self.guests:
             if g.dislikes(guest):
