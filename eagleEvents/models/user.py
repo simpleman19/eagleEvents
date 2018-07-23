@@ -2,6 +2,7 @@ from . import db
 import uuid
 import bcrypt
 from sqlalchemy_utils import UUIDType
+from typing import List
 
 
 class User(db.Model):
@@ -13,7 +14,8 @@ class User(db.Model):
     is_active = db.Column(db.Boolean, nullable=False, default=True)
     is_admin = db.Column(db.Boolean, nullable=False, default=False)
     company_id = db.Column(UUIDType(binary=False), db.ForeignKey('company.id'))
-    company = db.relationship('Company', lazy=False)
+    company: 'Company' = db.relationship('Company', lazy=False)
+    events: List['Event'] = db.relationship('Event', lazy=True)
 
     def __init__(self, company: 'Company'):
         self.company = company
