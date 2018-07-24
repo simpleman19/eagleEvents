@@ -5,6 +5,7 @@ from deap import creator
 from deap import tools
 from math import floor
 
+
 class SeatingChartGA():
 
     def __init__(self, event):
@@ -16,7 +17,7 @@ class SeatingChartGA():
         self.toolbox = base.Toolbox()
 
 
-    def initialize(self):
+    def initialization(self):
         creator.create("FitnessMin", base.Fitness, weights=(-1.0,))
         creator.create("Individual", list, fitness=creator.FitnessMin)
 
@@ -24,4 +25,6 @@ class SeatingChartGA():
         self.toolbox.register("individual", tools.initIterate, creator.Individual,
                               self.toolbox.indices)
 
+    def population(self):
+        self.toolbox.register("population", tools.initRepeat, list, self.toolbox.individual)
 
