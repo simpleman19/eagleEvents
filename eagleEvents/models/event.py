@@ -20,6 +20,7 @@ class Event(db.Model):
     planner_id = db.Column(UUIDType(binary=False), db.ForeignKey('users.id'), nullable=True)
     planner = db.relationship('User', lazy=False)
     tables = db.relationship('Table', lazy=False)
+    table_size = db.Column(db.Integer, nullable=False)
     _guests: List[Guest] = db.relationship('Guest', lazy=False,
                                            back_populates='event',
                                            foreign_keys=[Guest.event_id])

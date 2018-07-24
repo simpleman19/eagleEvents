@@ -1,5 +1,7 @@
 import math
 
+from numpy import count_nonzero
+
 from eagleEvents.seating_chart_ga import SeatingChartGA
 from eagleEvents.models import Company, Customer, Event, Guest, Table
 from flask_sqlalchemy import SQLAlchemy
@@ -20,8 +22,10 @@ def mock_event(monkeypatch):
         g = Guest(db)
         g.number = x
         mock_guests.append(g)
+
     monkeypatch.setattr(e, "_guests", mock_guests)
     monkeypatch.setattr(e, "percent_extra_seats", .5)
+    monkeypatch.setattr(e, 'table_size', 4)
     return e
 
 
@@ -130,3 +134,59 @@ def test_when_populating_with_odd_percent_then_it_returns_individuals_containing
 
     count = len(list(filter(lambda x: x == Table.EMPTY_SEAT, result[25])))
     assert count == num_empty_seats
+
+
+##
+# Evaluation
+##
+
+def test_when_calling_count_dislikes_at_table_then_it_returns_correct_count(monkeypatch):
+    e = mock_event(monkeypatch)
+    db = mock_db(monkeypatch)
+    def mock_dislike(guest):
+        return True
+    def mock_not_dislike(guest):
+        return False
+    mock_guests = []
+    for x in range(10):
+        g = Guest(db)
+        g.number = x
+        # Guest 1 hates everyone
+        if x == 1:
+            monkeypatch.setattr(g, "dislikes", mock_dislike)
+        else:
+            monkeypatch.setattr(g, "dislikes", mock_not_dislike)
+        mock_guests.append(g)
+
+    monkeypatch.setattr(e, "_guests", mock_guests)
+
+    ga = SeatingChartGA(e)
+    ga.initialization()
+    ga.population()
+    ga.evaluation()
+
+    individual = ga.toolbox.population(n=1)[0]
+    individual_without_empty_seats = list(filter(lambda x: x != Table.EMPTY_SEAT, individual))
+
+    result = ga.count_dislikes_in_list(individual)
+
+    assert result == len(individual_without_empty_seats) - 1
+
+
+def test_when_calling_evaluate_it_returns_a_tuple_containing_the_count_of_dislikes_at_every_table(monkeypatch):
+    e = mock_event(monkeypatch)
+
+    ga = SeatingChartGA(e)
+    ga.initialization()
+    ga.population()
+    ga.evaluation()
+
+    def mock_count(list):
+        return 2
+    monkeypatch.setattr(ga, "count_dislikes_in_list", mock_count)
+
+    individual = ga.toolbox.population(n=1)[0]
+    score = ga.evaluate(individual)
+
+    assert score[0] == 2 * ga.num_tables
+
