@@ -287,6 +287,7 @@ def seed_db():
         user.is_active = True
         db.session.add(user)
         db.session.commit()
+        user = User(company)
         user.username = 'admin'
         user.name = 'Admin'
         user.set_password('password')
@@ -294,6 +295,7 @@ def seed_db():
         user.is_active = True
         db.session.add(user)
         db.session.commit()
+        user = User(company)
         user.username = 'fired planner'
         user.name = 'Fired Planner'
         user.set_password('password')
