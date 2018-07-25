@@ -1,5 +1,6 @@
 from flask import Blueprint, render_template
 from eagleEvents import models
+from eagleEvents.models.event import Event
 main_blueprint = Blueprint('main', __name__)
 
 
@@ -7,7 +8,9 @@ main_blueprint = Blueprint('main', __name__)
 @main_blueprint.route('/home', methods=['GET'])
 def home():
     c = models.Company()
-    c.import_guest_list('GuestLists/GuestList_10_2_1.csv')
+
+    event = Event.query.filter_by(name='Test Event').first()
+    c.process_guest_list('GuestLists/GuestList_100_3_3.csv', event)
     return render_template('test.html.j2', test='"Test Argument to Page"')
 
 
