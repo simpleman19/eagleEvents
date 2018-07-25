@@ -1,5 +1,5 @@
-from flask import Blueprint, render_template
-
+from flask import Blueprint, render_template, g, redirect, url_for
+from eagleEvents.auth import multi_auth, get_token
 main_blueprint = Blueprint('main', __name__)
 
 
@@ -15,6 +15,18 @@ def home():
 def login():
     # TODO LOGIN
     return render_template('test.html.j2')
+
+
+@main_blueprint.route('/login', methods=['POST'])
+@multi_auth.login_required
+def login_user():
+    if g.current_user is None:
+        redirect(url_for('main_blueprint.login'))
+    else:
+        token = get_token()
+        resp = redirect(url_for('main_blueprint.home'))
+        resp.set_cookie('Bearer', token)
+        return resp
 
 
 @main_blueprint.route('/logout', methods=['GET'])
