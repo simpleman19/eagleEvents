@@ -3,6 +3,7 @@ from eagleEvents import db
 import datetime
 from random import randint
 import random
+random.seed()
 
 '''
 Private helper functions for the main seed function. 
@@ -247,35 +248,37 @@ def seed_db():
                 tables_to_have = randint(10,25)
 
                 # create tables for events
+                guests_status = randint(1,4)
                 for i in range(tables_to_have):
                     table = Table(event)
                     db.session.add(table)
                     table_num = __get_table_num()
 
                     # create guests for tables
-                    for k in range(table_num):
-                        rand = randint(1,10)
-                        if(rand != 1):
-                            guest = Guest(event)
-                            guest.assigned_table = table
-                            guest.first_name = __get_person_name(True)
-                            guest.last_name = __get_person_name(False)
-                            guest.number = k + i * table_num
-                            guest.title = __get_title()
-                            db.session.add(guest)
-                    guests = Guest.query.all()
-                    try:
-                        seating_preference = SeatingPreferenceTable(guests[0], guests[int(table_num/2)], SeatingPreference.LIKE)
-                        db.session.add(seating_preference)
-                        seating_preference = SeatingPreferenceTable(guests[1], guests[3], SeatingPreference.DISLIKE)
-                        db.session.add(seating_preference)
-                    except Exception:
-                        seating_preference = SeatingPreferenceTable(guests[0], guests[1], SeatingPreference.DISLIKE)
-                        db.session.add(seating_preference)
+                    if guests_status != 2:
+                        for k in range(table_num):
+                            rand = randint(1,10)
+                            if rand != 1:
+                                guest = Guest(event)
+                                guest.assigned_table = table
+                                guest.first_name = __get_person_name(True)
+                                guest.last_name = __get_person_name(False)
+                                guest.number = k + i * table_num
+                                guest.title = __get_title()
+                                db.session.add(guest)
+                        guests = Guest.query.all()
+                        try:
+                            seating_preference = SeatingPreferenceTable(guests[0], guests[int(table_num/2)], SeatingPreference.LIKE)
+                            db.session.add(seating_preference)
+                            seating_preference = SeatingPreferenceTable(guests[1], guests[3], SeatingPreference.DISLIKE)
+                            db.session.add(seating_preference)
+                        except Exception:
+                            seating_preference = SeatingPreferenceTable(guests[0], guests[1], SeatingPreference.DISLIKE)
+                            db.session.add(seating_preference)
 
             db.session.commit()
     else:
-        # Users created (Emily, Jacob, Dee Dee, Paresa, Chance)
+        # Users created (planner & admin)
         user = User(company)
         user.username = 'planner'
         user.name = 'Planner'
@@ -289,6 +292,13 @@ def seed_db():
         user.set_password('password')
         user.is_admin = True
         user.is_active = True
+        db.session.add(user)
+        db.session.commit()
+        user.username = 'fired planner'
+        user.name = 'Fired Planner'
+        user.set_password('password')
+        user.is_admin = False
+        user.is_active = False
         db.session.add(user)
         db.session.commit()
 
@@ -315,31 +325,33 @@ def seed_db():
                 tables_to_have = randint(10,20)
 
                 # create tables for events
+                guests_status = randint(1,4)
                 for i in range(tables_to_have):
                     table = Table(event)
                     db.session.add(table)
                     table_num = __get_table_num()
-
+                    
                     # create guests for tables
-                    for k in range(table_num):
-                        rand = randint(1,10)
-                        if(rand != 1):
-                            guest = Guest(event)
-                            guest.assigned_table = table
-                            guest.first_name = __get_person_name(True)
-                            guest.last_name = __get_person_name(False)
-                            guest.number = k + i * table_num
-                            guest.title = __get_title()
-                            db.session.add(guest)
-                    guests = Guest.query.all()
-                    try:
-                        seating_preference = SeatingPreferenceTable(guests[0], guests[int(table_num/2)], SeatingPreference.LIKE)
-                        db.session.add(seating_preference)
-                        seating_preference = SeatingPreferenceTable(guests[1], guests[3], SeatingPreference.DISLIKE)
-                        db.session.add(seating_preference)
-                    except Exception:
-                        seating_preference = SeatingPreferenceTable(guests[0], guests[1], SeatingPreference.DISLIKE)
-                        db.session.add(seating_preference)
+                    if guests_status !=2:
+                        for k in range(table_num):
+                            rand = randint(1,10)
+                            if rand != 1:
+                                guest = Guest(event)
+                                guest.assigned_table = table
+                                guest.first_name = __get_person_name(True)
+                                guest.last_name = __get_person_name(False)
+                                guest.number = k + i * table_num
+                                guest.title = __get_title()
+                                db.session.add(guest)
+                        guests = Guest.query.all()
+                        try:
+                            seating_preference = SeatingPreferenceTable(guests[0], guests[int(table_num/2)], SeatingPreference.LIKE)
+                            db.session.add(seating_preference)
+                            seating_preference = SeatingPreferenceTable(guests[1], guests[3], SeatingPreference.DISLIKE)
+                            db.session.add(seating_preference)
+                        except Exception:
+                            seating_preference = SeatingPreferenceTable(guests[0], guests[1], SeatingPreference.DISLIKE)
+                            db.session.add(seating_preference)
 
             db.session.commit()
         
