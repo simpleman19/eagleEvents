@@ -16,6 +16,9 @@ class Event(db.Model):
     customer = db.relationship('Customer', lazy=False)
     company_id = db.Column(UUIDType(binary=False), db.ForeignKey('company.id'))
     company = db.relationship('Company', lazy=False)
+    planner_id = db.Column(UUIDType(binary=False), db.ForeignKey('users.id'), nullable=True)
+    planner = db.relationship('User', lazy=False)
+    tables = db.relationship('Table', lazy=False)
 
     def __init__(self, customer):
         self.customer = customer
