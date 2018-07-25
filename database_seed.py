@@ -14,26 +14,10 @@ def __get_company_name(i: int):
     used to get name for each of our 10 test customers
         :param i:int: which company to get
     """
-    if i == 0:
-        return "Disney"
-    elif i == 1:
-        return "IHop"
-    elif i == 2:
-        return "IHob"
-    elif i == 3:
-        return "Staples"
-    elif i == 4:
-        return "Krispy Kreme"
-    elif i == 5:
-        return "PetCo"
-    elif i == 6:
-        return "Starbucks"
-    elif i == 7:
-        return "O'Reilly Auto Parts"
-    elif i == 8:
-        return "Studio Ghibli"
-    else:
-        return "Full Circle Books"
+    customers = ["Disney", "IHop", "IHob", "Staples",
+    "Krispy Kreme", "PetCo", "Starbucks", "O'Reilly Auto Parts", 
+    "Studio Ghibli", "Full Circle Books"];
+    return customers[i];
     
 
 def __get_person_name(first):
@@ -73,32 +57,18 @@ def __get_table_num():
     """
     used to get a random table size to use
     """
-    rand = randint(0, 4)
-
-    if rand == 0:
-        return 4
-    elif rand == 1:
-        return 6
-    elif rand == 2:
-        return 8
-    else:
-        return 12
+    rand = randint(0, 3)
+    table_sizes = [4, 6, 8, 12];
+    return table_sizes[rand]
 
 
 def __get_title():
     """
     used to get a random title or not a title
     """
-    rand = randint(0, 4)
-
-    if rand == 0:
-        return "CEO"
-    elif rand == 1:
-        return "President"
-    elif rand == 2:
-        return ""
-    else:
-        return ""
+    rand = randint(0, 3)
+    rand_titles = ["CEO", "President", "", ""];
+    return rand_titles[rand]
 
 
 def __get_phone_number():
