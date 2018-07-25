@@ -39,11 +39,13 @@ class Company(db.Model):
             like = len(header) - dislikes
 
             # clear out the guest list for this event
-            db.session.query(Guest).filter(Guest.event_id == event.id).delete()
+            guests_to_delete = db.session.query(Guest).filter(Guest.event_id == event.id).all()
+            [db.session.delete(g) for g in guests_to_delete]
             db.session.commit()
 
             likes_dict = {}
             dislikes_dict = {}
+            guest_dict = {}
             # read in the csv file and create a guest list
             for row in read_csv:
                 g = Guest(event)
@@ -65,14 +67,15 @@ class Company(db.Model):
                         # print('Dislikes ', row[j])
                 # print(' ')
                 db.session.add(g)
+                guest_dict[g.number] = g
 
         db.session.commit()
         # iterate through for seating preferences for each guest
         for key, value in likes_dict.items():
             # print('likes ', key, value)
-            g1 = Guest.query.filter_by(number=key, event=event).one_or_none()
+            g1 = guest_dict.get(key)
             for v in value:
-                g2 = Guest.query.filter_by(number=v, event=event).one_or_none()
+                g2 = guest_dict.get(v)
                 if g1 and g2:
                     pref = SeatingPreferenceTable(g1, g2, SeatingPreference.LIKE)
                     db.session.add(pref)
@@ -80,9 +83,9 @@ class Company(db.Model):
                     print('Guest was not found: ', g1, g2)
         for key, value in dislikes_dict.items():
             # print('dislikes ', key, value)
-            g1 = Guest.query.filter_by(number=key, event=event).one_or_none()
+            g1 = guest_dict.get(key)
             for v in value:
-                g2 = Guest.query.filter_by(number=v, event=event).one_or_none()
+                g2 = guest_dict.get(v)
                 if g1 and g2:
                     pref = SeatingPreferenceTable(g1, g2, SeatingPreference.DISLIKE)
                     db.session.add(pref)

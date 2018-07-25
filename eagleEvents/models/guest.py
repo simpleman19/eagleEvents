@@ -37,10 +37,14 @@ class Guest(db.Model):
     table_id = db.Column(UUIDType(binary=False), db.ForeignKey('event_table.id'))
     assigned_table: 'Table' = db.relationship('Table', lazy=True)
     seating_preferences: List[SeatingPreferenceTable] = db.relationship('SeatingPreferenceTable', lazy=False,
-                                                                        back_populates='guest', foreign_keys=[SeatingPreferenceTable.guest_id])
+                                                                        back_populates='guest', foreign_keys=[SeatingPreferenceTable.guest_id],
+                                                                        cascade='all,delete')
 
     def __init__(self, event):
         self.event = event
+
+    def __str__(self):
+        return 'guest: {}, number: {}'.format(self.id, self.number)
 
     # TODO stubbed but not fully tested
     def likes(self, guest: 'Guest') -> bool:

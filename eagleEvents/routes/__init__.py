@@ -10,7 +10,7 @@ def home():
     c = models.Company()
 
     event = Event.query.filter_by(name='Test Event').first()
-    c.process_guest_list('GuestLists/GuestList_100_3_3.csv', event)
+    c.process_guest_list('GuestLists/GuestList_3000_2_2.csv', event)
     return render_template('test.html.j2', test='"Test Argument to Page"')
 
 
