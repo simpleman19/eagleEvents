@@ -10,10 +10,11 @@ Flask-SQLAlchemy==2.3.2
 idna==2.7
 itsdangerous==0.24
 Jinja2==2.10
-jwt==0.5.4
 livereload==2.5.2
 MarkupSafe==1.0
+psycopg2==2.7.5
 pycparser==2.18
+PyJWT==1.6.4
 six==1.11.0
 SQLAlchemy==1.2.10
 SQLAlchemy-Utils==0.33.3

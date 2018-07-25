@@ -24,7 +24,7 @@ def login_user():
         redirect(url_for('main_blueprint.login'))
     else:
         token = get_token()
-        resp = redirect(url_for('main_blueprint.home'))
+        resp = redirect(url_for('main.home'))
         resp.set_cookie('Bearer', token)
         return resp
 

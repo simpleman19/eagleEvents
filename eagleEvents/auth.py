@@ -108,8 +108,7 @@ def get_token():
                 {'WWW-Authenticate': 'Bearer realm="Authentication Required"'})
     user = g.current_user
     token = jwt.encode({'username': user.username,
-                        'user_id': user.id,
-                        'name': user.display_name,
-                        'exp': (datetime.utcnow() + timedelta(seconds=24))
+                        'user_id': str(user.id.hex),
+                        'exp': (datetime.utcnow() + timedelta(hours=24))
                         }, app.config['SECRET_KEY'], algorithm='HS256')
     return token.decode('UTF-8')
