@@ -1,10 +1,8 @@
 from eagleEvents.models import db
 from eagleEvents.models import User
 from eagleEvents.models.guest import Guest, SeatingPreference, SeatingPreferenceTable
-import timeit
+import timeit, uuid, csv
 from sqlalchemy_utils import UUIDType
-import uuid
-import csv
 from typing import List
 
 
@@ -69,7 +67,6 @@ class Company(db.Model):
                 db.session.add(g)
                 guest_dict[g.number] = g
 
-        db.session.commit()
         # iterate through for seating preferences for each guest
         for key, value in likes_dict.items():
             # print('likes ', key, value)
