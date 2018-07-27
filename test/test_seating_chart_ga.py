@@ -319,3 +319,21 @@ def test_when_calling_do_generation_it_returns_offspring_not_in_the_parent_popul
 
     assert len(population) == len(offspring)
     assert any([not (array_equal(population[i], offspring[i])) for i in range(len(population))])
+
+
+def test_when_calling_do_generations_it_uses_should_terminate_to_terminate(monkeypatch):
+    e = mock_event(monkeypatch)
+    was_called = False
+    ga = SeatingChartGA(e)
+
+    def mock_terminate(pop, n):
+        nonlocal was_called
+        was_called = True
+        return True
+
+    monkeypatch.setattr(ga, "should_terminate", mock_terminate)
+
+    ga.setup()
+    ga.do_generations()
+
+    assert was_called

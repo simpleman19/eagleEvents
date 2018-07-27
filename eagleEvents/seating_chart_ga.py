@@ -9,7 +9,7 @@ from math import floor, ceil
 
 
 class SeatingChartGA:
-    CXPB, MUTPB, NGEN = 0.5, 0.2, 40
+    CXPB, MUTPB, NIND, NGEN = 0.5, 0.2, 50, 40
 
     def __init__(self, event):
         self.event = event
@@ -54,15 +54,33 @@ class SeatingChartGA:
 
     def should_terminate(self, population, generation_number):
         return generation_number > self.NGEN
+
+    def update_fitnesses(self, population):
+        fitnesses = map(self.toolbox.evaluate, population)
+        for ind, fit in zip(population, fitnesses):
+            ind.fitness.values = fit
+
+    # from http://deap.readthedocs.io/en/master/overview.html#algorithms
+    def do_generations(self):
+        pop = self.toolbox.population(n=self.NIND)
+
+        # Evaluate the first generation
+        self.update_fitnesses(pop)
+
+        generation_number = 1
+        while not self.should_terminate(pop, generation_number):
+            pop[:] = self.do_generation(pop)
+            generation_number += 1
+
+        return pop
+
     def do_generation(self, population):
         # from http://deap.readthedocs.io/en/master/tutorials/basic/part2.html#variations
         offspring = self.toolbox.select(population, len(population))
         offspring = map(self.toolbox.clone, offspring)
         offspring = self.crossover_and_mutate(offspring)
         invalid_ind = [ind for ind in offspring if not ind.fitness.valid]
-        fitnesses = map(self.toolbox.evaluate, invalid_ind)
-        for ind, fit in zip(invalid_ind, fitnesses):
-            ind.fitness.values = fit
+        self.update_fitnesses(invalid_ind)
 
         return offspring
 
