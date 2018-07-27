@@ -22,6 +22,7 @@ class SeatingChartGA:
             raise ValueError("No percent_extra_seats for this event!")
         self.event = event
         self.guest_numbers = [x.number for x in event._guests] if event._guests is not None else []
+        self.guest_lookup = self.guest_list_to_dict(self.event._guests)
         self.num_guests = len(self.guest_numbers)
         #TODO round up to the nearest table
         num_extra_seats = floor(self.num_guests * event.percent_extra_seats)
@@ -140,9 +141,9 @@ class SeatingChartGA:
         return count
 
     def get_guest_by_number(self, number):
-        for guest in self.event._guests:
-            if guest.number == number:
-                return guest
-        return None
+        return self.guest_lookup[number]
+
+    def guest_list_to_dict(self, guests):
+        return dict([(guest.number, guest) for guest in guests])
 
 
