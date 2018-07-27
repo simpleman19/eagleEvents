@@ -36,6 +36,8 @@ class SeatingChartGA:
         self.selection()
         self.crossover()
         self.mutation()
+        if self.COLLECT_STATS:
+            self.statistics()
 
     def initialization(self):
         creator.create("FitnessMin", base.Fitness, weights=(-1.0,))
@@ -60,6 +62,15 @@ class SeatingChartGA:
     def mutation(self):
         self.toolbox.register("mutate", tools.mutShuffleIndexes, indpb=0.1)
 
+    def statistics(self):
+        self.stats = tools.Statistics(lambda ind: ind.fitness.values)
+        self.stats.register("avg", mean)
+        self.stats.register("std", std)
+        self.stats.register("min", min)
+        self.stats.register("max", max)
+        self.logbook = tools.Logbook()
+        self.logbook.header = "gen", "avg", "std", "min", "max"
+
     def should_terminate(self, population, generation_number):
         return generation_number > self.NGEN
 
@@ -68,16 +79,23 @@ class SeatingChartGA:
         for ind, fit in zip(population, fitnesses):
             ind.fitness.values = fit
 
+    def update_stats(self, generation_number, population):
+        if not(self.stats is None):
+            record = self.stats.compile(population)
+            self.logbook.record(gen=generation_number, **record)
+
     # from http://deap.readthedocs.io/en/master/overview.html#algorithms
     def do_generations(self):
         pop = self.toolbox.population(n=self.NIND)
 
         # Evaluate the first generation
         self.update_fitnesses(pop)
+        self.update_stats(0, pop)
 
         generation_number = 1
         while not self.should_terminate(pop, generation_number):
             pop[:] = self.do_generation(pop)
+            self.update_stats(generation_number, pop)
             generation_number += 1
 
         return pop
