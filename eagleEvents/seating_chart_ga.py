@@ -6,18 +6,26 @@ from deap import base
 from deap import creator
 from deap import tools
 from math import floor, ceil
+from numpy import max, mean, min, std
 
 
 class SeatingChartGA:
     CXPB, MUTPB, NIND, NGEN = 0.5, 0.2, 50, 40
+    COLLECT_STATS = False
 
     def __init__(self, event):
+        if(event._guests is None or len(event._guests) == 0):
+            raise ValueError("No guests for this event!")
+        if (event.table_size is None):
+            raise ValueError("No table_size for this event!")
+        if (event.percent_extra_seats is None):
+            raise ValueError("No percent_extra_seats for this event!")
         self.event = event
         self.guest_numbers = [x.number for x in event._guests] if event._guests is not None else []
         self.num_guests = len(self.guest_numbers)
         #TODO round up to the nearest table
         num_extra_seats = floor(self.num_guests * event.percent_extra_seats)
-        self.num_tables = ceil(num_extra_seats / event.table_size)
+        self.num_tables = ceil(num_extra_seats / event.table_size.size)
         self.table_assignments = self.guest_numbers + [Table.EMPTY_SEAT for x in range(num_extra_seats)]
         self.toolbox = base.Toolbox()
 
