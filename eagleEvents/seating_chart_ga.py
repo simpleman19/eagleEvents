@@ -10,7 +10,7 @@ from numpy import max, mean, min, std
 
 
 class SeatingChartGA:
-    CXPB, MUTPB, NIND, NGEN = 0.5, 0.2, 50, 40
+    PCT_TO_EVAL, CXPB, MUTPB, NIND, NGEN = 0.2, 0.5, 0.5, 50, 50
     COLLECT_STATS = False
 
     def __init__(self, event):
@@ -30,6 +30,7 @@ class SeatingChartGA:
         self.toolbox = base.Toolbox()
 
     def setup(self):
+        self.num_tables_to_evaluate = floor(self.num_tables * self.PCT_TO_EVAL)
         self.initialization()
         self.population()
         self.evaluation()
@@ -116,7 +117,8 @@ class SeatingChartGA:
     def evaluate(self, individual):
         score = 0
         #TODO if this is too slow, only check a % of tables as written in the design doc
-        for t in range(self.num_tables):
+        tables_to_check = random.sample(range(self.num_tables), self.num_tables_to_evaluate)
+        for t in tables_to_check:
             guests_at_table = individual[t*self.num_tables:t*(self.num_tables+1)]
             score += self.count_dislikes_in_list(guests_at_table)
         return (score),

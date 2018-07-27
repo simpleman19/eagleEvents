@@ -1,3 +1,7 @@
+import random
+
+import math
+
 from eagleEvents.seating_chart_ga import SeatingChartGA
 from eagleEvents.models import Event
 from eagleEvents import db
