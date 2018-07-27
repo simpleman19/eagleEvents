@@ -300,8 +300,17 @@ def test_when_calling_do_generation_it_returns_offspring_with_fitness_values(mon
         assert count_nonzero(ind.fitness.values) == len(ind.fitness.values)
 
 
+@flaky(max_runs=5,min_passes=1)
 def test_when_calling_do_generation_it_returns_offspring_not_in_the_parent_population(monkeypatch):
     e = mock_event(monkeypatch)
+    db = mock_db(monkeypatch)
+    mock_guests = []
+    for x in range(100):
+        g = Guest(db)
+        g.number = x
+        mock_guests.append(g)
+
+    monkeypatch.setattr(e, "_guests", mock_guests)
 
     ga = SeatingChartGA(e)
 
