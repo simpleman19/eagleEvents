@@ -209,6 +209,7 @@ def seed_db():
                 event = Event(customer)
                 event.name = __get_company_name(x) + "'s Awesome Event " + str(y)
                 event.venue = __get_company_name(x) + "'s Venue"
+                event.table_size = company._table_sizes[random.randrange(len(company._table_sizes))]
                 event.percent_extra_seats = random.uniform(0.1,0.3)
                 info_date = __get_date()
                 event.time = info_date["date"]
@@ -288,6 +289,7 @@ def seed_db():
                 event = Event(customer)
                 event.name = __get_company_name(x) + "'s Awesome Event " + str(y)
                 event.venue = __get_company_name(x) + "'s Venue"
+                event.table_size = company._table_sizes[random.randrange(len(company._table_sizes))]
                 event.percent_extra_seats = random.uniform(0.1,0.3)
                 info_date = __get_date()
                 event.time = info_date["date"]
@@ -328,4 +330,3 @@ def seed_db():
             db.session.commit()
         
 
-    
