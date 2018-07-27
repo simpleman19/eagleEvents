@@ -9,7 +9,7 @@ from math import floor, ceil
 
 
 class SeatingChartGA:
-    CXPB, MUTPB = 0.5, 0.2
+    CXPB, MUTPB, NGEN = 0.5, 0.2, 40
 
     def __init__(self, event):
         self.event = event
@@ -52,6 +52,8 @@ class SeatingChartGA:
     def mutation(self):
         self.toolbox.register("mutate", tools.mutShuffleIndexes, indpb=0.1)
 
+    def should_terminate(self, population, generation_number):
+        return generation_number > self.NGEN
     def do_generation(self, population):
         # from http://deap.readthedocs.io/en/master/tutorials/basic/part2.html#variations
         offspring = self.toolbox.select(population, len(population))

@@ -256,6 +256,25 @@ def test_when_calling_crossover_and_mutate_it_returns_a_mutated_population(monke
 
 
 ##
+# Termination
+##
+
+
+def test_when_calling_should_terminate_it_returns_true_after_NGEN(monkeypatch):
+    e = mock_event(monkeypatch)
+
+    ga = SeatingChartGA(e)
+    monkeypatch.setattr(ga, "NGEN", 10)
+
+    assert not (ga.should_terminate({}, -1))
+    assert not (ga.should_terminate({}, 0))
+    assert not (ga.should_terminate({}, 9))
+    assert not (ga.should_terminate({}, 10))
+    assert ga.should_terminate({}, 11)
+    assert ga.should_terminate({}, 500)
+
+
+##
 # Generation
 ##
 
