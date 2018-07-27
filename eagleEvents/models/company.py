@@ -1,7 +1,7 @@
 from eagleEvents.models import db
 from eagleEvents.models import User
 from eagleEvents.models.guest import Guest, SeatingPreference, SeatingPreferenceTable
-import timeit, uuid, csv
+import timeit, uuid, csv, os
 from sqlalchemy_utils import UUIDType
 from typing import List
 
@@ -89,7 +89,9 @@ class Company(db.Model):
                 else:
                     print('Guest was not found: ', g1, g2)
         db.session.commit()
-
+        os.remove(file_name)
+        if not os.path.isfile(file_name):
+            print(file_name, ' removed')
         stop = timeit.default_timer()
         print('Import Complete', stop-start)
 

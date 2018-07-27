@@ -1,24 +1,16 @@
-from flask import Blueprint, render_template, Flask, flash, request, redirect, url_for
+from flask import Blueprint, render_template, Flask, flash, request, redirect, url_for, g
 from eagleEvents.models.event import Event
 from eagleEvents.models.company import Company
-import os
+import os, config
 from werkzeug.utils import secure_filename
-UPLOAD_FOLDER = '/tmp'
 ALLOWED_EXTENSIONS = set(['csv'])
 events_blueprint = Blueprint('events', __name__)
 
-app = Flask(__name__)
-app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
-
-@events_blueprint.route('/listEvents/<filename>')
-def list_events(filename):
+@events_blueprint.route('/listEvents')
+def list_events():
     # TODO LIST
-    c = Company()
-    event = Event.query.filter_by(name='Test Event').first()
-    path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
-    c.process_guest_list(path, event)
-    return render_template('test.html.j2', test=filename)
+    return render_template('test.html.j2')
 
 
 def allowed_file(filename):
@@ -42,11 +34,16 @@ def upload_file():
             return redirect(request.url)
         if file and allowed_file(file.filename):
             filename = secure_filename(file.filename)
-            path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+            path = os.path.join(config.basedir, filename)
             file.save(path)
             print(path)
-            return redirect(url_for('events.list_events', filename=filename))
-
+            event = Event.query.filter_by(name='Test Event').first()
+            c = Company()
+            c.process_guest_list(path, event)
+            # g.current_user.company.process_guest_list(path, g.current_event)
+            # return redirect(url_for('events.list_events', filename=filename))
+        else:
+            flash('Bad File Selected', 'Oops...')
     return '''
     <!doctype html>
     <title>Upload new File</title>
