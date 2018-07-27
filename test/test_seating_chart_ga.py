@@ -1,6 +1,6 @@
 import math
 
-from numpy import count_nonzero
+from numpy import count_nonzero, array_equal
 
 from eagleEvents.seating_chart_ga import SeatingChartGA
 from eagleEvents.models import Company, Customer, Event, Guest, Table
@@ -189,4 +189,51 @@ def test_when_calling_evaluate_it_returns_a_tuple_containing_the_count_of_dislik
     score = ga.evaluate(individual)
 
     assert score[0] == 2 * ga.num_tables
+
+##
+# Crossover / Mutate
+##
+
+
+def test_when_calling_crossover_and_mutate_it_returns_a_mated_population(monkeypatch):
+    e = mock_event(monkeypatch)
+
+    ga = SeatingChartGA(e)
+    ga.initialization()
+    ga.population()
+    ga.evaluation()
+    ga.crossover()
+    ga.mutation()
+
+    monkeypatch.setattr(ga, "CXPB", 1)
+    monkeypatch.setattr(ga, "MUTPB", 0)
+
+    population = ga.toolbox.population(n=10)
+    mated = ga.crossover_and_mutate(population)
+
+    assert len(population) == len(mated)
+    for i in range(len(population)):
+        assert not array_equal(population[i], mated[i])
+
+
+def test_when_calling_crossover_and_mutate_it_returns_a_mutated_population(monkeypatch):
+    e = mock_event(monkeypatch)
+
+    ga = SeatingChartGA(e)
+    ga.initialization()
+    ga.population()
+    ga.evaluation()
+    ga.crossover()
+    ga.mutation()
+
+    monkeypatch.setattr(ga, "CXPB", 0)
+    monkeypatch.setattr(ga, "MUTPB", 1)
+
+    population = ga.toolbox.population(n=10)
+    mated = ga.crossover_and_mutate(population)
+
+    assert len(population) == len(mated)
+    for i in range(len(population)):
+        assert not array_equal(population[i], mated[i])
+
 
