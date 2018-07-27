@@ -22,9 +22,8 @@ class Event(db.Model):
     tables = db.relationship('Table', lazy=False)
     table_size_id = db.Column(db.Integer, db.ForeignKey('table_sizes.id'), nullable=True)
     table_size = db.relationship('TableSize', lazy=False)
-    _guests: List[Guest] = db.relationship('Guest', lazy=False,
-                                           back_populates='event',
-                                           foreign_keys=[Guest.event_id])
+    _guests: List[Guest] = db.relationship('Guest', lazy=True,
+                    backref=db.backref('guests', lazy='subquery'))
 
     def __init__(self, customer):
         self.customer = customer
