@@ -6,7 +6,7 @@ events_blueprint = Blueprint('events', __name__)
 @events_blueprint.route('/listEvents')
 def list_events():
     # TODO LIST
-    return render_template('test.html.j2')
+    return render_template('event.html.j2')
 
 
 @events_blueprint.route('/modifyEvent')
