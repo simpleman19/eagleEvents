@@ -21,6 +21,13 @@ class SeatingChartGA:
         self.table_assignments = self.guest_numbers + [Table.EMPTY_SEAT for x in range(num_extra_seats)]
         self.toolbox = base.Toolbox()
 
+    def setup(self):
+        self.initialization()
+        self.population()
+        self.evaluation()
+        self.selection()
+        self.crossover()
+        self.mutation()
 
     def initialization(self):
         creator.create("FitnessMin", base.Fitness, weights=(-1.0,))
@@ -36,11 +43,26 @@ class SeatingChartGA:
     def evaluation(self):
         self.toolbox.register("evaluate", self.evaluate)
 
+    def selection(self):
+        self.toolbox.register("select", tools.selBest)
+
     def crossover(self):
         self.toolbox.register("mate", tools.cxPartialyMatched)
 
     def mutation(self):
         self.toolbox.register("mutate", tools.mutShuffleIndexes, indpb=0.1)
+
+    def do_generation(self, population):
+        # from http://deap.readthedocs.io/en/master/tutorials/basic/part2.html#variations
+        offspring = self.toolbox.select(population, len(population))
+        offspring = map(self.toolbox.clone, offspring)
+        offspring = self.crossover_and_mutate(offspring)
+        invalid_ind = [ind for ind in offspring if not ind.fitness.valid]
+        fitnesses = map(self.toolbox.evaluate, invalid_ind)
+        for ind, fit in zip(invalid_ind, fitnesses):
+            ind.fitness.values = fit
+
+        return offspring
 
     def crossover_and_mutate(self, offspring):
         return algorithms.varAnd(offspring, self.toolbox, self.CXPB, self.MUTPB)

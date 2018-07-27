@@ -6,6 +6,7 @@ from eagleEvents.seating_chart_ga import SeatingChartGA
 from eagleEvents.models import Company, Customer, Event, Guest, Table
 from flaky import flaky
 from flask_sqlalchemy import SQLAlchemy
+from random import random
 
 def mock_db(monkeypatch):
     db = SQLAlchemy()
@@ -254,3 +255,48 @@ def test_when_calling_crossover_and_mutate_it_returns_a_mutated_population(monke
     assert any([not (array_equal(population[i], mutated[i])) for i in range(len(population))])
 
 
+##
+# Generation
+##
+
+
+def test_when_calling_do_generation_it_returns_offspring_with_fitness_values(monkeypatch):
+    e = mock_event(monkeypatch)
+
+    ga = SeatingChartGA(e)
+    def mock_count(list):
+        return (1,)
+    monkeypatch.setattr(ga, "evaluate", mock_count)
+
+    ga.setup()
+
+    population = ga.toolbox.population(n=5)
+    for ind in population:
+        assert not(ind.fitness.valid)
+
+    offspring = ga.do_generation(population)
+
+    for ind in offspring:
+        assert ind.fitness.valid
+        assert count_nonzero(ind.fitness.values) == len(ind.fitness.values)
+
+
+def test_when_calling_do_generation_it_returns_offspring_not_in_the_parent_population(monkeypatch):
+    e = mock_event(monkeypatch)
+
+    ga = SeatingChartGA(e)
+
+    def mock_count(list):
+        return float(random()),
+    monkeypatch.setattr(ga, "evaluate", mock_count)
+
+    ga.setup()
+
+    population = ga.toolbox.population(n=5)
+    for ind in population:
+        assert not(ind.fitness.valid)
+
+    offspring = ga.do_generation(population)
+
+    assert len(population) == len(offspring)
+    assert any([not (array_equal(population[i], offspring[i])) for i in range(len(population))])
