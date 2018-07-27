@@ -19,6 +19,7 @@ class Table(db.Model):
 
     def __init__(self, event: 'Event'):
         self.event = event
+        self.seating_capacity = event.table_size.size
 
     def num_open_seats(self) -> int:
         # Assumed guests is never None, change if causes problems later
