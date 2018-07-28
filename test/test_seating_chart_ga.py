@@ -32,6 +32,11 @@ def mock_event(monkeypatch):
     monkeypatch.setattr(e, 'table_size', ts)
     return e
 
+def get_empty_seat_count(event):
+    num_empty_seats = math.floor(len(event._guests) * event.percent_extra_seats)
+    # account for table size
+    num_empty_seats = num_empty_seats + (event.table_size.size - (len(event._guests) + num_empty_seats) % event.table_size.size)
+    return num_empty_seats
 
 def all_in_list_once(numbers_expected, actual_list):
     already_checked = []
@@ -62,7 +67,7 @@ def test_when_initializing_with_even_percent_then_it_returns_a_list_containing_e
     e = mock_event(monkeypatch)
 
     monkeypatch.setattr(e, "percent_extra_seats", .5)
-    num_empty_seats = math.floor(len(e._guests) * e.percent_extra_seats)
+    num_empty_seats = get_empty_seat_count(e)
     ga = SeatingChartGA(e)
     ga.initialization()
 
@@ -75,7 +80,7 @@ def test_when_initializing_with_even_percent_then_it_returns_a_list_containing_e
 def test_when_initializing_with_odd_percent_then_it_returns_a_list_containing_enough_empty_seats(monkeypatch):
     e = mock_event(monkeypatch)
     monkeypatch.setattr(e, "percent_extra_seats", .83)
-    num_empty_seats = math.floor(len(e._guests) * e.percent_extra_seats)
+    num_empty_seats = get_empty_seat_count(e)
     ga = SeatingChartGA(e)
     ga.initialization()
 
@@ -115,7 +120,7 @@ def test_when_populating_with_even_percent_then_it_returns_individuals_containin
     e = mock_event(monkeypatch)
 
     monkeypatch.setattr(e, "percent_extra_seats", .5)
-    num_empty_seats = math.floor(len(e._guests) * e.percent_extra_seats)
+    num_empty_seats = get_empty_seat_count(e)
     ga = SeatingChartGA(e)
     ga.initialization()
     ga.population()
@@ -129,7 +134,7 @@ def test_when_populating_with_even_percent_then_it_returns_individuals_containin
 def test_when_populating_with_odd_percent_then_it_returns_individuals_containing_enough_empty_seats(monkeypatch):
     e = mock_event(monkeypatch)
     monkeypatch.setattr(e, "percent_extra_seats", .83)
-    num_empty_seats = math.floor(len(e._guests) * e.percent_extra_seats)
+    num_empty_seats = get_empty_seat_count(e)
     ga = SeatingChartGA(e)
     ga.initialization()
     ga.population()

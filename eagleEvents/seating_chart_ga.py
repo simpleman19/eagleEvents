@@ -25,11 +25,13 @@ class SeatingChartGA:
         self.event = event
         self.guest_numbers = [x.number for x in event._guests] if event._guests is not None else []
         self.guest_lookup = self.guest_list_to_nested_dict(self.event._guests)
+
         self.num_guests = len(self.guest_numbers)
-        #TODO round up to the nearest table
-        num_extra_seats = floor(self.num_guests * event.percent_extra_seats)
-        self.num_tables = ceil(num_extra_seats / event.table_size.size)
+        num_extra_seats = floor(len(event._guests) * event.percent_extra_seats)
+        # account for table size
+        num_extra_seats = num_extra_seats + (event.table_size.size - (len(event._guests) + num_extra_seats) % event.table_size.size)
         self.table_assignments = self.guest_numbers + [Table.EMPTY_SEAT for x in range(num_extra_seats)]
+        self.num_tables = ceil(len(self.table_assignments) / event.table_size.size)
         self.toolbox = base.Toolbox()
 
     def setup(self):
@@ -125,7 +127,7 @@ class SeatingChartGA:
         score = 0
         tables_to_check = range(self.num_tables)
         for t in tables_to_check:
-            guests_at_table = individual[t*self.num_tables:t*(self.num_tables+1)]
+            guests_at_table = individual[t*self.event.table_size.size:(t + 1)*self.event.table_size.size]
             score += self.count_dislikes_in_list(guests_at_table)
         return (score),
 
