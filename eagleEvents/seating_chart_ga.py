@@ -1,5 +1,6 @@
 import random
 
+from eagleEvents.models import SeatingPreference
 from eagleEvents.models.table import Table
 from deap import algorithms
 from deap import base
@@ -23,7 +24,7 @@ class SeatingChartGA:
             raise ValueError("No percent_extra_seats for this event!")
         self.event = event
         self.guest_numbers = [x.number for x in event._guests] if event._guests is not None else []
-        self.guest_lookup = self.guest_list_to_dict(self.event._guests)
+        self.guest_lookup = self.guest_list_to_nested_dict(self.event._guests)
         self.num_guests = len(self.guest_numbers)
         #TODO round up to the nearest table
         num_extra_seats = floor(self.num_guests * event.percent_extra_seats)
@@ -42,6 +43,12 @@ class SeatingChartGA:
         if self.COLLECT_STATS:
             self.statistics()
 
+    def pooled_map(self, fun, it):
+        pool = ThreadPool()
+        mapped = pool.map(fun, it)
+        pool.close()
+        pool.join()
+        return mapped
 
     def initialization(self):
         creator.create("FitnessMin", base.Fitness, weights=(-1.0,))
@@ -79,7 +86,7 @@ class SeatingChartGA:
         return generation_number > self.NGEN
 
     def update_fitnesses(self, population):
-        fitnesses = map(self.toolbox.evaluate, population)
+        fitnesses = self.pooled_map(self.toolbox.evaluate, population)
         for ind, fit in zip(population, fitnesses):
             ind.fitness.values = fit
 
@@ -107,7 +114,7 @@ class SeatingChartGA:
     def do_generation(self, population):
         # from http://deap.readthedocs.io/en/master/tutorials/basic/part2.html#variations
         offspring = self.toolbox.select(population, len(population))
-        offspring = map(self.toolbox.clone, offspring)
+        offspring = self.pooled_map(self.toolbox.clone, offspring)
         offspring = self.crossover_and_mutate(offspring)
         invalid_ind = [ind for ind in offspring if not ind.fitness.valid]
         self.update_fitnesses(invalid_ind)
