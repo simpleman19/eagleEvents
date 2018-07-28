@@ -370,3 +370,28 @@ def test_when_calling_pooled_map_it_returns_the_same_list_as_a_serial_map(monkey
     result = list(ga.pooled_map(shared_memory_function, shared_memory_array))
 
     assert array_equal(expected_result, result)
+
+
+##
+# Winner / Completion
+##
+
+def test_when_calling_get_seating_chart_tables_it_returns_a_list_of_tables_with_extra_seats(monkeypatch):
+    e = mock_event(monkeypatch)
+
+    ga = SeatingChartGA(e)
+    tables = ga.get_seating_chart_tables()
+
+    assert(len(tables) * e.table_size.size == len(e._guests) + get_empty_seat_count(e))
+
+def test_when_calling_get_seating_chart_tables_it_returns_a_list_of_tables_containing_all_guests_once(monkeypatch):
+    e = mock_event(monkeypatch)
+    expected_guest_numbers = [g.number for g in e._guests]
+
+    ga = SeatingChartGA(e)
+    tables = ga.get_seating_chart_tables()
+    for t in tables:
+        for g in t.guests:
+            assert(g.number in expected_guest_numbers)
+            expected_guest_numbers.remove(g.number)
+    assert len(expected_guest_numbers) == 0

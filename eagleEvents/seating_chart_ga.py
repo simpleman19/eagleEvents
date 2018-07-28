@@ -110,6 +110,20 @@ class SeatingChartGA:
 
         return pop
 
+    def get_seating_chart_tables(self):
+        self.setup()
+        population = self.do_generations()
+        winner = self.toolbox.select(population, 1)[0]
+        tables = []
+        for t in range(self.num_tables):
+            table = Table(self.event)
+            table.number = t + 1
+            guest_numbers_at_table = winner[t * self.event.table_size.size: (t + 1) * self.event.table_size.size]
+            table.guests = list(filter(lambda g: g.number in guest_numbers_at_table, self.event._guests))
+            tables.append(table)
+        return tables
+
+
     def do_generation(self, population):
         # from http://deap.readthedocs.io/en/master/tutorials/basic/part2.html#variations
         offspring = self.toolbox.select(population, len(population))
