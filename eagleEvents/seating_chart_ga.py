@@ -84,8 +84,7 @@ class SeatingChartGA:
         return generation_number > self.NGEN
 
     def update_fitnesses(self, population):
-        chunksize = max([floor(len(population) / 4), 1])
-        fitnesses = self.pooled_map(self.toolbox.evaluate, population, chunksize=chunksize)
+        fitnesses = self.toolbox.map(self.toolbox.evaluate, population)
         for ind, fit in zip(population, fitnesses):
             ind.fitness.values = fit
 
@@ -113,8 +112,7 @@ class SeatingChartGA:
     def do_generation(self, population):
         # from http://deap.readthedocs.io/en/master/tutorials/basic/part2.html#variations
         offspring = self.toolbox.select(population, len(population))
-        chunksize = max([floor(self.NIND / 4), 1])
-        offspring = self.pooled_map(self.toolbox.clone, offspring, chunksize=chunksize)
+        offspring = self.toolbox.map(self.toolbox.clone, offspring)
         offspring = self.crossover_and_mutate(offspring)
         invalid_ind = [ind for ind in offspring if not ind.fitness.valid]
         self.update_fitnesses(invalid_ind)
