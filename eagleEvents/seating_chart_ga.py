@@ -145,8 +145,7 @@ class SeatingChartGA:
                     pref_dict[pref.other_guest.number] = 1 if pref == SeatingPreference.LIKE else 0
             else:
                 pref_dict = None
-            guest_dict = dict([(guest.number, pref_dict) for guest in guests])
-            guests_dict[guest.number] = guest_dict
+            guests_dict[guest.number] = pref_dict
         return guests_dict
 
     def count_dislikes_in_list(self, guest_numbers):

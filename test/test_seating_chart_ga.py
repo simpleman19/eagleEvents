@@ -3,7 +3,8 @@ import math
 from numpy import count_nonzero, array_equal
 
 from eagleEvents.seating_chart_ga import SeatingChartGA
-from eagleEvents.models import Company, Customer, Event, Guest, TableSize, Table
+from eagleEvents.models import Company, Customer, Event, Guest, TableSize, Table, SeatingPreferenceTable, \
+    SeatingPreference
 from flaky import flaky
 from flask_sqlalchemy import SQLAlchemy
 from random import random
@@ -146,20 +147,17 @@ def test_when_populating_with_odd_percent_then_it_returns_individuals_containing
 def test_when_calling_count_dislikes_at_table_then_it_returns_correct_count(monkeypatch):
     e = mock_event(monkeypatch)
     db = mock_db(monkeypatch)
-    def mock_dislike(guest):
-        return True
-    def mock_not_dislike(guest):
-        return False
     mock_guests = []
     for x in range(10):
         g = Guest(db)
         g.number = x
-        # Guest 1 hates everyone
-        if x == 1:
-            monkeypatch.setattr(g, "dislikes", mock_dislike)
-        else:
-            monkeypatch.setattr(g, "dislikes", mock_not_dislike)
         mock_guests.append(g)
+
+    # First guest hates everyone
+    mock_seating_prefs = []
+    for x in range(9):
+        mock_seating_prefs.append(SeatingPreferenceTable(mock_guests[0], mock_guests[x+1], SeatingPreference.DISLIKE))
+    monkeypatch.setattr(mock_guests[0], "seating_preferences", mock_seating_prefs)
 
     monkeypatch.setattr(e, "_guests", mock_guests)
 
