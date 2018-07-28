@@ -132,26 +132,42 @@ class SeatingChartGA:
             score += self.count_dislikes_in_list(guests_at_table)
         return (score),
 
+    def guest_list_to_nested_dict(self, guests):
+        guests_dict = dict()
+        for guest in guests:
+            if not (guest.seating_preferences is None) and len(guest.seating_preferences) > 0:
+                pref_dict = dict()
+                for pref in guest.seating_preferences:
+                    if pref.other_guest is None:
+                        continue #FIXME: remove this before I commit
+                        #raise ValueError("Cannot find other_guest with id {other_id} for seating preference {pref_id} on guest {guest_id}".format(
+                        #    other_id=pref.other_guest_id,
+                        #    pref_id=pref.id,
+                        #    guest_id=guest.id))
+                    pref_dict[pref.other_guest.number] = 1 if pref == SeatingPreference.LIKE else 0
+            else:
+                pref_dict = None
+            guest_dict = dict([(guest.number, pref_dict) for guest in guests])
+            guests_dict[guest.number] = guest_dict
+        return guests_dict
+
     def count_dislikes_in_list(self, guest_numbers):
         count = 0
         for i in range(len(guest_numbers)):
             if guest_numbers[i] == Table.EMPTY_SEAT:
                 continue
-            guest = self.get_guest_by_number(guest_numbers[i])
+            guest_preferences = self.get_preferences_by_guest_number(guest_numbers[i])
+            if guest_preferences is None or len(guest_preferences) == 0:
+                continue
             for j in range(len(guest_numbers)):
                 if i == j:
                     continue
                 if guest_numbers[j] == Table.EMPTY_SEAT:
                     continue
-                other_guest = self.get_guest_by_number(guest_numbers[j])
-                if guest.dislikes(other_guest):
+                pref = guest_preferences[guest_numbers[j]]
+                if not (pref is None) and pref == 0:
                     count += 1
         return count
 
-    def get_guest_by_number(self, number):
+    def get_preferences_by_guest_number(self, number):
         return self.guest_lookup[number]
-
-    def guest_list_to_dict(self, guests):
-        return dict([(guest.number, guest) for guest in guests])
-
-
