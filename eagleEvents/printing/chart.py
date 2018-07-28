@@ -1,3 +1,4 @@
+import sys
 from reportlab.lib.pagesizes import letter
 from reportlab.pdfgen import canvas
 from reportlab.platypus import SimpleDocTemplate, Table, TableStyle
@@ -6,8 +7,8 @@ from eagleEvents import db
 
 
 
-def seating_chart():
-    e = Event.query.filter(Event.id == '9c310a07f50141f68c3163ba4067ddd9')[0]
+def seating_chart(id):
+    e = Event.query.filter(Event.id == id)[0]
     tables = Table.query.filter(Table.event_id == '9c310a07f50141f68c3163ba4067ddd9')
     guests = Guest.query.filter(Guest.event_id == '9c310a07f50141f68c3163ba4067ddd9')
     c = canvas.Canvas("/Users/DeeDee/Downloads/hello1.pdf")
@@ -18,7 +19,9 @@ def seating_chart():
     c.drawString(30,750,'Eagles Events')
     c.drawString(30,735, e.name)
     year, month, day = str(e.time.date()).split("-")
+    hour, min, second = str(e.time.time()).split(":")
     c.drawString(400,750,"Event Date: " + month + "/" + day + "/" + year)
+    c.drawString(400,735,"Event Time: " +  hour + ":" + min)
     # title
     c.setFont('Helvetica-Bold', 16)
     c.drawString(250,700,'Seating Chart')
@@ -38,7 +41,6 @@ def seating_chart():
         c.drawString(x + shift_x, y + shift_y, 'Last Name  ')
         c.drawString(x + shift_x + 90, y + shift_y, 'First Name  ')
         c.drawString(x + shift_x + 180, y + shift_y, 'Title')
-        c.setFont('Helvetica', 12)
         shift_y += -20
         c.setFont('Helvetica', 10)
         for guest in guests_for_table:
@@ -48,13 +50,14 @@ def seating_chart():
             shift_y += -20
         c.setFont('Helvetica', 12)
         x += 255
-        if x >= 450:
+        if x >= 500:
             x = 40
             y += -310
-        if y + -350 <= 100:
-            x = 40
-            y = 750
+        if y <= 50:
             c.showPage()
+            x = 40
+            y = 500
+            
 
     
 

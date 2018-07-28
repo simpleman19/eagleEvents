@@ -52,8 +52,8 @@ def seed():
     seed_db()
 
 @manager.command
-def test_print():
-    seating_chart()
+def test_print(id):
+    seating_chart(id)
 
 
 manager.add_command("livereload", LiveReloadServer)
