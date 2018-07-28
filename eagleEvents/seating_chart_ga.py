@@ -7,7 +7,7 @@ from deap import base
 from deap import creator
 from deap import tools
 from math import floor, ceil
-from multiprocessing.pool import ThreadPool
+from concurrent.futures import ProcessPoolExecutor, ThreadPoolExecutor
 from numpy import max, mean, min, std
 
 
@@ -43,11 +43,9 @@ class SeatingChartGA:
         if self.COLLECT_STATS:
             self.statistics()
 
-    def pooled_map(self, fun, it):
-        pool = ThreadPool()
-        mapped = pool.map(fun, it)
-        pool.close()
-        pool.join()
+    def pooled_map(self, fun, it, chunksize=5):
+        with ThreadPoolExecutor() as executor:
+            mapped = executor.map(fun, it, chunksize=5)
         return mapped
 
     def initialization(self):
@@ -86,7 +84,8 @@ class SeatingChartGA:
         return generation_number > self.NGEN
 
     def update_fitnesses(self, population):
-        fitnesses = self.pooled_map(self.toolbox.evaluate, population)
+        chunksize = max([floor(len(population) / 4), 1])
+        fitnesses = self.pooled_map(self.toolbox.evaluate, population, chunksize=chunksize)
         for ind, fit in zip(population, fitnesses):
             ind.fitness.values = fit
 
@@ -114,7 +113,8 @@ class SeatingChartGA:
     def do_generation(self, population):
         # from http://deap.readthedocs.io/en/master/tutorials/basic/part2.html#variations
         offspring = self.toolbox.select(population, len(population))
-        offspring = self.pooled_map(self.toolbox.clone, offspring)
+        chunksize = max([floor(self.NIND / 4), 1])
+        offspring = self.pooled_map(self.toolbox.clone, offspring, chunksize=chunksize)
         offspring = self.crossover_and_mutate(offspring)
         invalid_ind = [ind for ind in offspring if not ind.fitness.valid]
         self.update_fitnesses(invalid_ind)

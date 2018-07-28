@@ -351,7 +351,7 @@ def test_when_calling_do_generations_it_uses_should_terminate_to_terminate(monke
 
 
 ##
-# ThreadPool
+# Concurrency
 ##
 
 def test_when_calling_pooled_map_it_returns_the_same_list_as_a_serial_map(monkeypatch):
@@ -360,10 +360,10 @@ def test_when_calling_pooled_map_it_returns_the_same_list_as_a_serial_map(monkey
 
     shared_memory_value = 2
     def shared_memory_function(x):
-        return x + shared_memory_value
+        return (x + shared_memory_value),
     shared_memory_array = range(1000)
 
     expected_result = list(map(shared_memory_function, shared_memory_array))
-    result = ga.pooled_map(shared_memory_function, shared_memory_array)
+    result = list(ga.pooled_map(shared_memory_function, shared_memory_array))
 
     assert array_equal(expected_result, result)
