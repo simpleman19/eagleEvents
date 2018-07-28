@@ -3,7 +3,7 @@ import math
 from numpy import count_nonzero, array_equal
 
 from eagleEvents.seating_chart_ga import SeatingChartGA
-from eagleEvents.models import Company, Customer, Event, Guest, Table
+from eagleEvents.models import Company, Customer, Event, Guest, TableSize, Table
 from flaky import flaky
 from flask_sqlalchemy import SQLAlchemy
 from random import random
@@ -16,8 +16,10 @@ def mock_db(monkeypatch):
 
 def mock_event(monkeypatch):
     db = mock_db(monkeypatch)
-    c = Customer(Company())
+    company = Company()
+    c = Customer(company)
     e = Event(c)
+    ts = TableSize(company, 4)
     mock_guests = []
     for x in range(10):
         g = Guest(db)
@@ -26,7 +28,7 @@ def mock_event(monkeypatch):
 
     monkeypatch.setattr(e, "_guests", mock_guests)
     monkeypatch.setattr(e, "percent_extra_seats", .5)
-    monkeypatch.setattr(e, 'table_size', 4)
+    monkeypatch.setattr(e, 'table_size', ts)
     return e
 
 
@@ -174,7 +176,7 @@ def test_when_calling_count_dislikes_at_table_then_it_returns_correct_count(monk
     assert result == len(individual_without_empty_seats) - 1
 
 
-def test_when_calling_evaluate_it_returns_a_tuple_containing_the_count_of_dislikes_at_some_tables(monkeypatch):
+def test_when_calling_evaluate_it_returns_a_tuple_containing_the_count_of_dislikes_at_all_tables(monkeypatch):
     e = mock_event(monkeypatch)
 
     ga = SeatingChartGA(e)
@@ -189,7 +191,7 @@ def test_when_calling_evaluate_it_returns_a_tuple_containing_the_count_of_dislik
     individual = ga.toolbox.population(n=1)[0]
     score = ga.evaluate(individual)
 
-    assert score[0] < 2 * ga.num_tables
+    assert score[0] == 2 * ga.num_tables
 
 
 ##

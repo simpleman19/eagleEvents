@@ -42,6 +42,7 @@ class SeatingChartGA:
         if self.COLLECT_STATS:
             self.statistics()
 
+
     def initialization(self):
         creator.create("FitnessMin", base.Fitness, weights=(-1.0,))
         creator.create("Individual", list, fitness=creator.FitnessMin)
@@ -83,7 +84,7 @@ class SeatingChartGA:
             ind.fitness.values = fit
 
     def update_stats(self, generation_number, population):
-        if not(self.stats is None):
+        if hasattr(self, 'stats'):
             record = self.stats.compile(population)
             self.logbook.record(gen=generation_number, **record)
 
