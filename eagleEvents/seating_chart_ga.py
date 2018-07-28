@@ -12,7 +12,7 @@ from numpy import max, mean, min, std
 
 
 class SeatingChartGA:
-    PCT_TO_EVAL, CXPB, MUTPB, NIND, NGEN = 1.0, 0.5, 0.5, 50, 50
+    CXPB, MUTPB, NIND, NGEN = 0.5, 0.5, 50, 50
     COLLECT_STATS = False
 
     def __init__(self, event):
@@ -33,7 +33,6 @@ class SeatingChartGA:
         self.toolbox = base.Toolbox()
 
     def setup(self):
-        self.num_tables_to_evaluate = floor(self.num_tables * self.PCT_TO_EVAL)
         self.initialization()
         self.population()
         self.evaluation()
@@ -124,7 +123,7 @@ class SeatingChartGA:
 
     def evaluate(self, individual):
         score = 0
-        tables_to_check = range(self.num_tables)#random.sample(range(self.num_tables), self.num_tables_to_evaluate)
+        tables_to_check = range(self.num_tables)
         for t in tables_to_check:
             guests_at_table = individual[t*self.num_tables:t*(self.num_tables+1)]
             score += self.count_dislikes_in_list(guests_at_table)
@@ -160,6 +159,8 @@ class SeatingChartGA:
                 if i == j:
                     continue
                 if guest_numbers[j] == Table.EMPTY_SEAT:
+                    continue
+                if not (guest_numbers[j] in guest_preferences):
                     continue
                 pref = guest_preferences[guest_numbers[j]]
                 if not (pref is None) and pref == 0:
