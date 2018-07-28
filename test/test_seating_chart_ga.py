@@ -1,5 +1,6 @@
 import math
 
+import pytest
 from numpy import count_nonzero, array_equal
 
 from eagleEvents.seating_chart_ga import SeatingChartGA
@@ -52,6 +53,7 @@ def all_in_list_once(numbers_expected, actual_list):
 ##
 
 
+@pytest.mark.filterwarnings('ignore::RuntimeWarning')
 def test_when_initializing_then_it_returns_a_list_containing_all_guest_numbers(monkeypatch):
     e = mock_event(monkeypatch)
     guest_numbers = [x.number for x in e._guests]
@@ -63,6 +65,7 @@ def test_when_initializing_then_it_returns_a_list_containing_all_guest_numbers(m
     all_in_list_once(guest_numbers, result)
 
 
+@pytest.mark.filterwarnings('ignore::RuntimeWarning')
 def test_when_initializing_with_even_percent_then_it_returns_a_list_containing_enough_empty_seats(monkeypatch):
     e = mock_event(monkeypatch)
 
@@ -77,6 +80,7 @@ def test_when_initializing_with_even_percent_then_it_returns_a_list_containing_e
     assert count == num_empty_seats
 
 
+@pytest.mark.filterwarnings('ignore::RuntimeWarning')
 def test_when_initializing_with_odd_percent_then_it_returns_a_list_containing_enough_empty_seats(monkeypatch):
     e = mock_event(monkeypatch)
     monkeypatch.setattr(e, "percent_extra_seats", .83)
@@ -94,6 +98,7 @@ def test_when_initializing_with_odd_percent_then_it_returns_a_list_containing_en
 ##
 
 
+@pytest.mark.filterwarnings('ignore::RuntimeWarning')
 def test_when_populating_then_it_returns_a_list_of_individuals(monkeypatch):
     e = mock_event(monkeypatch)
 
@@ -104,6 +109,7 @@ def test_when_populating_then_it_returns_a_list_of_individuals(monkeypatch):
     assert len(result) == 100
 
 
+@pytest.mark.filterwarnings('ignore::RuntimeWarning')
 def test_when_populating_then_it_returns_individuals_containing_all_guest_numbers(monkeypatch):
     e = mock_event(monkeypatch)
     guest_numbers = [x.number for x in e._guests]
@@ -116,6 +122,7 @@ def test_when_populating_then_it_returns_individuals_containing_all_guest_number
     all_in_list_once(guest_numbers, result[25])
 
 
+@pytest.mark.filterwarnings('ignore::RuntimeWarning')
 def test_when_populating_with_even_percent_then_it_returns_individuals_containing_enough_empty_seats(monkeypatch):
     e = mock_event(monkeypatch)
 
@@ -131,6 +138,7 @@ def test_when_populating_with_even_percent_then_it_returns_individuals_containin
     assert count == num_empty_seats
 
 
+@pytest.mark.filterwarnings('ignore::RuntimeWarning')
 def test_when_populating_with_odd_percent_then_it_returns_individuals_containing_enough_empty_seats(monkeypatch):
     e = mock_event(monkeypatch)
     monkeypatch.setattr(e, "percent_extra_seats", .83)
@@ -149,6 +157,7 @@ def test_when_populating_with_odd_percent_then_it_returns_individuals_containing
 # Evaluation
 ##
 
+@pytest.mark.filterwarnings('ignore::RuntimeWarning')
 def test_when_calling_count_dislikes_at_table_then_it_returns_correct_count(monkeypatch):
     e = mock_event(monkeypatch)
     db = mock_db(monkeypatch)
@@ -179,6 +188,7 @@ def test_when_calling_count_dislikes_at_table_then_it_returns_correct_count(monk
     assert result == len(individual_without_empty_seats) - 1
 
 
+@pytest.mark.filterwarnings('ignore::RuntimeWarning')
 def test_when_calling_evaluate_it_returns_a_tuple_containing_the_count_of_dislikes_at_all_tables(monkeypatch):
     e = mock_event(monkeypatch)
 
@@ -203,6 +213,7 @@ def test_when_calling_evaluate_it_returns_a_tuple_containing_the_count_of_dislik
 
 
 @flaky(max_runs=5,min_passes=1)
+@pytest.mark.filterwarnings('ignore::RuntimeWarning')
 def test_when_calling_crossover_and_mutate_it_returns_a_mated_population(monkeypatch):
     e = mock_event(monkeypatch)
     db = mock_db(monkeypatch)
@@ -232,6 +243,7 @@ def test_when_calling_crossover_and_mutate_it_returns_a_mated_population(monkeyp
 
 
 @flaky(max_runs=5,min_passes=1)
+@pytest.mark.filterwarnings('ignore::RuntimeWarning')
 def test_when_calling_crossover_and_mutate_it_returns_a_mutated_population(monkeypatch):
     e = mock_event(monkeypatch)
     db = mock_db(monkeypatch)
@@ -265,6 +277,7 @@ def test_when_calling_crossover_and_mutate_it_returns_a_mutated_population(monke
 ##
 
 
+@pytest.mark.filterwarnings('ignore::RuntimeWarning')
 def test_when_calling_should_terminate_it_returns_true_after_NGEN(monkeypatch):
     e = mock_event(monkeypatch)
 
@@ -284,6 +297,7 @@ def test_when_calling_should_terminate_it_returns_true_after_NGEN(monkeypatch):
 ##
 
 
+@pytest.mark.filterwarnings('ignore::RuntimeWarning')
 def test_when_calling_do_generation_it_returns_offspring_with_fitness_values(monkeypatch):
     e = mock_event(monkeypatch)
 
@@ -306,6 +320,7 @@ def test_when_calling_do_generation_it_returns_offspring_with_fitness_values(mon
 
 
 @flaky(max_runs=5,min_passes=1)
+@pytest.mark.filterwarnings('ignore::RuntimeWarning')
 def test_when_calling_do_generation_it_returns_offspring_not_in_the_parent_population(monkeypatch):
     e = mock_event(monkeypatch)
     db = mock_db(monkeypatch)
@@ -335,6 +350,7 @@ def test_when_calling_do_generation_it_returns_offspring_not_in_the_parent_popul
     assert any([not (array_equal(population[i], offspring[i])) for i in range(len(population))])
 
 
+@pytest.mark.filterwarnings('ignore::RuntimeWarning')
 def test_when_calling_do_generations_it_uses_should_terminate_to_terminate(monkeypatch):
     e = mock_event(monkeypatch)
     was_called = False
@@ -357,6 +373,7 @@ def test_when_calling_do_generations_it_uses_should_terminate_to_terminate(monke
 # Concurrency
 ##
 
+@pytest.mark.filterwarnings('ignore::RuntimeWarning')
 def test_when_calling_pooled_map_it_returns_the_same_list_as_a_serial_map(monkeypatch):
     e = mock_event(monkeypatch)
     ga = SeatingChartGA(e)
@@ -376,6 +393,7 @@ def test_when_calling_pooled_map_it_returns_the_same_list_as_a_serial_map(monkey
 # Winner / Completion
 ##
 
+@pytest.mark.filterwarnings('ignore::RuntimeWarning')
 def test_when_calling_get_seating_chart_tables_it_returns_a_list_of_tables_with_extra_seats(monkeypatch):
     e = mock_event(monkeypatch)
 
@@ -384,6 +402,8 @@ def test_when_calling_get_seating_chart_tables_it_returns_a_list_of_tables_with_
 
     assert(len(tables) * e.table_size.size == len(e._guests) + get_empty_seat_count(e))
 
+
+@pytest.mark.filterwarnings('ignore::RuntimeWarning')
 def test_when_calling_get_seating_chart_tables_it_returns_a_list_of_tables_containing_all_guests_once(monkeypatch):
     e = mock_event(monkeypatch)
     expected_guest_numbers = [g.number for g in e._guests]
