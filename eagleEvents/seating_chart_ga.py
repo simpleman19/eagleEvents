@@ -82,7 +82,8 @@ class SeatingChartGA:
         self.logbook.header = "gen", "avg", "std", "min", "max"
 
     def should_terminate(self, population, generation_number):
-        return generation_number > self.NGEN
+        found_optimal_solution = self.toolbox.select(population, 1)[0].fitness.values == (0,)
+        return found_optimal_solution or generation_number > self.NGEN
 
     def update_fitnesses(self, population):
         fitnesses = self.toolbox.map(self.toolbox.evaluate, population)
