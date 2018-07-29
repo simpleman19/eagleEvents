@@ -88,6 +88,7 @@ class HTTPAuth(object):
                     request.data
                     resp = self.auth_error_callback()
                     resp.set_cookie('Bearer', '', expires=0)
+                    session['login_failed'] = True
                     print('Cleared Cookies')
                     return resp
 
