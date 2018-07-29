@@ -60,17 +60,16 @@ def verify_optional_password(username, password):
 
 @token_auth.verify_token
 def verify_token(token, add_to_session=False):
-    print(token)
     if add_to_session:
         if 'username' in session:
             del session['username']
     try:
         decoded = jwt.decode(token, app.config['SECRET_KEY'], algorithms=['HS256'])
     except jwt.ExpiredSignatureError:
-        print('Expired')
+        print('Expired Token')
         return False
     except jwt.DecodeError:
-        print('Decode error')
+        print('Decode Token Error')
         return False
     user_id = decoded['user_id']
     user = User.query.filter_by(id=user_id).one_or_none()
