@@ -1,5 +1,6 @@
 from . import db
 import uuid
+from eagleEvents.models import Guest
 from sqlalchemy_utils import UUIDType
 from typing import List
 
@@ -19,6 +20,10 @@ class Event(db.Model):
     planner_id = db.Column(UUIDType(binary=False), db.ForeignKey('users.id'), nullable=True)
     planner = db.relationship('User', lazy=False)
     tables = db.relationship('Table', lazy=False)
+    table_size_id = db.Column(db.Integer, db.ForeignKey('table_sizes.id'), nullable=True)
+    table_size = db.relationship('TableSize', lazy=False)
+    _guests: List[Guest] = db.relationship('Guest', lazy=True,
+                    backref=db.backref('guests', lazy='subquery'))
 
     def __init__(self, customer):
         self.customer = customer
