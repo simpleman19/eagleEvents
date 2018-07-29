@@ -1,10 +1,11 @@
 import time
+from sqlalchemy_utils import UUIDType
 
 from eagleEvents.seating_chart_ga import SeatingChartGA
 from eagleEvents.models import Event
 
 def run():
-    ga = SeatingChartGA(Event.query.first())
+    ga = SeatingChartGA(Event.query.get('3508863751a449b28799cc1b657f5890'))
     ga.COLLECT_STATS = True
 
     ga.setup()
