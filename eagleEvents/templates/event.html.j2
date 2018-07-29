@@ -1,0 +1,49 @@
+{% extends "layout.html.j2" %}
+{% block head_content %}
+    <title>Eagle Events Event</title>
+{% endblock %}
+{% block body_content %}
+    <h1>Events</h1>
+        <div class="container">
+            <div class="checkbox">
+                <label>
+                <input type="checkbox" value="">
+                    Show All
+                </label>
+            </div>
+            <div class="card card-container-2">
+                <table class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Planner</th>
+                            <th>Date</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>John</td>
+                            <td>Eva</td>
+                            <td>04/12/2018</td>
+                        </tr>
+                        <tr>
+                            <td>Mary</td>
+                            <td>Jacie</td>
+                            <td>08/22/2018</td>
+                        </tr>
+                        <tr>
+                            <td>July</td>
+                            <td>David</td>
+                            <td>01/23/2019</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <button type="button" class="btn btn-primary active btn-add">Add</button>
+            </div>
+        </div>
+<script src="https://code.jquery.com/jquery-1.12.4.min.js"></script>
+<script src="/static/bootstable.js"></script>
+<script>
+ $('table').SetEditable();
+</script>
+{% endblock %}
