@@ -124,11 +124,17 @@ def get_token():
     if g.current_user is None:
         return (jsonify({'error': 'authentication is required'}), 401,
                 {'WWW-Authenticate': 'Bearer realm="Authentication Required"'})
-    user = g.current_user
-    token = jwt.encode({'username': user.username,
-                        'user_id': str(user.id.hex),
-                        'exp': (datetime.utcnow() + timedelta(hours=24))
-                        }, app.config['SECRET_KEY'], algorithm='HS256')
+    token = create_token()
     resp = jsonify({'token': token.decode('UTF-8')})
-    resp.set_cookie('Bearer', token)
     return resp
+
+
+def create_token():
+    user = g.current_user
+    if user is not None:
+        return jwt.encode({'username': user.username,
+                    'user_id': str(user.id.hex),
+                    'exp': (datetime.utcnow() + timedelta(hours=24))
+                    }, app.config['SECRET_KEY'], algorithm='HS256')
+    else:
+        return None
