@@ -42,9 +42,7 @@ def password_error():
         return (jsonify({'error': 'authentication required'}), 401,
                 {'WWW-Authenticate': 'Bearer realm="Authentication Required"'})
     else:
-        response = redirect(url_for('main.login'))
-        response.status_code = 401
-        return response
+        return redirect(url_for('main.login'))
 
 
 @basic_optional_auth.verify_password
@@ -62,17 +60,16 @@ def verify_optional_password(username, password):
 
 @token_auth.verify_token
 def verify_token(token, add_to_session=False):
-    print(token)
     if add_to_session:
         if 'username' in session:
             del session['username']
     try:
         decoded = jwt.decode(token, app.config['SECRET_KEY'], algorithms=['HS256'])
     except jwt.ExpiredSignatureError:
-        print('Expired')
+        print('Expired Token')
         return False
     except jwt.DecodeError:
-        print('Decode error')
+        print('Decode Token Error')
         return False
     user_id = decoded['user_id']
     user = User.query.filter_by(id=user_id).one_or_none()
@@ -124,11 +121,17 @@ def get_token():
     if g.current_user is None:
         return (jsonify({'error': 'authentication is required'}), 401,
                 {'WWW-Authenticate': 'Bearer realm="Authentication Required"'})
-    user = g.current_user
-    token = jwt.encode({'username': user.username,
-                        'user_id': str(user.id.hex),
-                        'exp': (datetime.utcnow() + timedelta(hours=24))
-                        }, app.config['SECRET_KEY'], algorithm='HS256')
+    token = create_token()
     resp = jsonify({'token': token.decode('UTF-8')})
-    resp.set_cookie('Bearer', token)
     return resp
+
+
+def create_token():
+    user = g.current_user
+    if user is not None:
+        return jwt.encode({'username': user.username,
+                    'user_id': str(user.id.hex),
+                    'exp': (datetime.utcnow() + timedelta(hours=24))
+                    }, app.config['SECRET_KEY'], algorithm='HS256')
+    else:
+        return None
