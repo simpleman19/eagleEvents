@@ -282,14 +282,15 @@ def test_when_calling_should_terminate_it_returns_true_after_NGEN(monkeypatch):
     e = mock_event(monkeypatch)
 
     ga = SeatingChartGA(e)
+    ga.selection()
     monkeypatch.setattr(ga, "NGEN", 10)
 
-    assert not (ga.should_terminate({}, -1))
-    assert not (ga.should_terminate({}, 0))
-    assert not (ga.should_terminate({}, 9))
-    assert not (ga.should_terminate({}, 10))
-    assert ga.should_terminate({}, 11)
-    assert ga.should_terminate({}, 500)
+    assert not (ga.should_terminate([], -1))
+    assert not (ga.should_terminate([], 0))
+    assert not (ga.should_terminate([], 9))
+    assert not (ga.should_terminate([], 10))
+    assert ga.should_terminate([], 11)
+    assert ga.should_terminate([], 500)
 
 
 ##
