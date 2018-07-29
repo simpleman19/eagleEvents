@@ -42,9 +42,7 @@ def password_error():
         return (jsonify({'error': 'authentication required'}), 401,
                 {'WWW-Authenticate': 'Bearer realm="Authentication Required"'})
     else:
-        response = redirect(url_for('main.login'))
-        response.status_code = 401
-        return response
+        return redirect(url_for('main.login'))
 
 
 @basic_optional_auth.verify_password
