@@ -42,3 +42,10 @@ http://flask-sqlalchemy.pocoo.org/2.3/quickstart/
 
 Flask Documentation
 http://flask.pocoo.org/docs/1.0/
+
+PyTest
+https://docs.pytest.org/en/latest/contents.html
+* Writing your first test
+https://docs.pytest.org/en/latest/getting-started.html#create-your-first-test
+* Mocking
+https://docs.pytest.org/en/latest/monkeypatch.html

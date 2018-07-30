@@ -2,6 +2,30 @@
 {% from "_macros.html.j2" import hello %}
 {% block head_content %}
   <title>Eagle Events Home Page</title>
+  <script>
+  function setVal(response) {
+    console.log(response);
+    document.getElementById('username').innerHTML = response.username
+  }
+
+  function testApi() {
+
+    payload = {
+      test: 'testing'
+    }
+
+    fetch('/testApi', {
+        credentials: "same-origin",
+        headers: {
+            "Content-Type": "application/json",
+        },
+        method: "POST",
+        body: JSON.stringify( payload )
+    }).then(res => res.json())
+      .catch(error => console.error('Error:', error))
+      .then(setVal);
+    }
+  </script>
 {% endblock %}
 
 {% block body_content %}
@@ -15,5 +39,8 @@
     <h1>
     This is a test page with a test H1 and without a test variable
     </h1>
+    <p>Press button to get current username</p>
+    <p id='username' >Click the button</p>
+    <button id="setTimeButton" onclick='testApi()'>Test API</button>
   {% endif %}
 {% endblock %}
