@@ -59,10 +59,7 @@ def verify_optional_password(username, password):
 
 
 @token_auth.verify_token
-def verify_token(token, add_to_session=False):
-    if add_to_session:
-        if 'username' in session:
-            del session['username']
+def verify_token(token):
     try:
         decoded = jwt.decode(token, app.config['SECRET_KEY'], algorithms=['HS256'])
     except jwt.ExpiredSignatureError:
@@ -76,8 +73,6 @@ def verify_token(token, add_to_session=False):
     if user is None:
         return False
     g.current_user = user
-    if add_to_session:
-        session['username'] = user.username
     return True
 
 

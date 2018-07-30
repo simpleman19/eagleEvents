@@ -39,7 +39,6 @@ def login_user():
 
 @main_blueprint.route('/logout', methods=['GET'])
 def logout():
-    session['username'] = None
     resp = redirect(url_for('main.login'))
     resp.set_cookie('Bearer', '', expires=datetime.datetime.now())
     session['login_failed'] = False
