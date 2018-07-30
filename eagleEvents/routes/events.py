@@ -1,5 +1,5 @@
 from flask import Blueprint, render_template
-from ..printing.chart import seating_chart_print
+from eagleEvents.printing.chart import seating_chart_print
 
 events_blueprint = Blueprint('events', __name__)
 
