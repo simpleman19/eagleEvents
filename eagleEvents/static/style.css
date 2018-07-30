@@ -1,5 +1,4 @@
 body, html {
-    height: 100vh;
     background-repeat: no-repeat;
     background-image: linear-gradient(rgb(104, 145, 162), rgb(10, 81, 122));
 }
@@ -9,6 +8,10 @@ h1{
     color: #fff;
     text-transform: uppercase;
     padding-top: 50px;
+}
+
+h2,h3{
+    text-align: center;
 }
 
 .login-header h1{
@@ -35,6 +38,7 @@ h1{
     -webkit-user-select: none;
     user-select: none;
     cursor: default;
+    text-transform: uppercase;
 }
 
 /*
@@ -153,13 +157,82 @@ h1{
     color: rgb(10, 81, 122);
 }
 
-.btn.btn-primary.active.btn-add{
-    padding-right: 50px;
-    padding-left: 50px;
-    display: block;
-    margin-left: 40%;
+.btn.btn-save {
+    /*background-color: #4d90fe; */
+    background-color: rgb(104, 145, 162);
+    /* background-color: linear-gradient(rgb(104, 145, 162), rgb(12, 97, 33));*/
+    padding: 0px;
+    font-weight: 700;
+    font-size: 14px;
+    height: 36px;
+    -moz-border-radius: 3px;
+    -webkit-border-radius: 3px;
+    border-radius: 3px;
+    border: none;
+    -o-transition: all 0.218s;
+    -moz-transition: all 0.218s;
+    -webkit-transition: all 0.218s;
+    transition: all 0.218s;
 }
 
+.btn.btn-save:hover,
+.btn.btn-save:active,
+.btn.btn-save:focus {
+    background-color: rgb(10, 81, 122);
+}
+
+.btn.btn-cancel {
+    padding: 7px 30px;
+    font-weight: 700;
+    font-size: 14px;
+    height: 36px;
+    -moz-border-radius: 3px;
+    -webkit-border-radius: 3px;
+    border-radius: 3px;
+    border: none;
+    -o-transition: all 0.218s;
+    -moz-transition: all 0.218s;
+    -webkit-transition: all 0.218s;
+    transition: all 0.218s;
+}
+
+.button-add{
+    display: flex;
+    justify-content: center;
+    text-align: center;
+}
+
+.btn.btn-primary{
+    padding: 7px 40px;
+    text-transform: uppercase;
+}
+
+.buttons{
+    padding-top: 20px;
+    display:  flex;
+    justify-content: space-evenly;
+    text-align:  center;
+}
+
+.buttons-event{
+    padding-top: 20px;
+    max-width: 200px;
+    text-align: center;
+}
+
+.btn.btn-event-function {
+    font-weight: 700;
+    font-size: 14px;
+    height: 36px;
+    -moz-border-radius: 3px;
+    -webkit-border-radius: 3px;
+    border-radius: 3px;
+    border: none;
+    -o-transition: all 0.218s;
+    -moz-transition: all 0.218s;
+    -webkit-transition: all 0.218s;
+    transition: all 0.218s;
+}
 
 
 /*********************
@@ -175,6 +248,17 @@ TABLE SEATING CHART
 
 
 
+.form-control-event{
+    width: 50%;
+}
 
 
+.row-1{
+    display: flex;
+    justify-content: space-around;
+}
+
+.form-customer{ 
+    width: 350px;
+}
 
