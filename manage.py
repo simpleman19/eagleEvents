@@ -9,7 +9,7 @@ from livereload import Server
 from config import DevelopmentConfig
 from eagleEvents import create_app, db
 from database_seed import seed_db
-from eagleEvents.printing.chart import seating_chart
+from eagleEvents.printing.chart import seating_chart_print
 
 manager = Manager(create_app)
 
@@ -53,7 +53,7 @@ def seed():
 
 @manager.command
 def test_print(id):
-    seating_chart(id)
+    seating_chart_print(id)
 
 
 manager.add_command("livereload", LiveReloadServer)

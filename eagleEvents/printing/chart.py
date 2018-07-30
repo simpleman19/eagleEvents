@@ -7,8 +7,9 @@ from eagleEvents import db
 
 
 
-def seating_chart(id):
-    e = Event.query.filter(Event.id == id)[0]
+def seating_chart_print(id_event):
+    print(id_event)
+    e = Event.query.filter(Event.id == id_event)[0]
     tables = Table.query.filter(Table.event_id == '9c310a07f50141f68c3163ba4067ddd9')
     guests = Guest.query.filter(Guest.event_id == '9c310a07f50141f68c3163ba4067ddd9')
     c = canvas.Canvas("/Users/DeeDee/Downloads/hello1.pdf")
@@ -57,8 +58,6 @@ def seating_chart(id):
             c.showPage()
             x = 40
             y = 500
-            
-
-    
-
     c.save()
+
+    return

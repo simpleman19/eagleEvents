@@ -1,4 +1,5 @@
 from flask import Blueprint, render_template
+from ..printing.chart import seating_chart_print
 
 events_blueprint = Blueprint('events', __name__)
 
@@ -34,9 +35,21 @@ def attendance_list():
     return render_template('test.html.j2')
 
 
-@events_blueprint.route('/printSeatingChart')
-def print_seating_chart():
+@events_blueprint.route('/printSeatingChartTest')
+def print_seating_chartTest():
     # Print Seating Chart
     # TODO Probably just return the pdf or whatever
     # May not actually need this but stubbing it anyway
-    return render_template('test.html.j2')
+    return render_template('print.html.j2')
+
+
+@events_blueprint.route('/printSeatingChart/<id>', methods=['POST'])
+def print_seating_chart(id):
+    print('here in route')
+    # Print Seating Chart
+    seating_chart_print(id)
+    return ''
+
+
+
+    
