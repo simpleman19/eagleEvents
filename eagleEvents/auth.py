@@ -135,8 +135,7 @@ def create_token():
 @auth_blueprint.route('/loginAsAdmin', methods=['GET'])
 def login_as_admin():
     if app.config['DEBUG']:
-        admins = User.query.filter_by(is_admin=True)
-        g.current_user = admins[0]
+        g.current_user = User.query.filter_by(is_admin=True).first()
         token = create_token()
         resp = redirect(url_for('main.home'))
         resp.set_cookie('Bearer', token, expires=datetime.now() + timedelta(hours=app.config['JWT_EXPIRATION_HOURS']))
