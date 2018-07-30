@@ -1,4 +1,6 @@
+from eagleEvents.seating_chart_ga import SeatingChartGA
 from . import db
+from eagleEvents.models import Guest
 import uuid
 from eagleEvents.models import Guest
 from sqlalchemy_utils import UUIDType
@@ -29,7 +31,16 @@ class Event(db.Model):
         self.customer = customer
 
     def set_guests(self, guests: List['Event']):
-        pass
+        _guests = guests
+        new_tables = SeatingChartGA(self).get_seating_chart_tables()
+        # delete old tables
+        for t in self.tables:
+            db.session.remove(t)
+        # add new tables
+        for t in new_tables:
+            db.session.add(t)
+        self.tables = new_tables
+        db.session.commit()
 
     def generate_seating_chart(self):
         pass

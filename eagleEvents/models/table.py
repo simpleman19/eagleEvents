@@ -6,6 +6,7 @@ from typing import List
 
 
 class Table(db.Model):
+    EMPTY_SEAT = -1
     __tablename__ = 'event_table' # Turns out table is a sqlite keyword..
     id = db.Column(UUIDType(binary=False), primary_key=True, default=uuid.uuid4)
     # Auto generated
