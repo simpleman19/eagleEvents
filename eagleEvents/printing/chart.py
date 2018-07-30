@@ -10,8 +10,6 @@ from eagleEvents import db
 
 
 def seating_chart_print(id_event):
-    print("here  --")
-    print(id_event)
     e = Event.query.filter(Event.id == id_event)[0]
     tables = Table.query.filter(Table.event_id == id_event)
     guests = Guest.query.filter(Guest.event_id == id_event)
@@ -63,5 +61,4 @@ def seating_chart_print(id_event):
             x = 40
             y = 500
     c.save()
-    print("--- here")
     return
