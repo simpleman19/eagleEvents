@@ -1,0 +1,25 @@
+{% extends "layout.html.j2" %}
+{% block head_content %}
+    <title>Eagle Events Login</title>
+{% endblock %}
+{% block nav_content %}
+{% endblock %}
+{% block body_content %}
+    <div class="card card-container">
+        <img id="profile-img" class="profile-img-card" src="/static/image/admin-login.jpg" />
+        <p id="profile-name" class="profile-name-card"></p>
+            <div class="login-header">
+                <h1>Eagle Events Login</h1>
+            </div>
+                <form action="/login" method="POST" class="form-signin">
+                    <span id="error_message" class="reauth-email" style="color: red;">{{ error_message }}</span>
+                    <span id="reauth-email" class="reauth-email"></span>
+                        <input type="text" id="username" name="username" class="form-control" placeholder="Username" required autofocus>
+                        <input type="password" id="inputPassword" name="password" class="form-control" placeholder="Password" required>
+                    <button class="btn btn-lg btn-primary btn-block btn-signin" type="submit">Sign in</button>
+                </form><!-- /form -->
+                <a href="#" class="forgot-password">
+                Forgot the password?
+                </a>
+    </div>
+{% endblock %}
