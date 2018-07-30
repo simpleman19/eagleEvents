@@ -209,6 +209,7 @@ h2,h3{
 
 .buttons{
     padding-top: 20px;
+    padding-bottom: 50px;
     display:  flex;
     justify-content: space-evenly;
     text-align:  center;
