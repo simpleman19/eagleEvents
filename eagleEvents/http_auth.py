@@ -6,11 +6,18 @@ This module provides Basic and Digest HTTP authentication for Flask routes.
 :license:   MIT, see LICENSE for more details.
 """
 
+"""
+Modified by Chance Turner
+July 2018
+:license: MIT LICENSE
+"""
+
 from functools import wraps
 from hashlib import md5
 from random import Random, SystemRandom
 from flask import request, make_response, session
 from werkzeug.datastructures import Authorization
+import datetime
 
 __version__ = '3.2.3'
 
@@ -87,7 +94,7 @@ class HTTPAuth(object):
                     # Clear TCP receive buffer of any pending data
                     request.data
                     resp = self.auth_error_callback()
-                    resp.set_cookie('Bearer', '', expires=0)
+                    resp.set_cookie('Bearer', '', expires=datetime.datetime.now())
                     session['login_failed'] = True
                     print('Cleared Cookies')
                     return resp

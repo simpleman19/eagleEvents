@@ -1,5 +1,6 @@
 from flask import Blueprint, render_template, g, redirect, url_for, session, request, jsonify
 from eagleEvents.auth import multi_auth, create_token
+import datetime
 
 main_blueprint = Blueprint('main', __name__)
 
@@ -32,7 +33,7 @@ def login_user():
     else:
         token = create_token()
         resp = redirect(url_for('main.home'))
-        resp.set_cookie('Bearer', token)
+        resp.set_cookie('Bearer', token, expires=datetime.datetime.now() + datetime.timedelta(hours=24))
         return resp
 
 
@@ -40,7 +41,7 @@ def login_user():
 def logout():
     session['username'] = None
     resp = redirect(url_for('main.login'))
-    resp.set_cookie('Bearer', '', expires=0)
+    resp.set_cookie('Bearer', '', expires=datetime.datetime.now())
     session['login_failed'] = False
     return resp
 
