@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, g, redirect, url_for, session, request, jsonify
+from flask import Blueprint, render_template, g, redirect, url_for, session, request, jsonify, current_app as app
 from eagleEvents.auth import multi_auth, create_token
 import datetime
 
@@ -33,7 +33,8 @@ def login_user():
     else:
         token = create_token()
         resp = redirect(url_for('main.home'))
-        resp.set_cookie('Bearer', token, expires=datetime.datetime.now() + datetime.timedelta(hours=24))
+        resp.set_cookie('Bearer', token, expires=datetime.datetime.now() +
+                                                 datetime.timedelta(hours=app.config['JWT_EXPIRATION_HOURS']))
         return resp
 
 

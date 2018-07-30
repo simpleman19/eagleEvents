@@ -126,7 +126,20 @@ def create_token():
     if user is not None:
         return jwt.encode({'username': user.username,
                     'user_id': str(user.id.hex),
-                    'exp': (datetime.utcnow() + timedelta(hours=24))
+                    'exp': (datetime.utcnow() + timedelta(hours=app.config['JWT_EXPIRATION_HOURS']))
                     }, app.config['SECRET_KEY'], algorithm='HS256')
     else:
         return None
+
+
+@auth_blueprint.route('/loginAsAdmin', methods=['GET'])
+def login_as_admin():
+    if app.config['DEBUG']:
+        admins = User.query.filter_by(is_admin=True)
+        g.current_user = admins[0]
+        token = create_token()
+        resp = redirect(url_for('main.home'))
+        resp.set_cookie('Bearer', token, expires=datetime.now() + timedelta(hours=app.config['JWT_EXPIRATION_HOURS']))
+        return resp
+    else:
+        return "Error not running in debug mode"
