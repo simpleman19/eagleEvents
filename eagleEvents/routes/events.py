@@ -37,9 +37,7 @@ def attendance_list():
 
 @events_blueprint.route('/printSeatingChartTest')
 def print_seating_chartTest():
-    # Print Seating Chart
-    # TODO Probably just return the pdf or whatever
-    # May not actually need this but stubbing it anyway
+    # test page for printing seating chart
     return render_template('print.html.j2')
 
 
