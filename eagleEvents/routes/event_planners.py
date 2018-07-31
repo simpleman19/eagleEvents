@@ -38,7 +38,7 @@ def validate_and_save(user, request):
     user.name = request.form['name']
     user.username = request.form['username']
     if request.form['password']:
-        user.password = request.form['password']
+        user.set_password(request.form['password'], user.password)
     user.is_admin = 'is_admin' in request.form and request.form['is_admin'] == 'on'
     user.is_active = 'is_active' in request.form and request.form['is_active'] == 'on'
     if user.name is None or len(user.name) == 0:
