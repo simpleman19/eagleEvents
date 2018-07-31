@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template
+from flask import Blueprint, render_template, send_file, make_response, send_from_directory
 from eagleEvents.printing.chart import seating_chart_print
 
 events_blueprint = Blueprint('events', __name__)
@@ -43,11 +43,11 @@ def print_seating_chartTest():
 
 @events_blueprint.route('/printSeatingChart/<id>', methods=['POST'])
 def print_seating_chart(id):
-    print('here in route')
     # Print Seating Chart
-    seating_chart_print(id)
-    return ''
+   return seating_chart_print(id)
+
 
 
 
     
+ 

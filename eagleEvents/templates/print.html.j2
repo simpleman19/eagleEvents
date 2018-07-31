@@ -9,7 +9,7 @@
         <form id="seating-chart">
             <label>Event Number:</label>
             <input id="event-num-seating-chart" type=text>
-            <button onclick="testPrint()" type="submit">Print Seating Chart</button>
+            <button onclick="testPrint()" type="button">Print Seating Chart</button>
         </form>
         </div>
 <script src="https://code.jquery.com/jquery-1.12.4.min.js"></script>
@@ -22,7 +22,13 @@
             success: function(eventNum) {
             console.log('success ' + eventNum)
             },
-    });
+        }).then( (data) => {
+          var downA = document.createElement('a');
+          downA.setAttribute('href',"data:application/octet-stream," + encodeURIComponent(data));
+          downA.setAttribute('download',"seatingChart" + eventNum + ".pdf");
+          downA.click();
+        });
+      
 }
 </script>
 {% endblock %}

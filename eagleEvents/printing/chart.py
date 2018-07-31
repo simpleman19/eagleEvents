@@ -1,6 +1,8 @@
 import sys
 import os
 import datetime
+from io import BytesIO
+from flask import make_response, send_file, send_from_directory
 from reportlab.lib.pagesizes import letter
 from reportlab.pdfgen import canvas
 from reportlab.platypus import SimpleDocTemplate, Table, TableStyle
@@ -13,8 +15,10 @@ def seating_chart_print(id_event):
     e = Event.query.filter(Event.id == id_event)[0]
     tables = Table.query.filter(Table.event_id == id_event)
     guests = Guest.query.filter(Guest.event_id == id_event)
-    directory = os.path.expanduser("~")+"/Downloads/"
-    c = canvas.Canvas(directory + "/seatingChart" + str (datetime.datetime.now()) + ".pdf")
+    directory = os.path.join(os.getcwd(), 'temp')
+    file_name = 'seatingChart.pdf'
+
+    c = canvas.Canvas(os.path.join(directory , file_name))
 
     c.setLineWidth(.3)
     c.setFont("Helvetica", 12)
@@ -60,5 +64,5 @@ def seating_chart_print(id_event):
             c.showPage()
             x = 40
             y = 500
-    c.save()
-    return
+    c.save();
+    return send_from_directory(directory=directory, filename=file_name)
