@@ -58,7 +58,7 @@ def modify_event():
 def seating_chart():
     # TODO Seating Chart
     # UI Seating Chart
-    return render_template('test.html.j2')
+    return render_template('seating-chart.html.j2')
 
 
 @events_blueprint.route('/tableCards')
