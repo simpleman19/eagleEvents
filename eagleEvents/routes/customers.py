@@ -14,5 +14,5 @@ def list_customers():
 @multi_auth.login_required
 def modify_customer():
     # TODO add or modify customer
-    return render_template('test.html.j2')
+    return render_template('add-customer.html.j2')
 
