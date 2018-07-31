@@ -1,12 +1,9 @@
 import sys
 import os
 import datetime
-from io import BytesIO
-from flask import make_response, send_file, send_from_directory
-from reportlab.lib.pagesizes import letter
+from flask import send_from_directory
 from reportlab.pdfgen import canvas
-from reportlab.platypus import SimpleDocTemplate, Table, TableStyle
-from eagleEvents.models import Company, Customer, Event, Table, Guest, SeatingPreferenceTable, SeatingPreference, User
+from eagleEvents.models import Event, Table, Guest
 from eagleEvents import db
 
 
