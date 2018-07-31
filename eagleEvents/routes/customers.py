@@ -22,6 +22,7 @@ def add_customer():
     else:
         is_valid = validate_and_save(customer, request)
         if is_valid:
+            flash("{name} added".format(name=customer.name), "success")
             return redirect(url_for('customers.list_customers'))
         else:
             return render_template('add-update-customer.html.j2', customer=customer,
@@ -39,6 +40,7 @@ def modify_customer(customer_id):
     else:
         is_valid = validate_and_save(customer, request)
         if is_valid:
+            flash("{name} updated".format(name=customer.name), "error")
             return redirect(url_for('customers.list_customers'))
         else:
             return render_template('add-update-customer.html.j2', customer=customer,
