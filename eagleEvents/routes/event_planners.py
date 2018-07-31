@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, g
+from flask import abort, Blueprint, render_template, g
 from eagleEvents.auth import multi_auth
 event_planners_blueprint = Blueprint('event_planners', __name__)
 
@@ -15,6 +15,5 @@ def list_event_planners():
 def modify_event_planner():
     # TODO Modify event planner
     if not g.current_user.is_admin:
-        # TODO create and insert 401 page here
-        return "Not authorized"
+        abort(401)
     return render_template('add-user.html.j2', user=g.current_user)
