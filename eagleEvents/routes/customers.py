@@ -1,4 +1,4 @@
-from flask import Blueprint, redirect, render_template, request, url_for
+from flask import Blueprint, redirect, render_template, request, url_for, g, flash
 from eagleEvents import db
 from eagleEvents.auth import multi_auth
 from eagleEvents.models import Customer
@@ -11,6 +11,21 @@ def list_customers():
     # TODO List customers
     return render_template('customer.html.j2')
 
+
+@customers_blueprint.route('/addCustomer', methods=['GET', 'POST'])
+@multi_auth.login_required
+def add_customer():
+    customer = Customer(g.current_user.company)
+    if request.method == 'GET':
+        return render_template('add-update-customer.html.j2', customer=customer,
+                               cancel_redirect=url_for('customers.list_customers'))
+    else:
+        customer.name = request.form['name']
+        customer.email = request.form['email']
+        customer.phone_number = request.form['phone']
+        db.session.add(customer)
+        db.session.commit()
+        return redirect(url_for('customers.list_customers'))
 
 @customers_blueprint.route('/modifyCustomer/<customer_id>', methods=['GET', 'POST'])
 @multi_auth.login_required
