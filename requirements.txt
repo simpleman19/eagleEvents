@@ -4,6 +4,9 @@ attrs==18.1.0
 bcrypt==3.1.4
 cffi==1.11.5
 click==6.7
+cryptography==2.3
+deap==1.2.2
+flaky==3.4.0
 Flask==1.0.2
 Flask-Script==2.0.6
 Flask-SQLAlchemy==2.3.2
@@ -14,8 +17,11 @@ MarkupSafe==1.0
 Pillow==5.2.0
 pycparser==2.18
 reportlab==3.5.2
+psycopg2==2.7.5
+pycparser==2.18
 more-itertools==4.2.0
 mpi4py==3.0.0
+numpy==1.15.0
 pluggy==0.6.0
 py==1.5.4
 pycparser==2.18

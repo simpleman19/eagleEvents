@@ -28,19 +28,23 @@ class SeatingPreferenceTable(db.Model):
 class Guest(db.Model):
     __tablename__ = 'guest'
     id = db.Column(UUIDType(binary=False), primary_key=True, default=uuid.uuid4)
-    number = db.Column(db.Integer, nullable=False)
+    number = db.Column(db.Integer, nullable=False, index=True)
     last_name = db.Column(db.String(50), nullable=False)
     first_name = db.Column(db.String(50), nullable=False)
     title = db.Column(db.String(150), nullable=False)
-    event_id = db.Column(UUIDType(binary=False), db.ForeignKey('event.id'))
+    event_id = db.Column(UUIDType(binary=False), db.ForeignKey('event.id'), index=True)
     event: 'Event' = db.relationship('Event', lazy=True)
     table_id = db.Column(UUIDType(binary=False), db.ForeignKey('event_table.id'))
     assigned_table: 'Table' = db.relationship('Table', lazy=True)
     seating_preferences: List[SeatingPreferenceTable] = db.relationship('SeatingPreferenceTable', lazy=False,
-                                                                        back_populates='guest', foreign_keys=[SeatingPreferenceTable.guest_id])
+                                                                        back_populates='guest', foreign_keys=[SeatingPreferenceTable.guest_id],
+                                                                        cascade='all,delete')
 
     def __init__(self, event):
         self.event = event
+
+    def __str__(self):
+        return 'guest: {}, number: {}'.format(self.id, self.number)
 
     # TODO stubbed but not fully tested
     def likes(self, guest: 'Guest') -> bool:
