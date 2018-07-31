@@ -16,4 +16,5 @@ def modify_event_planner():
     # TODO Modify event planner
     if not g.current_user.is_admin:
         abort(401)
-    return render_template('add-user.html.j2', user=g.current_user)
+    return render_template('add-update-user.html.j2', user=g.current_user)
+
