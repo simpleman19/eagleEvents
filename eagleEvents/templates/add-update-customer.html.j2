@@ -10,19 +10,19 @@
                    <div class="form-group row">
                         <label for="customer-name" class="col-2 col-form-label">Name</label>
                             <div class="col-10">
-                                <input class="form-control" type="text" value="{{customer.name}}" name="name">
+                                <input class="form-control" type="text" value="{{customer.name if customer.name != None}}" name="name">
                             </div>
                     </div>
                 <div class="form-group row">
                     <label for="phone" class="col-2 col-form-label">Telephone</label>
                         <div class="col-10">
-                            <input class="form-control" type="tel" value="{{customer.phone_number}}" name="phone">
+                            <input class="form-control" type="tel" value="{{customer.phone_number if customer.phone_number != None}}" name="phone">
                         </div>
                 </div>
                 <div class="form-group row">
                     <label for="email" class="col-2 col-form-label">Email</label>
                         <div class="col-10">
-                            <input class="form-control" type="email" value="{{customer.email}}" name="email">
+                            <input class="form-control" type="email" value="{{customer.email if customer.email != None}}" name="email">
                         </div>
                 </div>  
                 <div class="buttons">

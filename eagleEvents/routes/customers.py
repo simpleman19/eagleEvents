@@ -17,7 +17,8 @@ def list_customers():
 def modify_customer(customer_id):
     customer = Customer.query.get(customer_id)
     if request.method == 'GET':
-        return render_template('add-update-customer.html.j2', customer=customer, cancel_redirect=url_for('customers.list_customers'))
+        return render_template('add-update-customer.html.j2', customer=customer,
+                               cancel_redirect=url_for('customers.list_customers'))
     else:
         customer.name = request.form['name']
         customer.email = request.form['email']
