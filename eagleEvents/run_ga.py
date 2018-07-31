@@ -2,15 +2,17 @@ import time
 from sqlalchemy_utils import UUIDType
 
 from eagleEvents.seating_chart_ga import SeatingChartGA
-from eagleEvents.models import Event
+from eagleEvents.models import Event, db
 
 def run():
-    ga = SeatingChartGA(Event.query.get('3508863751a449b28799cc1b657f5890'))
+    ga = SeatingChartGA(Event.query.get('8080fad5593d429aa1735737997d3f5c'))
     ga.COLLECT_STATS = True
 
     ga.setup()
     start = time.time()
     tables = ga.get_seating_chart_tables()
+    [db.session.add(table) for table in tables]
+    db.session.commit()
     end = time.time()
     print(ga.logbook)
     print("Execution time: {time}".format(time=end-start))
