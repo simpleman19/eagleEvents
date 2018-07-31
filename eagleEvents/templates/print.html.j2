@@ -23,12 +23,11 @@
             console.log('success ' + eventNum)
             },
         }).then( (data) => {
-          var downA = document.createElement('a');
-          downA.setAttribute('href',"data:application/octet-stream," + encodeURIComponent(data));
-          downA.setAttribute('download',"seatingChart" + eventNum + ".pdf");
-          downA.click();
+          var downloadAttribute = document.createElement('a');
+          downloadAttribute.setAttribute('href',"data:application/octet-stream," + encodeURIComponent(data));
+          downloadAttribute.setAttribute('download',"seatingChart" + eventNum + ".pdf");
+          downloadAttribute.click();
         });
-      
 }
 </script>
 {% endblock %}
