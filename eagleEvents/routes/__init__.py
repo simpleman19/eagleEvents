@@ -1,4 +1,7 @@
-from flask import Blueprint, render_template, g, redirect, url_for, session, request, jsonify, current_app as app
+from flask import current_app as app
+from eagleEvents import models
+from eagleEvents.models.event import Event
+from flask import Blueprint, render_template, g, redirect, url_for, session, request, jsonify
 from eagleEvents.auth import multi_auth, create_token
 import datetime
 

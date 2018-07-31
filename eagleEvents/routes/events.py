@@ -1,9 +1,11 @@
-from flask import Blueprint, render_template, flash, request, redirect, g
-from eagleEvents.models.event import Event
 from pathlib import Path
+from flask import Blueprint, render_template, Flask, flash, request, redirect, url_for, g
+from eagleEvents.models.event import Event
+from eagleEvents.models.company import Company
 import os, config
 from werkzeug.utils import secure_filename
 from eagleEvents.auth import multi_auth
+ALLOWED_EXTENSIONS = set(['csv'])
 
 events_blueprint = Blueprint('events', __name__)
 
@@ -16,8 +18,7 @@ def list_events():
 
 
 def allowed_file(filename):
-    return '.' in filename and \
-           filename.rsplit('.', 1)[1].lower() in set(['csv'])
+    return '.' in filename and filename.rsplit('.', 1)[1].lower() in set(['csv'])
 
 
 @events_blueprint.route('/modifyEvent', methods=['GET', 'POST'])

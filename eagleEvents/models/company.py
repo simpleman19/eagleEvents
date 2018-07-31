@@ -1,10 +1,8 @@
 from eagleEvents.models import db
 from eagleEvents.models import User
 from eagleEvents.models.guest import Guest, SeatingPreference, SeatingPreferenceTable
-import timeit
+import timeit, uuid, csv, os
 from sqlalchemy_utils import UUIDType
-import uuid
-import csv
 from typing import List
 
 
@@ -69,7 +67,6 @@ class Company(db.Model):
                 db.session.add(g)
                 guest_dict[g.number] = g
 
-        db.session.commit()
         # iterate through for seating preferences for each guest
         for key, value in likes_dict.items():
             # print('likes ', key, value)
@@ -92,7 +89,9 @@ class Company(db.Model):
                 else:
                     print('Guest was not found: ', g1, g2)
         db.session.commit()
-
+        os.remove(file_name)
+        if not os.path.isfile(file_name):
+            print(file_name, ' removed')
         stop = timeit.default_timer()
         print('Import Complete', stop-start)
 
