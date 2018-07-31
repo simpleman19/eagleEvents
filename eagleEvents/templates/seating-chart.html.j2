@@ -1,0 +1,211 @@
+{% extends "layout.html.j2" %}
+{% block head_content %}
+      <title>Eagle Events Seating Chart</title>
+{% endblock %}  
+{% block body_content %}
+    <nav class="navbar navbar-default">
+        <div class="container-fluid">
+            <div class="navbar-header">
+                <a class="navbar-brand" href="#">Eagle Events Planner</a>
+        </div>
+            <ul class="nav navbar-nav">
+                <li class="active"><a href="event.html">Events</a></li>
+                <li><a href="customer.html">Customers</a></li>
+                <li><a href="#">Event Planners</a></li>
+            </ul>
+            <ul class="nav navbar-nav navbar-right">
+                <li><a href="#"><span class="glyphicon glyphicon-log-in"></span> Logout</a></li>
+            </ul>
+        </div>
+    </nav>
+    <h1>Table Seating Chart</h1>
+<div class="container">
+    <div class="card card-container-2 col-sm-4">
+    <table class="table-seating table-bordered">
+        <h2>Table 1</h2>
+        <thead>
+        <tr>
+            <th>First Name</th>
+            <th>Last Name</th>
+            <th>Title</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+            <td>John</td>
+            <td>Green</td>
+            <td>Project Manager</td>
+        </tr>
+        <tr>
+            <td>Don</td>
+            <td>Henson</td>
+            <td>Doctor</td>
+        </tr>
+        <tr>
+            <td>July</td>
+            <td>Smith</td>
+            <td>CEO</td>
+        </tr>
+        </tbody>
+  </table>
+  </div>
+    <div class="card card-container-2 col-sm-4 ">
+    <table class="table-seating table-bordered">
+        <h2>Table 2</h2>
+        <thead>
+        <tr>
+            <th>First Name</th>
+            <th>Last Name</th>
+            <th>Title</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+            <td>John</td>
+            <td>Green</td>
+            <td>Project Manager</td>
+        </tr>
+        <tr>
+            <td>Don</td>
+            <td>Henson</td>
+            <td>Doctor</td>
+        </tr>
+        <tr>
+            <td>July</td>
+            <td>Smith</td>
+            <td>CEO</td>
+        </tr>
+        </tbody>
+  </table>
+  </div>
+    <div class="card card-container-2 col-sm-4">
+    <table class="table-seating table-bordered">
+        <h2>Table 3</h2>
+        <thead>
+        <tr>
+            <th>First Name</th>
+            <th>Last Name</th>
+            <th>Title</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+            <td>John</td>
+            <td>Green</td>
+            <td>Project Manager</td>
+        </tr>
+        <tr>
+            <td>Don</td>
+            <td>Henson</td>
+            <td>Doctor</td>
+        </tr>
+        <tr>
+            <td>July</td>
+            <td>Smith</td>
+            <td>CEO</td>
+        </tr>
+        </tbody>
+  </table>
+  </div>
+    </div>
+    <div class="container">
+    <div class="card card-container-2 col-sm-4">
+    <table class="table-seating table-bordered">
+        <h2>Table 4</h2>
+        <thead>
+        <tr>
+            <th>First Name</th>
+            <th>Last Name</th>
+            <th>Title</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+            <td>John</td>
+            <td>Green</td>
+            <td>Project Manager</td>
+        </tr>
+        <tr>
+            <td>Don</td>
+            <td>Henson</td>
+            <td>Doctor</td>
+        </tr>
+        <tr>
+            <td>July</td>
+            <td>Smith</td>
+            <td>CEO</td>
+        </tr>
+        </tbody>
+  </table>
+  </div>
+    <div class="card card-container-2 col-sm-4">
+    <table class="table-seating table-bordered">
+        <h2>Table 5</h2>
+        <thead>
+        <tr>
+            <th>First Name</th>
+            <th>Last Name</th>
+            <th>Title</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+            <td>John</td>
+            <td>Green</td>
+            <td>Project Manager</td>
+        </tr>
+        <tr>
+            <td>Don</td>
+            <td>Henson</td>
+            <td>Doctor</td>
+        </tr>
+        <tr>
+            <td>July</td>
+            <td>Smith</td>
+            <td>CEO</td>
+        </tr>
+        </tbody>
+  </table>
+  </div>
+    <div class="card card-container-2 col-sm-4">
+    <table class="table-seating table-bordered">
+        <h2>Table 6</h2>
+        <thead>
+        <tr>
+            <th>First Name</th>
+            <th>Last Name</th>
+            <th>Title</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+            <td>John</td>
+            <td>Green</td>
+            <td>Project Manager</td>
+        </tr>
+        <tr>
+            <td>Don</td>
+            <td>Henson</td>
+            <td>Doctor</td>
+        </tr>
+        <tr>
+            <td>July</td>
+            <td>Smith</td>
+            <td>CEO</td>
+        </tr>
+        </tbody>
+  </table>
+  </div>
+    </div>
+        <div class="buttons">
+            <button class="btn btn-lg btn-primary btn-save" type="submit">Save</button>
+            <button class="btn btn-lg btn-danger btn-cancel" type="cancel">Cancel</button>
+        </div>
+<script src="https://code.jquery.com/jquery-1.12.4.min.js"></script>
+<script src="bootstable.js"></script>
+<script>
+ $('table').SetEditable();
+</script>
+{% endblock %}
+
+
