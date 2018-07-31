@@ -30,10 +30,14 @@
                     </div>
                 </form>
                        <div class="buttons-event">
-                        <button class="btn btn-lg btn-success btn-block btn-event-function" type="submit">Import Guests</button>
-                        <button class="btn btn-lg btn-success btn-block btn-event-function" type="submit">Seating Chart</button>
-                        <button class="btn btn-lg btn-success btn-block btn-event-function" type="submit">Print Attendance List</button>
-                        <button class="btn btn-lg btn-success btn-block btn-event-function" type="submit">Print Table Cart</button>
+                           <button method=post enctype=multipart/form-data class="btn btn-lg btn-success btn-block btn-event-function"
+                                       onclick="document.getElementById('file').click();" type="submit">Import Guests</button>
+                           <button class="btn btn-lg btn-success btn-block btn-event-function" type="submit">Seating Chart</button>
+                           <button class="btn btn-lg btn-success btn-block btn-event-function" type="submit">Print Attendance List</button>
+                           <button class="btn btn-lg btn-success btn-block btn-event-function" type="submit">Print Table Cart</button>
+                           <form method="post" enctype="multipart/form-data">
+                               <input type=file id="file" name="file" onchange="this.form.submit()" style="display:none;"/>
+                           </form>
                     </div>
             </div>
         </div>
@@ -99,12 +103,7 @@
                     </div>
         </div>
     </div>
-    
-    
-    <div class="container-fluid">
-<!--      {% block body_content %}-->
-        
-<!--      {% endblock %}-->
+
     </div>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
 {% endblock %}
