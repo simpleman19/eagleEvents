@@ -1,4 +1,5 @@
 from flask import Blueprint, redirect, render_template, request, url_for
+from eagleEvents import db
 from eagleEvents.auth import multi_auth
 from eagleEvents.models import Customer
 customers_blueprint = Blueprint('customers', __name__)
@@ -18,6 +19,10 @@ def modify_customer(customer_id):
     if request.method == 'GET':
         return render_template('add-update-customer.html.j2', customer=customer)
     else:
-        # TODO add or modify customer
+        customer.name = request.form['name']
+        customer.email = request.form['email']
+        customer.phone_number = request.form['phone']
+        db.session.add(customer)
+        db.session.commit()
         return redirect(url_for('customers.list_customers'))
 
