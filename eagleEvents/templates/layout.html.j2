@@ -17,20 +17,20 @@
   <body>
       {% block nav_content %} 
         <nav class="navbar navbar-default">
-        <div class="container-fluid">
-            <div class="navbar-header">
-                <a class="navbar-brand" href="#">Eagle Events Planner</a>
-        </div>
-            <ul class="nav navbar-nav">
-                <li class="active"><a href="event.html">Events</a></li>
-                <li><a href="customer.html.j2">Customers</a></li>
-                <li><a href="event_planner.html.j2">Event Planners</a></li>
-            </ul>
-            <ul class="nav navbar-nav navbar-right">
-                <li><a href="#"><span class="glyphicon glyphicon-log-in"></span> Logout</a></li>
-            </ul>
-        </div>
-    </nav>
+            <div class="container-fluid">
+                <div class="navbar-header">
+                    <a class="navbar-brand" href="/home">Eagle Events Planner</a>
+            </div>
+                <ul class="nav navbar-nav">
+                    <li class="active"><a href="/listEvents">Events</a></li>
+                    <li><a href="/listCustomers">Customers</a></li>
+                    <li><a href="/listEventPlanners">Event Planners</a></li>
+                </ul>
+                <ul class="nav navbar-nav navbar-right">
+                    <li><a href="/logout"><span class="glyphicon glyphicon-log-in"></span> Logout</a></li>
+                </ul>
+            </div>
+        </nav>
        {% endblock %}
     <div class="container">
       {% block body_content %} 
