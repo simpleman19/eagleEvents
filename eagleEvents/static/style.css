@@ -1,7 +1,25 @@
-body, html {
-    background-repeat: no-repeat;
-    background-image: linear-gradient(rgb(104, 145, 162), rgb(10, 81, 122));
+*{
+    margin: 0;
+    padding: 0;
 }
+
+
+body, html {
+    height: 100%;
+    -webkit-background-size: cover;
+    -moz-background-size: cover;
+    -o-background-size: cover;
+    background-size: cover;
+    background-repeat: no-repeat;
+    background: #004770;
+    background-repeat:no-repeat;
+    background: -webkit-linear-gradient( to left top, #360033, #0b8793);
+    background: -moz-linear-gradient( to left top, #360033, #0b8793);
+    background: -ms-linear-gradient( to left top, #360033, #0b8793);
+    background: -o-linear-gradient( to left top, #360033, #0b8793);
+    background: linear-gradient( to left top, #360033, #0b8793);
+}
+
 
 h1{
     text-align: center;
@@ -235,6 +253,9 @@ h2,h3{
     transition: all 0.218s;
 }
 
+.checkbox label{
+    color: #fff;
+}
 
 /*********************
 TABLE SEATING CHART
