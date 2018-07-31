@@ -45,8 +45,6 @@ def modify_event():
             c = g.current_user.company
             c.process_guest_list(path, event)
             flash('Import Completed: ' + filename)
-            os.remove(path)
-            print(path + ' removed')
         else:
             flash('File Type Not Accepted', category='error')
 
