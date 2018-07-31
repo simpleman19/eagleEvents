@@ -5,11 +5,6 @@
 
 
 body, html {
-    height: 100%;
-    -webkit-background-size: cover;
-    -moz-background-size: cover;
-    -o-background-size: cover;
-    background-size: cover;
     background-repeat: no-repeat;
     background: #004770;
     background-repeat:no-repeat;
@@ -57,6 +52,17 @@ h2,h3{
     user-select: none;
     cursor: default;
     text-transform: uppercase;
+}
+
+.flashes {
+    width: 50%;
+    margin: auto;
+    background: linear-gradient(rgb(55, 162, 69), #3eb94f, rgb(55, 162, 69));
+    text-align: center;
+    color: white;
+    font-size: 1.5em;
+    list-style-type: none;
+    border-radius: 5px;
 }
 
 /*
@@ -256,6 +262,7 @@ h2,h3{
 .checkbox label{
     color: #fff;
 }
+
 
 /*********************
 TABLE SEATING CHART
