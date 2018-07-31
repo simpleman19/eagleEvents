@@ -14,6 +14,26 @@ def list_event_planners():
     return render_template('user.html.j2')
 
 
+@event_planners_blueprint.route('/addEventPlanner', methods=['GET', 'POST'])
+@multi_auth.login_required
+def add_event_planner():
+    user = User(g.current_user.company)
+    # Set defaults
+    user.is_active = True
+    user.is_admin = False
+    if request.method == 'GET':
+        return render_template('add-update-user.html.j2', user=user,
+                               cancel_redirect=url_for('event_planners.list_event_planners'))
+    else:
+        is_valid = validate_and_save(user, request)
+        if is_valid:
+            flash("{name} added".format(name=user.name), "success")
+            return redirect(url_for('event_planners.list_event_planners'))
+        else:
+            return render_template('add-update-user.html.j2', user=user,
+                                   cancel_redirect=url_for('event_planners.list_event_planners'))
+
+
 @event_planners_blueprint.route('/modifyEventPlanner/<user_id>', methods=['GET', 'POST'])
 @multi_auth.login_required
 def modify_event_planner(user_id):
