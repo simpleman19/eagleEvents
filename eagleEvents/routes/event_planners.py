@@ -1,5 +1,7 @@
-from flask import abort, Blueprint, render_template, g
+from flask import abort, Blueprint, render_template, g, request
 from eagleEvents.auth import multi_auth
+from eagleEvents.models import User
+
 event_planners_blueprint = Blueprint('event_planners', __name__)
 
 
@@ -10,11 +12,13 @@ def list_event_planners():
     return render_template('user.html.j2')
 
 
-@event_planners_blueprint.route('/modifyEventPlanner')
+@event_planners_blueprint.route('/modifyEventPlanner/<user_id>', methods=['GET', 'POST'])
 @multi_auth.login_required
-def modify_event_planner():
-    # TODO Modify event planner
+def modify_event_planner(user_id):
     if not g.current_user.is_admin:
         abort(401)
-    return render_template('add-update-user.html.j2', user=g.current_user)
+    user = User.query.get(user_id)
+    if request.method == 'GET':
+        return render_template('add-update-user.html.j2', user=user)
+    # TODO Modify event planner
 
