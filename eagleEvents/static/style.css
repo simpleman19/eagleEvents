@@ -220,6 +220,10 @@ h2,h3{
     transition: all 0.218s;
 }
 
+a.btn.btn-cancel {
+    padding-top: 10px;
+}
+
 .button-add{
     display: flex;
     justify-content: center;
