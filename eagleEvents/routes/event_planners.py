@@ -1,4 +1,4 @@
-from flask import abort, Blueprint, render_template, g, request
+from flask import abort, Blueprint, render_template, g, request, url_for
 from eagleEvents.auth import multi_auth
 from eagleEvents.models import User
 
@@ -19,6 +19,7 @@ def modify_event_planner(user_id):
         abort(401)
     user = User.query.get(user_id)
     if request.method == 'GET':
-        return render_template('add-update-user.html.j2', user=user)
+        return render_template('add-update-user.html.j2', user=user,
+                               cancel_redirect=url_for('event_planners.list_event_planners'))
     # TODO Modify event planner
 
