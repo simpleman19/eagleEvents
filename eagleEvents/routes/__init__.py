@@ -3,6 +3,7 @@ from eagleEvents import models
 from eagleEvents.models.event import Event
 from flask import Blueprint, render_template, g, redirect, url_for, session, request, jsonify
 from eagleEvents.auth import multi_auth, create_token
+from eagleEvents.routes.events import list_events
 import datetime
 
 main_blueprint = Blueprint('main', __name__)
@@ -12,7 +13,7 @@ main_blueprint = Blueprint('main', __name__)
 @main_blueprint.route('/home', methods=['GET'])
 @multi_auth.login_required
 def home():
-    return render_template('event.html.j2')
+    return list_events()
 
 
 # Will handle UI login and logout in this file, everything else will be in a blueprint in another file
@@ -53,3 +54,9 @@ def logout():
 @multi_auth.login_required
 def test_api():
     return jsonify({ 'username': g.current_user.username })
+
+
+@main_blueprint.route('/test', methods=['GET'])
+@multi_auth.login_required
+def test():
+    return render_template('test.html.j2')
