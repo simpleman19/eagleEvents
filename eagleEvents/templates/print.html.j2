@@ -1,0 +1,32 @@
+{% extends "layout.html.j2" %}
+{% block head_content %}
+    <title>Eagle Events Event</title>
+{% endblock %}
+
+{% block body_content %}
+    <h1>Test Print</h1>
+    <div class="container">
+        <label>Event Number:</label>
+        <input id="event-num-seating-chart" type=text>
+        <button onclick="testPrint()" type="button">Print Seating Chart</button>
+    </div>
+<script src="https://code.jquery.com/jquery-1.12.4.min.js"></script>
+<script>
+    function testPrint() {
+        var eventNum = document.getElementById("event-num-seating-chart").value;
+        $.ajax({     
+            url: "/printSeatingChart/" + eventNum,
+            type: "POST",
+            success: function(eventNum) {
+            console.log('success ' + eventNum)
+            },
+        }).then( (data) => {
+          var downloadAttribute = document.createElement('a');
+          downloadAttribute.setAttribute('href',"data:application/octet-stream," + encodeURIComponent(data));
+          downloadAttribute.setAttribute('download',"seatingChart" + eventNum + ".pdf");
+          downloadAttribute.click();
+        });
+}
+</script>
+{% endblock %}
+
