@@ -5,46 +5,49 @@
 {% block body_content %}
     <h1>Users</h1>
         <div class="container">
-            <div class="checkbox">
-                <label>
-                <input type="checkbox" value="">
-                Show All
-                </label>
+            <button class="btn btn-primary active" id="refreshButton">Refresh Table</button>
         </div>
             <div class="card card-container-2">
-                <table class="table table-bordered">
-                    <thead>
-                        <tr>
-                            <th>Name</th>
-                            <th>Username</th>
-                            <th>Active</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td>John</td>
-                            <td>john_1</td>
-                            <td><input type="checkbox" value=""></td>
-                        </tr>
-                        <tr>
-                            <td>Mary</td>
-                            <td>mary_2</td>
-                            <td><input type="checkbox" value=""></td>
-                        </tr>
-                        <tr>
-                            <td>July</td>
-                            <td>july_3</td>
-                            <td><input type="checkbox" value=""></td>
-                        </tr>
-                    </tbody>
-                </table>
-                <button type="button" class="btn btn-primary active btn-add">Add</button>
+                <div class="dynamic-wrapper-list">
+                    <table id="listTable" class="table table-hover table-scroll">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Username</th>
+                                <th>Active</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for user in users %}
+                            <tr class = "click-row" data-href="modifyEventPlanner/ + {{user.id}}">
+                                <td>{{user.name}}</td>
+                                <td>{{user.username}}</td>
+                                {% if user.is_active == True %}
+                                    <td><input type="checkbox" value="" checked disabled></td>
+                                {% else %}
+                                    <td><input type="checkbox" value="" disabled></td>
+                                {% endif %}
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                <input type="button" class="btn btn-primary active btn-add" onclick="window.location.href='/modifyEventPlanner'" value="Add"/>
             </div>
         </div>
 <script src="https://code.jquery.com/jquery-1.12.4.min.js"></script>
-<script src="bootstable.js"></script>
 <script>
- $('table').SetEditable();
+    $("#refreshButton").on("click", refreshTable);
+
+    function refreshTable() {
+        $("#listTable").load("/listEventPlanners #listTable");
+        $("#listTable").addClass("table table-bordered table-scroll");
+    }
+
+    $(".click-row").click(function() {
+        window.location = $(this).data("href");
+    });
+
 </script>
 {% endblock %}
 
