@@ -94,13 +94,18 @@ def print_seating_chart(id):
     
     Allows user to manually move guests between tables and even swap guests if needed
     
-    Expected JSON to move guest:
+    Expected JSON to move guest to open seat:
     {
         'selectedGuest' : '<UUID>'     # REQUIRED, This is the guest initially selected to move
         'destinationTable' : '<UUID>'  # REQUIRED, This is the table that the selected guest is moving to
-        'otherGuest' : '<UUID:-1>'     # REQUIRED, This is used if swapping 2 guests, if moving to empty seat then '-1'
     }
     
+    Expected JSON to swap guests
+    {
+        'selectedGuest' : '<UUID>'     # REQUIRED, This is the guest initially selected to move
+        'otherGuest' : '<UUID>'     # REQUIRED, This is used if swapping 2 guests
+    }
+
     Response JSON:
     {
         'error' : '<This field will contain any error messages to show user>'
@@ -118,12 +123,12 @@ def change_seats():
     if not json:
         response['error'] = "Error, invalid json in request"
         return jsonify(response), 400
-    if not json['selectedGuest'] and not json['destinationTable'] and not json['otherGuest']:
+    if not (('selectedGuest' in json and 'destinationTable' in json) or ('selectedGuest' in json and 'otherGuest' in json)):
         response['error'] = "Missing required fields in request JSON"
         return jsonify(response), 400
     try:
         sel_guest: Guest = Guest.query.filter_by(id=json['selectedGuest']).one_or_none()
-        if json['otherGuest'] == '-1':
+        if 'otherGuest' not in json:
             other_guest = None
             dest_table: Table = Table.query.filter_by(id=json['destinationTable']).one_or_none()
         else:
@@ -132,13 +137,17 @@ def change_seats():
                 dest_table = other_guest.assigned_table
             else:
                 dest_table = None
-        if sel_guest and dest_table and (other_guest or json['otherGuest'] == '-1'):
+        if sel_guest and dest_table and (other_guest or 'otherGuest' not in json):
             if other_guest:
                 other_guest.assigned_table = sel_guest.assigned_table
             sel_guest.assigned_table = dest_table
             db.session.commit()
-            response['success'] = "Successfully moved {} to table # {} and {} to table # {}"\
-                .format(sel_guest.full_name, dest_table.number, other_guest.full_name, other_guest.assigned_table.number)
+            if other_guest:
+                response['success'] = "Successfully moved {} to table # {} and {} to table # {}"\
+                    .format(sel_guest.full_name, dest_table.number, other_guest.full_name, other_guest.assigned_table.number)
+            else:
+                response['success'] = "Successfully moved {} to table # {}" \
+                    .format(sel_guest.full_name, dest_table.number)
             return jsonify(response)
         else:
             response['error'] = 'Error finding table or a guest'
