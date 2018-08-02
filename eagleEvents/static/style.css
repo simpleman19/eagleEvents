@@ -90,7 +90,7 @@ th,td{
     text-transform: uppercase;
 }
 
-.flashes {
+.flashes li {
     width: 50%;
     margin: auto;
     background: linear-gradient(rgb(55, 162, 69), #3eb94f, rgb(55, 162, 69));
@@ -101,6 +101,9 @@ th,td{
     border-radius: 5px;
 }
 
+.flashes li.error {
+    background: linear-gradient(#e5381e, #c25a4a, #e5381e);
+}
 /*
  * Card component
  */
@@ -254,6 +257,10 @@ th,td{
     -moz-transition: all 0.218s;
     -webkit-transition: all 0.218s;
     transition: all 0.218s;
+}
+
+a.btn.btn-cancel {
+    padding-top: 10px;
 }
 
 .button-add{
