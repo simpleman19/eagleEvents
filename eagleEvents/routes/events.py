@@ -119,7 +119,9 @@ def change_seats():
         'error': '',
         'success': ''
     }
+    return_code = 500
     json = request.json
+    # Validate JSON
     if not json:
         response['error'] = "Error, invalid json in request"
         return jsonify(response), 400
@@ -127,34 +129,51 @@ def change_seats():
         response['error'] = "Missing required fields in request JSON"
         return jsonify(response), 400
     try:
+        # Find guest
         sel_guest: Guest = Guest.query.filter_by(id=json['selectedGuest']).one_or_none()
+        # Find table if not swapping
         if 'otherGuest' not in json:
             other_guest = None
             dest_table: Table = Table.query.filter_by(id=json['destinationTable']).one_or_none()
+        # Find other guests and get table from other guest
         else:
             other_guest: Guest = Guest.query.filter_by(id=json['otherGuest']).one_or_none()
+            # Ensure other guest is found before trying to get table
             if other_guest:
                 dest_table = other_guest.assigned_table
             else:
-                dest_table = None
+                dest_table = None  # This will break next if statement if table or guest not found
+        # Ensure everything was found in database
         if sel_guest and dest_table and (other_guest or 'otherGuest' not in json):
+            # Ensure guests and tables are all part of the same event
+            if sel_guest.event_id != dest_table.event_id or (other_guest and sel_guest.event_id != other_guest.event_id):
+                response['error'] = "Guests and tables are not part of the same event"
+                return_code = 400
+                return jsonify(response), return_code
+
+            # If swapping then move other guest
             if other_guest:
                 other_guest.assigned_table = sel_guest.assigned_table
+
+            # Swap main guests
             sel_guest.assigned_table = dest_table
             db.session.commit()
+
+            # Return message depending on whether it was a swap or not
             if other_guest:
                 response['success'] = "Successfully moved {} to table # {} and {} to table # {}"\
                     .format(sel_guest.full_name, dest_table.number, other_guest.full_name, other_guest.assigned_table.number)
             else:
                 response['success'] = "Successfully moved {} to table # {}" \
                     .format(sel_guest.full_name, dest_table.number)
-            return jsonify(response)
+            return_code = 200
         else:
             response['error'] = 'Error finding table or a guest'
-            return jsonify(response), 404
+            return_code = 404
+        return jsonify(response), return_code
+    # If anything threw an exception (Probably a filter_by statement)
     except Exception:
         response['error'] = 'Error finding table or a guest, exception thrown'
         return jsonify(response), 404
-    response['error'] = 'Congrats, you made it to a part of the code that I thought was unreachable, bad news is I probably don\'t know how'
-    return jsonify(response), 500
+
 
