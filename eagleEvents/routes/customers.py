@@ -29,7 +29,6 @@ def add_customer():
                                    cancel_redirect=url_for('customers.list_customers'))
 
 
-
 @customers_blueprint.route('/modifyCustomer/<customer_id>', methods=['GET', 'POST'])
 @multi_auth.login_required
 def modify_customer(customer_id):

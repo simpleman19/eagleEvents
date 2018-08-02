@@ -1,3 +1,7 @@
+<<<<<<< HEAD
+from flask import Blueprint, render_template, send_file, make_response, send_from_directory
+from eagleEvents.printing.chart import seating_chart_print
+=======
 from pathlib import Path
 from flask import Blueprint, render_template, Flask, flash, request, redirect, url_for, g
 from eagleEvents.models.event import Event
@@ -6,6 +10,7 @@ import os, config
 from werkzeug.utils import secure_filename
 from eagleEvents.auth import multi_auth
 ALLOWED_EXTENSIONS = set(['csv'])
+>>>>>>> dev
 
 events_blueprint = Blueprint('events', __name__)
 
@@ -56,7 +61,7 @@ def modify_event():
 def seating_chart():
     # TODO Seating Chart
     # UI Seating Chart
-    return render_template('test.html.j2')
+    return render_template('seating-chart.html.j2')
 
 
 @events_blueprint.route('/tableCards')
@@ -73,10 +78,19 @@ def attendance_list():
     return render_template('test.html.j2')
 
 
-@events_blueprint.route('/printSeatingChart')
-@multi_auth.login_required
-def print_seating_chart():
+@events_blueprint.route('/printSeatingChartTest')
+def print_seating_chartTest():
+    # test page for printing seating chart
+    return render_template('print.html.j2')
+
+
+@events_blueprint.route('/printSeatingChart/<id>', methods=['POST'])
+def print_seating_chart(id):
     # Print Seating Chart
-    # TODO Probably just return the pdf or whatever
-    # May not actually need this but stubbing it anyway
-    return render_template('test.html.j2')
+   return seating_chart_print(id)
+
+
+
+
+    
+ 
