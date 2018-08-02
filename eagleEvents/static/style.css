@@ -3,8 +3,18 @@
     padding: 0;
 }
 
+html{
+    margin: 0 auto;
+}
 
 body, html {
+    height: auto;
+    background-size: cover;
+    background-position: center;
+    -webkit-background-size: cover;
+    -moz-background-size: cover;
+    -o-background-size: cover;
+    background-size: cover;
     background-repeat: no-repeat;
     background: #004770;
     background-repeat:no-repeat;
@@ -15,6 +25,28 @@ body, html {
     background: linear-gradient( to left top, #360033, #0b8793);
 }
 
+.main{
+    padding-bottom: 30%;
+}
+.current{
+    background-color: #2D3C8A;  
+    color: #fff;
+  }
+
+#bEdit{
+    display: none;
+}
+
+button#bElim{
+    color: #fff;
+    background-color: #b10;
+}
+
+.pull-right{
+    float: none !important;
+    display: flex;
+    justify-content: center;
+}
 
 h1{
     text-align: center;
@@ -24,6 +56,10 @@ h1{
 }
 
 h2,h3{
+    text-align: center;
+}
+
+th,td{
     text-align: center;
 }
 
@@ -44,9 +80,9 @@ h2,h3{
     padding: 40px 40px;
 }
 
+
 .btn {
     font-weight: 700;
-    height: 36px;
     -moz-user-select: none;
     -webkit-user-select: none;
     user-select: none;
@@ -231,7 +267,7 @@ h2,h3{
     text-transform: uppercase;
 }
 
-.buttons{
+.buttons-action{
     padding-top: 20px;
     padding-bottom: 50px;
     display:  flex;
@@ -273,6 +309,7 @@ TABLE SEATING CHART
   line-height: 1.42857143;
   vertical-align: top;
   border-top: 1px solid #ddd;
+  margin-left: 23px;
 }
 
 
