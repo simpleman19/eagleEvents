@@ -9,6 +9,7 @@ from livereload import Server
 from config import DevelopmentConfig
 from eagleEvents import create_app, db
 from database_seed import seed_db
+from eagleEvents.printing.chart import seating_chart_print
 
 manager = Manager(create_app)
 
@@ -49,8 +50,8 @@ def seed():
     db.drop_all()
     db.create_all()
     seed_db()
+    
 
-@manager.command
 def run_ga():
     from eagleEvents import run_ga
     run_ga.run()
