@@ -21,6 +21,7 @@
   </head>
   <body class="main">
       {% block nav_content %} 
+
 <nav class="navbar navbar-default">
   <div class="container-fluid">
     <div class="navbar-header">
@@ -43,10 +44,19 @@
     </div>
   </div>
 </nav>
+
        {% endblock %}
     <div class="container">
-      {% block body_content %} 
-        
+        {% with messages = get_flashed_messages() %}
+            {% if messages %}
+                <ul class=flashes>
+                    {% for message in messages %}
+                        <li>{{ message }}</li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+        {% endwith %}
+        {% block body_content %}
         {% endblock %}
     </div>
 

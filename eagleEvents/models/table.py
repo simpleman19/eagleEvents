@@ -6,6 +6,7 @@ from typing import List
 
 
 class Table(db.Model):
+    EMPTY_SEAT = -1
     __tablename__ = 'event_table' # Turns out table is a sqlite keyword..
     id = db.Column(UUIDType(binary=False), primary_key=True, default=uuid.uuid4)
     # Auto generated
@@ -18,6 +19,7 @@ class Table(db.Model):
 
     def __init__(self, event: 'Event'):
         self.event = event
+        self.seating_capacity = event.table_size.size
 
     def num_open_seats(self) -> int:
         # Assumed guests is never None, change if causes problems later

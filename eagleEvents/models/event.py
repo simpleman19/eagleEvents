@@ -1,5 +1,8 @@
+from eagleEvents.seating_chart_ga import SeatingChartGA
 from . import db
+from eagleEvents.models import Guest
 import uuid
+from eagleEvents.models import Guest
 from sqlalchemy_utils import UUIDType
 from typing import List
 
@@ -19,12 +22,25 @@ class Event(db.Model):
     planner_id = db.Column(UUIDType(binary=False), db.ForeignKey('users.id'), nullable=True)
     planner = db.relationship('User', lazy=False)
     tables = db.relationship('Table', lazy=False)
+    table_size_id = db.Column(db.Integer, db.ForeignKey('table_sizes.id'), nullable=True)
+    table_size = db.relationship('TableSize', lazy=False)
+    _guests: List[Guest] = db.relationship('Guest', lazy=True,
+                    backref=db.backref('guests', lazy='subquery'))
 
     def __init__(self, customer):
         self.customer = customer
 
     def set_guests(self, guests: List['Event']):
-        pass
+        _guests = guests
+        new_tables = SeatingChartGA(self).get_seating_chart_tables()
+        # delete old tables
+        for t in self.tables:
+            db.session.remove(t)
+        # add new tables
+        for t in new_tables:
+            db.session.add(t)
+        self.tables = new_tables
+        db.session.commit()
 
     def generate_seating_chart(self):
         pass
