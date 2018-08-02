@@ -1,3 +1,4 @@
+from eagleEvents.printing.chart import seating_chart_print
 from pathlib import Path
 from flask import Blueprint, render_template, flash, request, redirect, url_for, g, jsonify
 from eagleEvents.models.event import Event
@@ -75,13 +76,16 @@ def attendance_list():
     return render_template('test.html.j2')
 
 
-@events_blueprint.route('/printSeatingChart')
-@multi_auth.login_required
-def print_seating_chart():
+@events_blueprint.route('/printSeatingChartTest')
+def print_seating_chartTest():
+    # test page for printing seating chart
+    return render_template('print.html.j2')
+
+
+@events_blueprint.route('/printSeatingChart/<id>', methods=['POST'])
+def print_seating_chart(id):
     # Print Seating Chart
-    # TODO Probably just return the pdf or whatever
-    # May not actually need this but stubbing it anyway
-    return render_template('test.html.j2')
+    return seating_chart_print(id)
 
 
 """
@@ -144,3 +148,4 @@ def change_seats():
         return jsonify(response), 404
     response['error'] = 'Congrats, you made it to a part of the code that I thought was unreachable, bad news is I probably don\'t know how'
     return jsonify(response), 500
+
