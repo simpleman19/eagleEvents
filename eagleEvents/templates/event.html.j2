@@ -43,7 +43,7 @@
                 </table>
             </div>
                 <div class="buttons-action">
-                <button class="btn btn-lg btn-primary btn-add" type="submit">Add</button>
+                <button id="addEvent" class="btn btn-lg btn-primary btn-add" type="button">Add</button>
             </div>
         </div>
 <script src="https://code.jquery.com/jquery-1.12.4.min.js"></script>
@@ -57,7 +57,6 @@
     function onDocumentReload() {
         url = window.location.href;
         parameter = url.split("?");
-        console.log(parameter);
         if (parameter[1] == "show_all=yes") {
             document.getElementById("showAllCB").checked = true;
         }
@@ -72,6 +71,10 @@
         window.location = $(this).data("href");
     });
 
+    $("#addEvent").click(function() {
+        window.location.href = "/modifyEvent";
+    });
+
     function showAll() {
         if(document.getElementById("showAllCB").checked)
         {
@@ -79,7 +82,7 @@
         }
         else
         {
-            window.location.href = "/listEvents?show_all=no";
+            window.location.href = "/listEvents";
         }
     }
 
