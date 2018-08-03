@@ -5,11 +5,11 @@
 {% block body_content %}
     <h1>Users</h1>
         <div class="container">
-            <button class="btn btn-primary active" id="refreshButton" onclick="refreshTable()">Refresh Table</button>
+            <button class="btn btn-primary active" id="refreshButton" onclick="refresh()">Refresh</button>
         </div>
             <div class="card card-container-2">
                 <div class="dynamic-wrapper-list">
-                    <table id="listTable" class="table table-hover">
+                    <table id="listTable" class="table table-bordered table-hover">
                         <thead>
                             <tr>
                                 <th>Name</th>
@@ -31,10 +31,9 @@
                 <input type="button" class="btn btn-primary active btn-add" onclick="window.location.href='/modifyEventPlanner'" value="Add"/>
             </div>
         </div>
-<script src="https://code.jquery.com/jquery-1.12.4.min.js"></script>
 <script>
 
-    function refreshTable() {
+    function refresh() {
         url = window.location.href;
         window.location = url;
     }
