@@ -1,13 +1,13 @@
 {% extends "layout.html.j2" %}
 {% block head_content %}
       <title>Eagle Events Seating Chart</title>
-{% endblock %}  
+{% endblock %}
 {% block body_content %}
     <h1>Table Seating Chart</h1>
 <div class="container">
     <div class="card card-container-2 col-sm-4">
     <table class="table-seating table-bordered">
-        <h2>Table 1</h2>
+        <h3>Table 1</h3>
         <thead>
         <tr>
             <th>First Name</th>
@@ -36,7 +36,7 @@
   </div>
     <div class="card card-container-2 col-sm-4 ">
     <table class="table-seating table-bordered">
-        <h2>Table 2</h2>
+        <h3>Table 2</h3>
         <thead>
         <tr>
             <th>First Name</th>
@@ -65,7 +65,7 @@
   </div>
     <div class="card card-container-2 col-sm-4">
     <table class="table-seating table-bordered">
-        <h2>Table 3</h2>
+        <h3>Table 3</h3>
         <thead>
         <tr>
             <th>First Name</th>
@@ -96,7 +96,7 @@
     <div class="container">
     <div class="card card-container-2 col-sm-4">
     <table class="table-seating table-bordered">
-        <h2>Table 4</h2>
+        <h3>Table 4</h3>
         <thead>
         <tr>
             <th>First Name</th>
@@ -125,7 +125,7 @@
   </div>
     <div class="card card-container-2 col-sm-4">
     <table class="table-seating table-bordered">
-        <h2>Table 5</h2>
+        <h3>Table 5</h3>
         <thead>
         <tr>
             <th>First Name</th>
@@ -154,7 +154,7 @@
   </div>
     <div class="card card-container-2 col-sm-4">
     <table class="table-seating table-bordered">
-        <h2>Table 6</h2>
+        <h3>Table 6</h3>
         <thead>
         <tr>
             <th>First Name</th>
@@ -183,8 +183,8 @@
   </div>
     </div>
         <div class="buttons">
-            <button class="btn btn-lg btn-primary btn-save" type="submit">Save</button>
-            <button class="btn btn-lg btn-danger btn-cancel" type="cancel">Cancel</button>
+            <button class="btn btn-lg btn-primary btn-save" type="submit">Print</button>
+            <button class="btn btn-lg btn-danger btn-cancel" type="cancel">View Event</button>
         </div>
 <script src="https://code.jquery.com/jquery-1.12.4.min.js"></script>
 <script src="bootstable.js"></script>
@@ -192,5 +192,3 @@
  $('table').SetEditable();
 </script>
 {% endblock %}
-
-

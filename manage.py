@@ -51,7 +51,7 @@ def seed():
     db.create_all()
     seed_db()
     
-
+@manager.command
 def run_ga():
     from eagleEvents import run_ga
     run_ga.run()
