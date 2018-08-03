@@ -13,7 +13,7 @@
             </div>
             <br>
             <br>
-            <button class="btn btn-primary active" id="refreshButton" onclick="refreshTable()">Refresh Table</button>
+            <button class="btn btn-primary active" id="refreshButton" onclick="refresh()">Refresh</button>
           
             <div class="card card-container-2">
                 <div style="margin: 5px">
@@ -62,7 +62,7 @@
         }
     }
 
-    function refreshTable() {
+    function refresh() {
        url = window.location.href;
        window.location = url;
     }
