@@ -16,7 +16,7 @@ def list_events():
     show_all = request.args['show_all']
     currentUser = g.current_user
     company_id_user = currentUser.company_id
-    events_of_company = Event.query.filter_by(company_id = company_id_user)
+    events_of_company = Event.query.filter_by(company_id = company_id_user).order_by(Event.time.desc())
     if show_all == 'yes':
         events = events_of_company
     else:

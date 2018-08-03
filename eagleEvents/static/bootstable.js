@@ -8,26 +8,27 @@ Bootstable
   //Global variables
   var params = null;  		//Parameters
   var colsEdi =null;
-  var newColHtml = '<div class="btn-group pull-right">'+
-'<button id="bEdit" type="button" class="btn btn-sm btn-default" onclick="rowEdit(this);">' +
-'<span class="glyphicon glyphicon-pencil" > </span>'+
-'</button>'+
-'<button id="bElim" type="button" class="btn btn-sm btn-default" onclick="rowElim(this);">' +
-'<span class="glyphicon glyphicon-trash" > </span>'+
-'</button>'+
-'<button id="bAcep" type="button" class="btn btn-sm btn-default" style="display:none;" onclick="rowAcep(this);">' + 
-'<span class="glyphicon glyphicon-ok" > </span>'+
-'</button>'+
-'<button id="bCanc" type="button" class="btn btn-sm btn-default" style="display:none;" onclick="rowCancel(this);">' + 
-'<span class="glyphicon glyphicon-remove" > </span>'+
-'</button>'+
+  var newColHtml = '<div class="btn-group pull-left">'+
+    '<button id="bEdit" type="button" class="btn btn-sm btn-default edit-button" onclick="rowEdit(this);">' +
+    '<span class="glyphicon glyphicon-pencil" > </span>'+
+    '</button>'+
+    '<button id="bElim" type="button" class="btn btn-sm btn-default delete-button" onclick="rowElim(this);">' +
+    '<span class="glyphicon glyphicon-trash" > </span>'+
+    '</button>'+
+    '<button id="bAcep" type="button" class="btn btn-sm btn-default" style="display:none;" onclick="rowAcep(this);">' + 
+    '<span class="glyphicon glyphicon-ok" > </span>'+
+    '</button>'+
+    '<button id="bCanc" type="button" class="btn btn-sm btn-default" style="display:none;" onclick="rowCancel(this);">' + 
+    '<span class="glyphicon glyphicon-remove" > </span>'+
+    '</button>'+
     '</div>';
-  var colEdicHtml = '<td name="buttons">'+newColHtml+'</td>'; 
+    var colEdicHtml = '<td name="buttons">'+newColHtml+'</td>'; 
     
   $.fn.SetEditable = function (options) {
     var defaults = {
         columnsEd: null,         //Index to editable columns. If null all td editables. Ex.: "1,2,3,4,5"
         $addButton: null,        //Jquery object of "Add" button
+        editButton: true,
         onEdit: function() {},   //Called after edition
 		onBeforeDelete: function() {}, //Called before deletion
         onDelete: function() {}, //Called after deletion
@@ -49,6 +50,16 @@ Bootstable
         //Extract felds
         colsEdi = params.columnsEd.split(',');
     }
+
+    if (params.editButton == false) {
+        for(var i = 0; i < document.getElementsByClassName("edit-button").length; i++) {
+            document.getElementsByClassName("edit-button")[i].style.display = "none";
+        }
+        for(var i = 0; i < document.getElementsByClassName("delete-button").length; i++) {
+            document.getElementsByClassName("edit-button")[i].style.float = "left";
+        }
+        
+    } 
   };
 function IterarCamposEdit($cols, tarea) {
 //Itera por los campos editables de una fila
