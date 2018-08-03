@@ -209,7 +209,7 @@ def seed_db():
             # create events for customers
             for y in range(3):
                 event = Event(customer)
-                rand = randint(0,5)
+                rand = randint(0,6)
                 event.planner = users[rand]
                 event.name = __get_company_name(x) + "'s Awesome Event " + str(y)
                 event.venue = __get_company_name(x) + "'s Venue"
@@ -255,30 +255,31 @@ def seed_db():
             db.session.commit()
     else:
         # Users created (planner & admin)
-        user = User(company)
-        user.username = 'planner'
-        user.name = 'Planner'
-        user.set_password('password')
-        user.is_admin = False
-        user.is_active = True
-        db.session.add(user)
+        userA = User(company)
+        userA.username = 'planner'
+        userA.name = 'Planner'
+        userA.set_password('password')
+        userA.is_admin = False
+        userA.is_active = True
+        db.session.add(userA)
         db.session.commit()
-        user = User(company)
-        user.username = 'admin'
-        user.name = 'Admin'
-        user.set_password('password')
-        user.is_admin = True
-        user.is_active = True
-        db.session.add(user)
+        userB = User(company)
+        userB.username = 'admin'
+        userB.name = 'Admin'
+        userB.set_password('password')
+        userB.is_admin = True
+        userB.is_active = True
+        db.session.add(userB)
         db.session.commit()
-        user = User(company)
-        user.username = 'fired planner'
-        user.name = 'Fired Planner'
-        user.set_password('password')
-        user.is_admin = False
-        user.is_active = False
-        db.session.add(user)
+        userC = User(company)
+        userC.username = 'fired planner'
+        userC.name = 'Fired Planner'
+        userC.set_password('password')
+        userC.is_admin = False
+        userC.is_active = False
+        db.session.add(userC)
         db.session.commit()
+        users2 = [userA, userB, userC]
 
         # create customers 
         for x in range(5):
@@ -292,6 +293,8 @@ def seed_db():
             # create events for customers
             for y in range(2):
                 event = Event(customer)
+                rand = randint(0,2)
+                event.planner = users2[rand]
                 event.name = __get_company_name(x) + "'s Awesome Event " + str(y)
                 event.venue = __get_company_name(x) + "'s Venue"
                 event.company = company
