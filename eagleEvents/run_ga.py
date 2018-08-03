@@ -2,7 +2,8 @@ import time
 from sqlalchemy_utils import UUIDType
 
 from eagleEvents.seating_chart_ga import SeatingChartGA
-from eagleEvents.models import Event
+from eagleEvents.models import Event, SeatingPreference
+
 
 def run():
     ga = SeatingChartGA(Event.query.get('3508863751a449b28799cc1b657f5890'))
@@ -19,7 +20,7 @@ def run():
         for g in t.guests:
             print("Guest {number}".format(number=g.number))
             for p in g.seating_preferences:
-                pref_display = "LIKE" if p.preference == 1 else "DISLIKE"
+                pref_display = p.preference.name
                 if not(p.other_guest is None):
                     print("\t{pref} {other}".format(pref=pref_display, other=p.other_guest.number))
         print("\n")

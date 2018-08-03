@@ -93,6 +93,29 @@ def test_when_initializing_with_odd_percent_then_it_returns_a_list_containing_en
     count = len(list(filter(lambda x: x == Table.EMPTY_SEAT, result)))
     assert count == num_empty_seats
 
+@pytest.mark.filterwarnings('ignore::RuntimeWarning')
+def test_when_constructing_then_it_uses_the_correct_count_of_like_preferences(monkeypatch):
+    e = mock_event(monkeypatch)
+    db = mock_db(monkeypatch)
+    mock_guests = []
+    for x in range(10):
+        g = Guest(db)
+        g.number = x
+        mock_guests.append(g)
+
+    # First guest likes 5 people
+    mock_seating_prefs = []
+    for x in range(5):
+        mock_seating_prefs.append(SeatingPreferenceTable(mock_guests[0], mock_guests[x + 1], SeatingPreference.LIKE))
+    monkeypatch.setattr(mock_guests[0], "seating_preferences", mock_seating_prefs)
+
+    monkeypatch.setattr(e, "_guests", mock_guests)
+
+    ga = SeatingChartGA(e)
+
+
+    assert ga.total_like_preferences == 5
+
 ##
 # Population
 ##
@@ -187,6 +210,35 @@ def test_when_calling_count_dislikes_at_table_then_it_returns_correct_count(monk
 
     assert result == len(individual_without_empty_seats) - 1
 
+@pytest.mark.filterwarnings('ignore::RuntimeWarning')
+def test_when_calling_count_likes_at_table_then_it_returns_correct_count(monkeypatch):
+    e = mock_event(monkeypatch)
+    db = mock_db(monkeypatch)
+    mock_guests = []
+    for x in range(10):
+        g = Guest(db)
+        g.number = x
+        mock_guests.append(g)
+
+    # First guest likes 5 people
+    mock_seating_prefs = []
+    for x in range(5):
+        mock_seating_prefs.append(SeatingPreferenceTable(mock_guests[0], mock_guests[x+1], SeatingPreference.LIKE))
+    monkeypatch.setattr(mock_guests[0], "seating_preferences", mock_seating_prefs)
+
+    monkeypatch.setattr(e, "_guests", mock_guests)
+
+    ga = SeatingChartGA(e)
+    ga.initialization()
+    ga.population()
+    ga.evaluation()
+
+    individual = ga.toolbox.population(n=1)[0]
+
+    result = ga.count_likes_in_list(individual)
+
+    assert result == 5
+
 
 @pytest.mark.filterwarnings('ignore::RuntimeWarning')
 def test_when_calling_evaluate_it_returns_a_tuple_containing_the_count_of_dislikes_at_all_tables(monkeypatch):
@@ -197,7 +249,7 @@ def test_when_calling_evaluate_it_returns_a_tuple_containing_the_count_of_dislik
     ga.population()
     ga.evaluation()
 
-    def mock_count(list):
+    def mock_count(_):
         return 2
     monkeypatch.setattr(ga, "count_dislikes_in_list", mock_count)
 
@@ -205,6 +257,25 @@ def test_when_calling_evaluate_it_returns_a_tuple_containing_the_count_of_dislik
     score = ga.evaluate(individual)
 
     assert score[0] == 2 * ga.num_tables
+
+@pytest.mark.filterwarnings('ignore::RuntimeWarning')
+def test_when_calling_evaluate_it_returns_a_tuple_containing_the_count_of_likes_at_all_tables(monkeypatch):
+    e = mock_event(monkeypatch)
+
+    ga = SeatingChartGA(e)
+    ga.initialization()
+    ga.population()
+    ga.evaluation()
+
+    def mock_count(_):
+        return 5
+    monkeypatch.setattr(ga, "total_like_preferences", 100)
+    monkeypatch.setattr(ga, "count_likes_in_list", mock_count)
+
+    individual = ga.toolbox.population(n=1)[0]
+    score = ga.evaluate(individual)
+
+    assert score[1] == 100 - (5 * ga.num_tables)
 
 
 ##

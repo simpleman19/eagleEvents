@@ -25,12 +25,13 @@ class SeatingChartGA:
         self.event = event
         self.guest_numbers = [x.number for x in event._guests] if event._guests is not None else []
         self.guest_lookup = self.guest_list_to_nested_dict(self.event._guests)
+        self.total_like_preferences = self.count_like_preferences(self.guest_lookup)
 
         self.num_guests = len(self.guest_numbers)
         num_extra_seats = floor(len(event._guests) * event.percent_extra_seats)
         # account for table size
         num_extra_seats = num_extra_seats + (event.table_size.size - (len(event._guests) + num_extra_seats) % event.table_size.size)
-        self.table_assignments = self.guest_numbers + [Table.EMPTY_SEAT for x in range(num_extra_seats)]
+        self.table_assignments = self.guest_numbers + [Table.EMPTY_SEAT for _ in range(num_extra_seats)]
         self.num_tables = ceil(len(self.table_assignments) / event.table_size.size)
         self.toolbox = base.Toolbox()
 
@@ -50,7 +51,7 @@ class SeatingChartGA:
         return mapped
 
     def initialization(self):
-        creator.create("FitnessMin", base.Fitness, weights=(-1.0,))
+        creator.create("FitnessMin", base.Fitness, weights=(-1.0, -1.0))
         creator.create("Individual", list, fitness=creator.FitnessMin)
 
         self.toolbox.register("indices", random.sample, self.table_assignments, len(self.table_assignments))
@@ -73,16 +74,20 @@ class SeatingChartGA:
         self.toolbox.register("mutate", tools.mutShuffleIndexes, indpb=0.1)
 
     def statistics(self):
-        self.stats = tools.Statistics(lambda ind: ind.fitness.values)
-        self.stats.register("avg", mean)
-        self.stats.register("std", std)
-        self.stats.register("min", min)
-        self.stats.register("max", max)
+        dislike_stats = tools.Statistics(lambda ind: ind.fitness.values[0])
+        like_stats = tools.Statistics(lambda ind: ind.fitness.values[1])
+        self.mstats = tools.MultiStatistics(dislike=dislike_stats, like=like_stats)
+        self.mstats.register("avg", mean)
+        self.mstats.register("std", std)
+        self.mstats.register("min", min)
+        self.mstats.register("max", max)
         self.logbook = tools.Logbook()
-        self.logbook.header = "gen", "avg", "std", "min", "max"
+        self.logbook.header = "gen", "dislike", "like"
+        self.logbook.chapters["dislike"].header = "avg", "std", "min", "max"
+        self.logbook.chapters["like"].header = "avg", "std", "min", "max"
 
     def should_terminate(self, population, generation_number):
-        found_optimal_solution = len(population) > 0 and self.toolbox.select(population, 1)[0].fitness.values == (0,)
+        found_optimal_solution = len(population) > 0 and self.toolbox.select(population, 1)[0].fitness.values == (0, 0)
         return found_optimal_solution or generation_number > self.NGEN
 
     def update_fitnesses(self, population):
@@ -91,8 +96,8 @@ class SeatingChartGA:
             ind.fitness.values = fit
 
     def update_stats(self, generation_number, population):
-        if hasattr(self, 'stats'):
-            record = self.stats.compile(population)
+        if hasattr(self, 'mstats'):
+            record = self.mstats.compile(population)
             self.logbook.record(gen=generation_number, **record)
 
     # from http://deap.readthedocs.io/en/master/overview.html#algorithms
@@ -139,12 +144,15 @@ class SeatingChartGA:
         return algorithms.varAnd(offspring, self.toolbox, self.CXPB, self.MUTPB)
 
     def evaluate(self, individual):
-        score = 0
+        dislike_score = 0
+        like_score = self.total_like_preferences
         tables_to_check = range(self.num_tables)
         for t in tables_to_check:
             guests_at_table = individual[t*self.event.table_size.size:(t + 1)*self.event.table_size.size]
-            score += self.count_dislikes_in_list(guests_at_table)
-        return (score),
+            dislike_score += self.count_dislikes_in_list(guests_at_table)
+            # minimize the amount of unmet likes
+            like_score -= self.count_likes_in_list(guests_at_table)
+        return dislike_score, like_score
 
     def guest_list_to_nested_dict(self, guests):
         guests_dict = dict()
@@ -158,13 +166,19 @@ class SeatingChartGA:
                         #    other_id=pref.other_guest_id,
                         #    pref_id=pref.id,
                         #    guest_id=guest.id))
-                    pref_dict[pref.other_guest.number] = 1 if pref == SeatingPreference.LIKE else 0
+                    pref_dict[pref.other_guest.number] = pref.preference.value
             else:
                 pref_dict = None
             guests_dict[guest.number] = pref_dict
         return guests_dict
 
     def count_dislikes_in_list(self, guest_numbers):
+        return self.count_preferences_in_list(guest_numbers, SeatingPreference.DISLIKE.value)
+
+    def count_likes_in_list(self, guest_numbers):
+        return self.count_preferences_in_list(guest_numbers, SeatingPreference.LIKE.value)
+
+    def count_preferences_in_list(self, guest_numbers, preference_number):
         count = 0
         for i in range(len(guest_numbers)):
             if guest_numbers[i] == Table.EMPTY_SEAT:
@@ -180,9 +194,19 @@ class SeatingChartGA:
                 if not (guest_numbers[j] in guest_preferences):
                     continue
                 pref = guest_preferences[guest_numbers[j]]
-                if not (pref is None) and pref == 0:
+                if not (pref is None) and pref == preference_number:
                     count += 1
         return count
 
     def get_preferences_by_guest_number(self, number):
         return self.guest_lookup[number]
+
+    def count_like_preferences(self, guest_dict):
+        count = 0
+        for number, guest_preference_dict in guest_dict.items():
+            if guest_preference_dict is None:
+                continue
+            for other_number, preference_number in guest_preference_dict.items():
+                if preference_number == SeatingPreference.LIKE.value:
+                    count += 1
+        return count
