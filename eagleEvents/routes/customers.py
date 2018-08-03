@@ -8,8 +8,8 @@ customers_blueprint = Blueprint('customers', __name__)
 @customers_blueprint.route('/listCustomers')
 @multi_auth.login_required
 def list_customers():
-    # TODO List customers
-    return render_template('customer.html.j2')
+    customers = Customer.query.all();
+    return render_template('customer.html.j2', customers = customers)
 
 
 @customers_blueprint.route('/addCustomer', methods=['GET', 'POST'])
