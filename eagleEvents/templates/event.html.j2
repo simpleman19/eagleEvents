@@ -1,7 +1,7 @@
 {% extends "layout.html.j2" %}
 {% block head_content %}
-    <title>Eagle Events Event</title>
-{% endblock %}
+    <title>Eagle Events Events</title>
+{% endblock %}   
 {% block body_content %}
     <h1>Events</h1>
         <div class="container">
@@ -41,11 +41,14 @@
                         {% endfor %}
                     </tbody>
                 </table>
-                <button type="button" class="btn btn-primary active btn-add">Add</button>
+            </div>
+                <div class="buttons-action">
+                <button class="btn btn-lg btn-primary btn-add" type="submit">Add</button>
             </div>
         </div>
 <script src="https://code.jquery.com/jquery-1.12.4.min.js"></script>
 <script src="/static/bootstable.js"></script>
+
 <script>
     $('table').SetEditable({editButton: false, onBeforeDelete: deleteEvent});
 
