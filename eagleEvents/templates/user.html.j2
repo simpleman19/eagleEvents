@@ -5,11 +5,11 @@
 {% block body_content %}
     <h1>Users</h1>
         <div class="container">
-            <button class="btn btn-primary active" id="refreshButton">Refresh Table</button>
+            <button class="btn btn-primary active" id="refreshButton" onclick="refreshTable()">Refresh Table</button>
         </div>
             <div class="card card-container-2">
                 <div class="dynamic-wrapper-list">
-                    <table id="listTable" class="table table-hover table-scroll">
+                    <table id="listTable" class="table table-hover">
                         <thead>
                             <tr>
                                 <th>Name</th>
@@ -19,14 +19,10 @@
                         </thead>
                         <tbody>
                             {% for user in users %}
-                            <tr class = "click-row" data-href="modifyEventPlanner/ + {{user.id}}">
+                            <tr class = "click-row" data-href="modifyEventPlanner/ + {{ user.id }}">
                                 <td>{{user.name}}</td>
                                 <td>{{user.username}}</td>
-                                {% if user.is_active == True %}
-                                    <td><input type="checkbox" value="" checked disabled></td>
-                                {% else %}
-                                    <td><input type="checkbox" value="" disabled></td>
-                                {% endif %}
+                                <td><input type="checkbox" value="" {{'checked="checked"' if user.is_active}} disabled></td>
                             </tr>
                             {% endfor %}
                         </tbody>
@@ -37,11 +33,10 @@
         </div>
 <script src="https://code.jquery.com/jquery-1.12.4.min.js"></script>
 <script>
-    $("#refreshButton").on("click", refreshTable);
 
     function refreshTable() {
-        $("#listTable").load("/listEventPlanners #listTable");
-        $("#listTable").addClass("table table-bordered table-scroll");
+        url = window.location.href;
+        window.location = url;
     }
 
     $(".click-row").click(function() {
