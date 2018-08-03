@@ -7,12 +7,20 @@
         <div class="container">
             <div class="checkbox">
                 <label>
-                <input type="checkbox" value="">
+                <input id="showAllCB" type="checkbox" onclick="filter()" value="">
                     Show All
                 </label>
             </div>
+            <br>
+            <br>
+            <button class="btn btn-primary active" id="refreshButton">Refresh Table</button>
+          
             <div class="card card-container-2">
-                <table class="table table-bordered">
+                <div style="margin: 5px">
+                    <input class="form-control" style="display: inline; width: 30%" type="text" id="filter" onkeyup="filter()" placeholder="Search for events..">
+                    <button type="button" class="btn btn-light"><i class="fa fa-filter" aria-hidden="true"></i></button>
+                </div>
+                <table id="listTable" class="table table-bordered table-hover table-scroll">
                     <thead>
                         <tr>
                             <th>Name</th>
@@ -21,21 +29,14 @@
                         </tr>
                     </thead>
                     <tbody>
+                        {% for event in events %}
                         <tr>
-                            <td>John</td>
-                            <td>Eva</td>
-                            <td>08/22/2017</td>
+                            <td>{{event.name}}</td>
+                            <td>{{event.planner.name}}</td>
+                            <td>{{event.time.date()}}</td>
+                            <td style="display:none">{{event.planner.id}}</td>
                         </tr>
-                        <tr>
-                            <td>Mary</td>
-                            <td>Jacie</td>
-                            <td>08/22/2018</td>
-                        </tr>
-                        <tr>
-                            <td>July</td>
-                            <td>David</td>
-                            <td>01/23/2019</td>
-                        </tr>
+                        {% endfor %}
                     </tbody>
                 </table>
                 <button type="button" class="btn btn-primary active btn-add">Add</button>
@@ -44,6 +45,42 @@
 <script src="https://code.jquery.com/jquery-1.12.4.min.js"></script>
 <script src="/static/bootstable.js"></script>
 <script>
- $('table').SetEditable();
+    $("#refreshButton").on("click", refreshTable);
+
+    function refreshTable() {
+        $("#listTable").load("/listEventPlanners #listTable");
+        $("#listTable").addClass("table table-bordered table-scroll");
+    }
+
+    $(".click-row").click(function() {
+        window.location = $(this).data("href");
+    });
+
+    function filter() {
+        var input, filter, table, tr, tdName, tdPlanner, tdDate, i;
+        input = document.getElementById("filter");
+        filter = input.value.toUpperCase();
+        table = document.getElementById("listTable");
+        tr = table.getElementsByTagName("tr");
+
+        for (i = 0; i < tr.length; i++) {
+            tdName = tr[i].getElementsByTagName("td")[0];
+            tdPlanner = tr[i].getElementsByTagName("td")[1];
+            tdDate = tr[i].getElementsByTagName("td")[2];
+            
+            if (tdName || tdPlanner || tdDate) {
+                if (tdName.innerHTML.toUpperCase().indexOf(filter) > -1 || 
+                tdPlanner.innerHTML.toUpperCase().indexOf(filter) > -1 ||
+                tdDate.innerHTML.toUpperCase().indexOf(filter) > -1) {
+                    tr[i].style.display = "";
+                } else {
+                    tr[i].style.display = "none";
+                }
+            } 
+        }
+    }
+
+
+</script>
 </script>
 {% endblock %}
