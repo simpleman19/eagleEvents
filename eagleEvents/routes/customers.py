@@ -1,5 +1,4 @@
 from flask import Blueprint, redirect, render_template, request, url_for, g, flash
-import urllib.parse
 
 from eagleEvents import db
 from eagleEvents.auth import multi_auth
@@ -34,9 +33,7 @@ def add_customer():
 @customers_blueprint.route('/modifyCustomer/<customer_id>', methods=['GET', 'POST'])
 @multi_auth.login_required
 def modify_customer(customer_id):
-    customer_id_new = urllib.parse.urlparse(customer_id).path
-    customer_id_new = customer_id_new[3:]
-    customer = Customer.query.get(customer_id_new)
+    customer = Customer.query.get(customer_id)
     if request.method == 'GET':
         return render_template('add-update-customer.html.j2', customer=customer,
                                cancel_redirect=url_for('customers.list_customers'))
