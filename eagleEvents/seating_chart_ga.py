@@ -12,7 +12,7 @@ from numpy import max, mean, min, std
 
 
 class SeatingChartGA:
-    CXPB, MUTPB, INDPB, TOURNSIZE, NIND, NGEN = 0.5, 0.15, 0.2, 10, 500, 50
+    CXPB, MUTPB, INDPB, TOURNSIZE, NIND, NGEN = 0.5, 0.15, 0.2, 20, 500, 50
     COLLECT_STATS = False
 
     def __init__(self, event):
@@ -53,8 +53,8 @@ class SeatingChartGA:
         return mapped
 
     def initialization(self):
-        creator.create("FitnessMin", base.Fitness, weights=(-1.0, 1.0))
-        creator.create("Individual", list, fitness=creator.FitnessMin)
+        creator.create("FitnessMulti", base.Fitness, weights=(-0.2, 1.0))
+        creator.create("Individual", list, fitness=creator.FitnessMulti)
 
         self.toolbox.register("indices", random.sample, self.table_assignments, len(self.table_assignments))
         self.toolbox.register("individual", tools.initIterate, creator.Individual,
