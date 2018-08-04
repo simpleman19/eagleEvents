@@ -33,7 +33,7 @@
                     </thead>
                     <tbody>
                         {% for event in events %}
-                        <tr class = "click-row" data-href="modifyEvent/ + {{event.id}}">
+                        <tr class = "click-row" data-href="modifyEvent/{{event.id}}">
                             <td>{{event.name}}</td>
                             <td>{{event.planner.name}}</td>
                             <td>{{event.time.date()}}</td>
