@@ -31,8 +31,9 @@ def list_events():
 @events_blueprint.route('/addEvent', methods=['GET', 'POST'])
 @multi_auth.login_required
 def add_event():
-    planner_list = User.query.all()
-    customer_list = Customer.query.all()
+    user_company_id = g.current_user.company.id
+    planner_list = User.query.filter_by(company_id=user_company_id).all()
+    customer_list = Customer.query.filter_by(company_id=user_company_id).all()
     sizes = TableSize.query.all()
     # create a new event on the first customer in the list
     event = Event(customer_list[0])
