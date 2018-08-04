@@ -18,14 +18,14 @@ events_blueprint = Blueprint('events', __name__)
 @multi_auth.login_required
 def list_events():
     show_all = request.args.get("show_all")
-    currentUser = g.current_user
-    company_id_user = currentUser.company_id
-    events_of_company = Event.query.filter_by(company_id = company_id_user).order_by(Event.time.desc())
+    current_user = g.current_user
+    company_id_user = current_user.company_id
+    events_of_company = Event.query.filter_by(company_id=company_id_user).order_by(Event.time.desc())
     if show_all is not None:
         events = events_of_company
     else:
-        events = events_of_company.filter_by(planner_id = currentUser.id)
-    return render_template('event.html.j2', events=events, currentUser = currentUser)
+        events = events_of_company.filter_by(planner_id=current_user.id)
+    return render_template('event.html.j2', events=events, currentUser=current_user)
 
 
 @events_blueprint.route('/addEvent', methods=['GET', 'POST'])
@@ -55,9 +55,10 @@ def add_event():
 @events_blueprint.route('/modifyEvent/<event_id>', methods=['GET', 'POST'])
 @multi_auth.login_required
 def modify_event(event_id):
+    user_company_id = g.current_user.company.id
     event = Event.query.get(event_id)
-    planner_list = User.query.all()
-    customer_list = Customer.query.all()
+    planner_list = User.query.filter_by(company_id=user_company_id).all()
+    customer_list = Customer.query.filter_by(company_id=user_company_id).all()
     sizes = TableSize.query.all()
     imported = True if Guest.query.filter_by(event_id=event.id).count() > 0 else False
     # if the method is post, handle that the same way as add event
@@ -73,8 +74,9 @@ def modify_event(event_id):
 
 
 def handle_post(event, new):
-    planner_list = User.query.all()
-    customer_list = Customer.query.all()
+    user_company_id = g.current_user.company.id
+    planner_list = User.query.filter_by(company_id=user_company_id).all()
+    customer_list = Customer.query.filter_by(company_id=user_company_id).all()
     sizes = TableSize.query.all()
     button = request.form.get('button')
     imported = True if Guest.query.filter_by(event_id=event.id).count() > 0 else False
