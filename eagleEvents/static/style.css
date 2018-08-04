@@ -303,32 +303,3 @@ a.btn.btn-cancel {
     color: #fff;
 }
 
-
-/*********************
-TABLE SEATING CHART
-**********************/
-
-.table-seating {
-  padding: 8px;
-  line-height: 1.42857143;
-  vertical-align: top;
-  border-top: 1px solid #ddd;
-  margin-left: 23px;
-}
-
-
-
-.form-control-event{
-    width: 50%;
-}
-
-
-.row-1{
-    display: flex;
-    justify-content: space-around;
-}
-
-.form-customer{ 
-    width: 350px;
-}
-
