@@ -52,7 +52,7 @@ def modify_event(event_id):
     planner_list = User.query.all()
     customer_list = Customer.query.all()
     sizes = TableSize.query.all()
-    imported = True if Guest.query.filter_by(event_id=event.id) else False
+    imported = True if Guest.query.filter_by(event_id=event.id).count() > 0 else False
     # if the method is post, handle that the same way as add event
     if request.method == 'POST':
         # let the function tell us how we should be directed
@@ -70,7 +70,7 @@ def handle_post(event, new):
     customer_list = Customer.query.all()
     sizes = TableSize.query.all()
     button = request.form.get('button')
-    imported = True if Guest.query.filter_by(event_id=event.id) else False
+    imported = True if Guest.query.filter_by(event_id=event.id).count() > 0 else False
     if button == 'save':
         is_valid = validate_and_save(event, request)
         if is_valid:
