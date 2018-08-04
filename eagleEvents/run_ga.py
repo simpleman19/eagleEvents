@@ -5,12 +5,15 @@ from eagleEvents.seating_chart_ga import SeatingChartGA
 from eagleEvents.models import Event, db
 
 def run():
-    ga = SeatingChartGA(Event.query.get('8080fad5593d429aa1735737997d3f5c'))
+    event = Event.query.get('b45e38e0004946718126bd72446b76d3')
+    ga = SeatingChartGA(event)
     ga.COLLECT_STATS = True
 
     ga.setup()
     start = time.time()
     tables = ga.get_seating_chart_tables()
+    [db.session.delete(table) for table in event.tables]
+    db.session.commit()
     [db.session.add(table) for table in tables]
     db.session.commit()
     end = time.time()

@@ -1,6 +1,6 @@
 from eagleEvents.printing.chart import seating_chart_print
 from pathlib import Path
-from flask import Blueprint, render_template, flash, request, redirect, url_for, g, jsonify
+from flask import Blueprint, render_template, flash, request, redirect, url_for, g, jsonify, abort
 from eagleEvents.models.event import Event
 from eagleEvents.models.guest import Guest
 from eagleEvents.models.table import Table
@@ -29,6 +29,7 @@ def allowed_file(filename):
 def modify_event():
     # TODO get the event that is currenlty being modified
     event = Event.query.first()
+    print("Modifying: " + str(event.id))
     if request.method == 'POST' and request.files:
         # check if the post request has the file part
         if 'file' not in request.files:
@@ -59,7 +60,8 @@ def modify_event():
 def seating_chart():
     # TODO Seating Chart
     # UI Seating Chart
-    return render_template('seating-chart.html.j2')
+    event = Event.query.filter_by(id="b45e38e0004946718126bd72446b76d3").one_or_none()
+    return render_template('seating-chart.html.j2', tables=event.tables)
 
 
 @events_blueprint.route('/tableCards')
@@ -177,3 +179,23 @@ def change_seats():
         return jsonify(response), 404
 
 
+@events_blueprint.route('/api/table/guests', methods=['GET'])
+@multi_auth.login_required
+def get_guests_for_table():
+    table_id = request.args.get('table')
+    response = {
+        'guests': []
+    }
+    if table_id is not None:
+        try:
+            table = Table.query.filter_by(id=table_id).one_or_none()
+            if table is not None:
+                response['guests'] = [{'full_name': g.full_name, 'id': str(g.id)} for g in table.guests]
+                return jsonify(response), 200
+            else:
+                return jsonify({'error': 'Error finding table'}), 404
+        # If anything threw an exception (Probably a sql statement)
+        except Exception:
+            return jsonify({'error': 'Error finding table, exception thrown'}), 404
+    else:
+        abort(404)

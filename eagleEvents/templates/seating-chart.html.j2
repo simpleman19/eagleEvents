@@ -4,188 +4,36 @@
 {% endblock %}
 {% block body_content %}
     <h1>Table Seating Chart</h1>
-<div class="container">
-    <div class="card card-container-2 col-sm-4">
-    <table class="table-seating table-bordered">
-        <h3>Table 1</h3>
-        <thead>
-        <tr>
-            <th>First Name</th>
-            <th>Last Name</th>
-            <th>Title</th>
-        </tr>
-        </thead>
-        <tbody>
-        <tr data-toggle="modal" data-id="1" data-target="#myModal">
-            <td>John</td>
-            <td>Green</td>
-            <td>Project Manager</td>
-        </tr>
-        <tr data-toggle="modal" data-id="2" data-target="#myModal">
-            <td>Don</td>
-            <td>Henson</td>
-            <td>Doctor</td>
-        </tr>
-        <tr data-toggle="modal" data-id="3" data-target="#myModal">
-            <td>July</td>
-            <td>Smith</td>
-            <td>CEO</td>
-        </tr>
-        </tbody>
-  </table>
-  </div>
-    <div class="card card-container-2 col-sm-4 ">
-    <table class="table-seating table-bordered">
-        <h3>Table 2</h3>
-        <thead>
-        <tr>
-            <th>First Name</th>
-            <th>Last Name</th>
-            <th>Title</th>
-        </tr>
-        </thead>
-        <tbody>
-        <tr data-toggle="modal" data-id="1" data-target="#myModal">
-            <td>John</td>
-            <td>Green</td>
-            <td>Project Manager</td>
-        </tr>
-        <tr data-toggle="modal" data-id="2" data-target="#myModal">
-            <td>Don</td>
-            <td>Henson</td>
-            <td>Doctor</td>
-        </tr>
-        <tr data-toggle="modal" data-id="3" data-target="#myModal">
-            <td>July</td>
-            <td>Smith</td>
-            <td>CEO</td>
-        </tr>
-        </tbody>
-  </table>
-  </div>
-    <div class="card card-container-2 col-sm-4">
-    <table class="table-seating table-bordered">
-        <h3>Table 3</h3>
-        <thead>
-        <tr>
-            <th>First Name</th>
-            <th>Last Name</th>
-            <th>Title</th>
-        </tr>
-        </thead>
-        <tbody>
-        <tr data-toggle="modal" data-id="1" data-target="#myModal">
-            <td>John</td>
-            <td>Green</td>
-            <td>Project Manager</td>
-        </tr>
-        <tr data-toggle="modal" data-id="2" data-target="#myModal">
-            <td>Don</td>
-            <td>Henson</td>
-            <td>Doctor</td>
-        </tr>
-        <tr data-toggle="modal" data-id="3" data-target="#myModal">
-            <td>July</td>
-            <td>Smith</td>
-            <td>CEO</td>
-        </tr>
-        </tbody>
-  </table>
-  </div>
-    </div>
-    <div class="container">
-    <div class="card card-container-2 col-sm-4">
-    <table class="table-seating table-bordered">
-        <h3>Table 4</h3>
-        <thead>
-        <tr>
-            <th>First Name</th>
-            <th>Last Name</th>
-            <th>Title</th>
-        </tr>
-        </thead>
-        <tbody>
-        <tr data-toggle="modal" data-id="1" data-target="#myModal">
-            <td>John</td>
-            <td>Green</td>
-            <td>Project Manager</td>
-        </tr>
-        <tr data-toggle="modal" data-id="2" data-target="#myModal">
-            <td>Don</td>
-            <td>Henson</td>
-            <td>Doctor</td>
-        </tr>
-        <tr data-toggle="modal" data-id="3" data-target="#myModal">
-            <td>July</td>
-            <td>Smith</td>
-            <td>CEO</td>
-        </tr>
-        </tbody>
-  </table>
-  </div>
-    <div class="card card-container-2 col-sm-4">
-    <table class="table-seating table-bordered">
-        <h3>Table 5</h3>
-        <thead>
-        <tr>
-            <th>First Name</th>
-            <th>Last Name</th>
-            <th>Title</th>
-        </tr>
-        </thead>
-        <tbody>
-        <tr data-toggle="modal" data-id="1" data-target="#myModal">
-            <td >John</td>
-            <td>Green</td>
-            <td>Project Manager</td>
-        </tr>
-        <tr data-toggle="modal" data-id="2" data-target="#myModal">
-            <td>Don</td>
-            <td>Henson</td>
-            <td>Doctor</td>
-        </tr>
-        <tr data-toggle="modal" data-id="3" data-target="#myModal">
-            <td>July</td>
-            <td>Smith</td>
-            <td>CEO</td>
-        </tr>
-        </tbody>
-  </table>
-  </div>
-    <div class="card card-container-2 col-sm-4">
-    <table class="table-seating table-bordered">
-        <h3>Table 6</h3>
-        <thead>
-        <tr>
-            <th>First Name</th>
-            <th>Last Name</th>
-            <th>Title</th>
-        </tr>
-        </thead>
-        <tbody>
-        <tr data-toggle="modal" data-id="1" data-target="#myModal">
-            <td>John</td>
-            <td>Green</td>
-            <td>Project Manager</td>
-        </tr>
-        <tr data-toggle="modal" data-id="2" data-target="#myModal">
-            <td>Don</td>
-            <td>Henson</td>
-            <td>Doctor</td>
-        </tr>
-        <tr data-toggle="modal" data-id="3" data-target="#myModal">
-            <td>July</td>
-            <td>Smith</td>
-            <td>CEO</td>
-        </tr>
-        </tbody>
-  </table>
-  </div>
-    </div>
-        <!-- Modal -->
-  <div class="modal fade" id="myModal" role="dialog">
+    {% for table in tables %}
+        <div class="card card-container-2 col-xs-4" style="height: 400px;">
+            <table id="{{ table.id }}" class="table-seating table-bordered">
+                <h3>Table {{ table.number }}</h3>
+                <thead>
+                <tr>
+                    <th>First Name</th>
+                    <th>Last Name</th>
+                    <th>Title</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for guest in table.guests %}
+                    <tr id="{{ guest.id }}" onClick="modifySeating('{{ table.id }}', '{{ guest.id }}')">
+                        <td class="first_name">{{ guest.first_name }}</td>
+                        <td class="last_name">{{ guest.last_name }}</td>
+                        <td class="title">{{ guest.title }}</td>
+                        <td class="id" style="display:none;">{{ guest.id }}</td>
+                        <td class="table_id" style="display:none;">{{ guest.table_id }}</td>
+                        <td class="event_id" style="display:none;">{{ guest.event_id }}</td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+          </table>
+      </div>
+    {% endfor %}
+  <!-- Modal -->
+  <div class="modal fade" id="seatingModificationModal" role="dialog">
     <div class="modal-dialog">
-    
+
       <!-- Modal content-->
       <div class="modal-content">
         <div class="modal-header">
@@ -193,60 +41,63 @@
           <div class="container-table">
             <h2>Move Guest</h2>
             <div class="row_">
-                <h3>Guest: Jacie Dryden</h3>
+                <h3 id="sel-guest-name">Guest: Loading...</h3>
             </div>
             <div class="row-1">
             <form class="form-customer">
                    <div class="form-group row">
                         <label for="example-number-input" class="col-2 col-form-label">Table</label>
                             <div class="col-10">
-                                <input class="form-control form-control-event" type="number" value="50" id="example-number-input">
+                                <select class="form-control form-control-event" id="table-select">
+                                    <option>Loading...</option>
+                                </select>
                             </div>
                     </div>
                     <div class="form-group row">
                         <label for="exampleFormControlSelect2">Guests</label>
-                            <select multiple class="form-control" id="exampleFormControlSelect2">
-                                <option>Joe Exotic</option>
-                                <option>Jacob Collins</option>
-                                <option>Chance Turner</option>
-                                <option>Dee Dee McCroskey</option>
-                                <option>Emily P.</option>
-                                 <option>Paresa N.</option>
-                                <option>Empty Seat</option>
-                                </select>
+                            <select multiple class="form-control" id="guest-select">
+                                <option>Loading...</option>
+                            </select>
                     </div>
                 </form>
             </div>
-            
-        
-                </div>
-               
+          </div>
         <div class="modal-footer">
             <button class="btn btn-lg btn-primary btn-save" type="submit">Save</button>
-            <button class="btn btn-lg btn-danger btn-cancel" type="cancel">Cancel</button>       
+            <button class="btn btn-lg btn-danger btn-cancel" type="cancel" data-dismiss="modal">Cancel</button>
         </div>
       </div>
-      
+
     </div>
   </div>
     </div>
-<script src="https://code.jquery.com/jquery-1.12.4.min.js"></script>
-<script src="bootstable.js"></script>
+<script src="/static/bootstable.js"></script>
 <script>
- $('table').SetEditable();
-    
-    
-$(function(){
-$('#myModal').modal({
-    keyboard: true,
-    backdrop: "static",
-    show:false,
-
-}).on('show', function(){
-      var getIdFromRow = $(event.target).closest('tr').data('id');
-    //make your ajax call populate items or what even you need
-    $(this).find('#orderDetails').html($('<b> Order Id selected: ' + getIdFromRow  + '</b>'))
-});
-});
+  function modifySeating(tableId, selGuestId) {
+    console.log(tableId);
+    console.log(selGuestId);
+    fetch('/api/table/guests?table=' + tableId, {
+        credentials: "same-origin",
+        method: "GET",
+    }).catch(error => console.error('Error:', error))
+      .then(res => res.json())
+      .then(json => {
+        console.log(json)
+        var option, i;
+        var selectbox = document.getElementById('guest-select');
+        for(i = selectbox.options.length - 1 ; i >= 0 ; i--)
+        {
+            selectbox.remove(i);
+        }
+        for (i = 0; i < json.guests.length; i++){
+          console.log(json[i]);
+          option = document.createElement( 'option' );
+          option.value = option.text = json.guests[i].full_name;
+          selectbox.add(option);
+        }
+      });
+      document.getElementById('sel-guest-name').innerHTML = "Guest: " + document.getElementById(selGuestId).getElementsByClassName('last_name')[0].innerHTML + ", " + document.getElementById(selGuestId).getElementsByClassName('first_name')[0].innerHTML;
+      $('#seatingModificationModal').modal('show');
+  }
 </script>
 {% endblock %}
