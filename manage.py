@@ -56,6 +56,12 @@ def run_ga():
     from eagleEvents import run_ga
     run_ga.run()
 
+@manager.command
+def run_ga_all():
+    from eagleEvents import run_ga
+    run_ga.run_all()
+
+
 manager.add_command("livereload", LiveReloadServer)
 
 if __name__ == '__main__':

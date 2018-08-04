@@ -138,8 +138,14 @@ def upload_file(event, request):
 def seating_chart(event_id):
     # TODO Seating Chart
     # UI Seating Chart
-    event = Event.query.filter_by(id="b45e38e0004946718126bd72446b76d3").one_or_none()
-    return render_template('seating-chart.html.j2', tables=event.tables)
+    event = None
+    try:
+        event = Event.query.filter_by(id=event_id).one_or_none()
+    except Exception:
+        abort(404)
+    if event is None:
+        abort(404)
+    return render_template('seating-chart.html.j2', tables=sorted(event.tables, key=lambda x: x.number))
 
 
 @events_blueprint.route('/tableCards')
@@ -306,7 +312,13 @@ def get_guests_for_table():
         try:
             table = Table.query.filter_by(id=table_id).one_or_none()
             if table is not None:
-                response['guests'] = [{'full_name': g.full_name, 'id': str(g.id)} for g in table.guests]
+                response['guests'] = [{
+                    'full_name': g.full_name,
+                    'id': str(g.id),
+                    'first_name': g.first_name,
+                    'last_name': g.last_name
+                } for g in table.guests]
+                response['empty_seat'] = table.seating_capacity > len(table.guests)
                 return jsonify(response), 200
             else:
                 return jsonify({'error': 'Error finding table'}), 404
