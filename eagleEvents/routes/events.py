@@ -1,7 +1,6 @@
-from flask import Blueprint, render_template, send_file, make_response, send_from_directory
 from eagleEvents.printing.chart import seating_chart_print
 from pathlib import Path
-from flask import Blueprint, render_template, Flask, flash, request, redirect, url_for, g
+from flask import Blueprint, render_template, flash, request, redirect, g, url_for
 from eagleEvents.models.event import Event
 from eagleEvents.models.customer import Customer
 from eagleEvents.models.user import User
@@ -11,7 +10,6 @@ from eagleEvents import db
 import os, config, datetime
 from werkzeug.utils import secure_filename
 from eagleEvents.auth import multi_auth
-ALLOWED_EXTENSIONS = set(['csv'])
 
 events_blueprint = Blueprint('events', __name__)
 
