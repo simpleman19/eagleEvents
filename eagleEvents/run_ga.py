@@ -15,13 +15,15 @@ def run():
     end = time.time()
     print(ga.logbook)
     print("Execution time: {time}".format(time=end-start))
-    for t in tables:
-        print("Table {number}".format(number=t.number))
-        for g in t.guests:
-            print("Guest {number}".format(number=g.number))
-            for p in g.seating_preferences:
-                pref_display = p.preference.name
-                if not(p.other_guest is None):
-                    print("\t{pref} {other}".format(pref=pref_display, other=p.other_guest.number))
-        print("\n")
+    print("Number of likes: {likes}\nNumber of dislikes: {dislikes}".format(
+        likes=ga.total_like_preferences, dislikes=ga.total_dislike_preferences))
+    #for t in tables:
+    #    print("Table {number}".format(number=t.number))
+    #    for g in t.guests:
+    #        print("Guest {number}".format(number=g.number))
+    #        for p in g.seating_preferences:
+    #            pref_display = p.preference.name
+    #            if not(p.other_guest is None):
+    #                print("\t{pref} {other}".format(pref=pref_display, other=p.other_guest.number))
+    #    print("\n")
 

@@ -12,7 +12,7 @@ from numpy import max, mean, min, std
 
 
 class SeatingChartGA:
-    CXPB, MUTPB, NIND, NGEN = 0.5, 0.5, 50, 50
+    CXPB, MUTPB, INDPB, TOURNSIZE, NIND, NGEN = 0.5, 0.15, 0.2, 10, 500, 50
     COLLECT_STATS = False
 
     def __init__(self, event):
@@ -25,7 +25,8 @@ class SeatingChartGA:
         self.event = event
         self.guest_numbers = [x.number for x in event._guests] if event._guests is not None else []
         self.guest_lookup = self.guest_list_to_nested_dict(self.event._guests)
-        self.total_like_preferences = self.count_like_preferences(self.guest_lookup)
+        self.total_like_preferences = self.count_preferences(self.guest_lookup, SeatingPreference.LIKE)
+        self.total_dislike_preferences = self.count_preferences(self.guest_lookup, SeatingPreference.DISLIKE)
 
         self.num_guests = len(self.guest_numbers)
         num_extra_seats = floor(len(event._guests) * event.percent_extra_seats)
@@ -51,7 +52,7 @@ class SeatingChartGA:
         return mapped
 
     def initialization(self):
-        creator.create("FitnessMin", base.Fitness, weights=(-1.0, -1.0))
+        creator.create("FitnessMin", base.Fitness, weights=(-1.0, 1.0))
         creator.create("Individual", list, fitness=creator.FitnessMin)
 
         self.toolbox.register("indices", random.sample, self.table_assignments, len(self.table_assignments))
@@ -65,13 +66,13 @@ class SeatingChartGA:
         self.toolbox.register("evaluate", self.evaluate)
 
     def selection(self):
-        self.toolbox.register("select", tools.selBest)
+        self.toolbox.register("select", tools.selTournament, tournsize=self.TOURNSIZE, fit_attr="fitness")
 
     def crossover(self):
-        self.toolbox.register("mate", tools.cxPartialyMatched)
+        self.toolbox.register("mate", tools.cxOrdered)
 
     def mutation(self):
-        self.toolbox.register("mutate", tools.mutShuffleIndexes, indpb=0.1)
+        self.toolbox.register("mutate", tools.mutShuffleIndexes, indpb=self.INDPB)
 
     def statistics(self):
         dislike_stats = tools.Statistics(lambda ind: ind.fitness.values[0])
@@ -87,7 +88,7 @@ class SeatingChartGA:
         self.logbook.chapters["like"].header = "avg", "std", "min", "max"
 
     def should_terminate(self, population, generation_number):
-        found_optimal_solution = len(population) > 0 and self.toolbox.select(population, 1)[0].fitness.values == (0, 0)
+        found_optimal_solution = len(population) > 0 and self.toolbox.select(population, 1)[0].fitness.values == (0, self.total_like_preferences)
         return found_optimal_solution or generation_number > self.NGEN
 
     def update_fitnesses(self, population):
@@ -141,17 +142,16 @@ class SeatingChartGA:
         return offspring
 
     def crossover_and_mutate(self, offspring):
-        return algorithms.varAnd(offspring, self.toolbox, self.CXPB, self.MUTPB)
+        return algorithms.varOr(list(offspring), self.toolbox, cxpb=self.CXPB, mutpb=self.MUTPB, lambda_=self.NIND)
 
     def evaluate(self, individual):
         dislike_score = 0
-        like_score = self.total_like_preferences
+        like_score = 0
         tables_to_check = range(self.num_tables)
         for t in tables_to_check:
             guests_at_table = individual[t*self.event.table_size.size:(t + 1)*self.event.table_size.size]
             dislike_score += self.count_dislikes_in_list(guests_at_table)
-            # minimize the amount of unmet likes
-            like_score -= self.count_likes_in_list(guests_at_table)
+            like_score += self.count_likes_in_list(guests_at_table)
         return dislike_score, like_score
 
     def guest_list_to_nested_dict(self, guests):
@@ -201,12 +201,12 @@ class SeatingChartGA:
     def get_preferences_by_guest_number(self, number):
         return self.guest_lookup[number]
 
-    def count_like_preferences(self, guest_dict):
+    def count_preferences(self, guest_dict, seating_preference):
         count = 0
         for number, guest_preference_dict in guest_dict.items():
             if guest_preference_dict is None:
                 continue
             for other_number, preference_number in guest_preference_dict.items():
-                if preference_number == SeatingPreference.LIKE.value:
+                if preference_number == seating_preference.value:
                     count += 1
         return count
