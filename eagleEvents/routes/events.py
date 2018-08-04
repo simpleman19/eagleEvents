@@ -13,8 +13,15 @@ events_blueprint = Blueprint('events', __name__)
 @events_blueprint.route('/listEvents')
 @multi_auth.login_required
 def list_events():
-    # TODO LIST
-    return render_template('event.html.j2')
+    show_all = request.args.get("show_all")
+    currentUser = g.current_user
+    company_id_user = currentUser.company_id
+    events_of_company = Event.query.filter_by(company_id = company_id_user).order_by(Event.time.desc())
+    if show_all is not None:
+        events = events_of_company
+    else:
+        events = events_of_company.filter_by(planner_id = currentUser.id)
+    return render_template('event.html.j2', events=events, currentUser = currentUser)
 
 
 def allowed_file(filename):
