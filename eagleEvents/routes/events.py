@@ -33,33 +33,6 @@ def list_events():
     return render_template('event.html.j2', events=events, currentUser = currentUser)
 
 
-@events_blueprint.route('/modifyEvent', methods=['GET', 'POST'])
-@multi_auth.login_required
-def modify_event():
-    # TODO get the event that is currenlty being modified
-    event = Event.query.first()
-    print("Modifying: " + str(event.id))
-    if request.method == 'POST' and request.files:
-        # check if the post request has the file part
-        if 'file' not in request.files:
-            flash('No file part')
-            return redirect(request.url)
-        file = request.files['file']
-        # if user does not select file, browser also
-        # submit a empty part without filename
-        if file.filename == '':
-            flash('No selected file')
-            return redirect(request.url)
-        if file and allowed_file(file.filename):
-            filename = secure_filename(file.filename)
-            home = str(Path.home())
-            path = os.path.join(home, filename)
-            file.save(path)
-            c = g.current_user.company
-            c.process_guest_list(path, event)
-            flash('Import Completed: ' + filename)
-
-
 @events_blueprint.route('/addEvent', methods=['GET', 'POST'])
 @multi_auth.login_required
 def add_event():
