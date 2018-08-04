@@ -83,7 +83,7 @@ def handle_post(event, new):
     elif button == 'cancel':
         return redirect(url_for('events.list_events'))
     elif button == 'seat':
-        return redirect(url_for('events.print_seating_chart', id=event.id))
+        return redirect(url_for('events.seating_chart', event_id=event.id))
     elif button == 'attendance':
         return redirect(url_for('events.attendance_list'))
     elif button == 'table':
@@ -121,9 +121,9 @@ def upload_file(event, request):
         flash('File Type Not Accepted', category='error')
 
 
-@events_blueprint.route('/seatingChart')
+@events_blueprint.route('/seatingChart/<event_id>', methods=['GET', 'POST'])
 @multi_auth.login_required
-def seating_chart():
+def seating_chart(event_id):
     # TODO Seating Chart
     # UI Seating Chart
     return render_template('seating-chart.html.j2')
