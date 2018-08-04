@@ -16,17 +16,17 @@
         </tr>
         </thead>
         <tbody>
-        <tr>
+        <tr data-toggle="modal" data-id="1" data-target="#myModal">
             <td>John</td>
             <td>Green</td>
             <td>Project Manager</td>
         </tr>
-        <tr>
+        <tr data-toggle="modal" data-id="2" data-target="#myModal">
             <td>Don</td>
             <td>Henson</td>
             <td>Doctor</td>
         </tr>
-        <tr>
+        <tr data-toggle="modal" data-id="3" data-target="#myModal">
             <td>July</td>
             <td>Smith</td>
             <td>CEO</td>
@@ -45,17 +45,17 @@
         </tr>
         </thead>
         <tbody>
-        <tr>
+        <tr data-toggle="modal" data-id="1" data-target="#myModal">
             <td>John</td>
             <td>Green</td>
             <td>Project Manager</td>
         </tr>
-        <tr>
+        <tr data-toggle="modal" data-id="2" data-target="#myModal">
             <td>Don</td>
             <td>Henson</td>
             <td>Doctor</td>
         </tr>
-        <tr>
+        <tr data-toggle="modal" data-id="3" data-target="#myModal">
             <td>July</td>
             <td>Smith</td>
             <td>CEO</td>
@@ -74,17 +74,17 @@
         </tr>
         </thead>
         <tbody>
-        <tr>
+        <tr data-toggle="modal" data-id="1" data-target="#myModal">
             <td>John</td>
             <td>Green</td>
             <td>Project Manager</td>
         </tr>
-        <tr>
+        <tr data-toggle="modal" data-id="2" data-target="#myModal">
             <td>Don</td>
             <td>Henson</td>
             <td>Doctor</td>
         </tr>
-        <tr>
+        <tr data-toggle="modal" data-id="3" data-target="#myModal">
             <td>July</td>
             <td>Smith</td>
             <td>CEO</td>
@@ -105,17 +105,17 @@
         </tr>
         </thead>
         <tbody>
-        <tr>
+        <tr data-toggle="modal" data-id="1" data-target="#myModal">
             <td>John</td>
             <td>Green</td>
             <td>Project Manager</td>
         </tr>
-        <tr>
+        <tr data-toggle="modal" data-id="2" data-target="#myModal">
             <td>Don</td>
             <td>Henson</td>
             <td>Doctor</td>
         </tr>
-        <tr>
+        <tr data-toggle="modal" data-id="3" data-target="#myModal">
             <td>July</td>
             <td>Smith</td>
             <td>CEO</td>
@@ -134,17 +134,17 @@
         </tr>
         </thead>
         <tbody>
-        <tr>
-            <td>John</td>
+        <tr data-toggle="modal" data-id="1" data-target="#myModal">
+            <td >John</td>
             <td>Green</td>
             <td>Project Manager</td>
         </tr>
-        <tr>
+        <tr data-toggle="modal" data-id="2" data-target="#myModal">
             <td>Don</td>
             <td>Henson</td>
             <td>Doctor</td>
         </tr>
-        <tr>
+        <tr data-toggle="modal" data-id="3" data-target="#myModal">
             <td>July</td>
             <td>Smith</td>
             <td>CEO</td>
@@ -163,17 +163,17 @@
         </tr>
         </thead>
         <tbody>
-        <tr>
+        <tr data-toggle="modal" data-id="1" data-target="#myModal">
             <td>John</td>
             <td>Green</td>
             <td>Project Manager</td>
         </tr>
-        <tr>
+        <tr data-toggle="modal" data-id="2" data-target="#myModal">
             <td>Don</td>
             <td>Henson</td>
             <td>Doctor</td>
         </tr>
-        <tr>
+        <tr data-toggle="modal" data-id="3" data-target="#myModal">
             <td>July</td>
             <td>Smith</td>
             <td>CEO</td>
@@ -182,13 +182,71 @@
   </table>
   </div>
     </div>
-        <div class="buttons">
-            <button class="btn btn-lg btn-primary btn-save" type="submit">Print</button>
-            <button class="btn btn-lg btn-danger btn-cancel" type="cancel">View Event</button>
+        <!-- Modal -->
+  <div class="modal fade" id="myModal" role="dialog">
+    <div class="modal-dialog">
+    
+      <!-- Modal content-->
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal">&times;</button>
+          <div class="container-table">
+            <h2>Move Guest</h2>
+            <div class="row_">
+                <h3>Guest: Jacie Dryden</h3>
+            </div>
+            <div class="row-1">
+            <form class="form-customer">
+                   <div class="form-group row">
+                        <label for="example-number-input" class="col-2 col-form-label">Table</label>
+                            <div class="col-10">
+                                <input class="form-control form-control-event" type="number" value="50" id="example-number-input">
+                            </div>
+                    </div>
+                    <div class="form-group row">
+                        <label for="exampleFormControlSelect2">Guests</label>
+                            <select multiple class="form-control" id="exampleFormControlSelect2">
+                                <option>Joe Exotic</option>
+                                <option>Jacob Collins</option>
+                                <option>Chance Turner</option>
+                                <option>Dee Dee McCroskey</option>
+                                <option>Emily P.</option>
+                                 <option>Paresa N.</option>
+                                <option>Empty Seat</option>
+                                </select>
+                    </div>
+                </form>
+            </div>
+            
+        
+                </div>
+               
+        <div class="modal-footer">
+            <button class="btn btn-lg btn-primary btn-save" type="submit">Save</button>
+            <button class="btn btn-lg btn-danger btn-cancel" type="cancel">Cancel</button>       
         </div>
+      </div>
+      
+    </div>
+  </div>
+    </div>
 <script src="https://code.jquery.com/jquery-1.12.4.min.js"></script>
 <script src="bootstable.js"></script>
 <script>
  $('table').SetEditable();
+    
+    
+$(function(){
+$('#myModal').modal({
+    keyboard: true,
+    backdrop: "static",
+    show:false,
+
+}).on('show', function(){
+      var getIdFromRow = $(event.target).closest('tr').data('id');
+    //make your ajax call populate items or what even you need
+    $(this).find('#orderDetails').html($('<b> Order Id selected: ' + getIdFromRow  + '</b>'))
+});
+});
 </script>
 {% endblock %}
