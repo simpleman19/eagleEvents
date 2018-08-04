@@ -6,6 +6,7 @@ from eagleEvents.models.event import Event
 from eagleEvents.models.customer import Customer
 from eagleEvents.models.user import User
 from eagleEvents.models.company import TableSize
+from eagleEvents.models.guest import Guest
 from eagleEvents import db
 import os, config, datetime
 from werkzeug.utils import secure_filename
@@ -42,7 +43,7 @@ def add_event():
         return handler
     # if this is GET, handle that for first time event creation
     return render_template('add-update-event.html.j2', event=event, sizes=sizes, planner=g.current_user,
-                           customers=customer_list, planners=planner_list, new=True,
+                           customers=customer_list, planners=planner_list, new=True, imported=False,
                            date=convert_time(event.time), cancel_redirect=url_for('events.list_events'))
 
 
@@ -53,6 +54,7 @@ def modify_event(event_id):
     planner_list = User.query.all()
     customer_list = Customer.query.all()
     sizes = TableSize.query.all()
+    imported = True if Guest.query.filter_by(event_id=event.id) else False
     # if the method is post, handle that the same way as add event
     if request.method == 'POST':
         # let the function tell us how we should be directed
@@ -61,7 +63,7 @@ def modify_event(event_id):
         return handler
     # if this is GET, handle that for event modification
     return render_template('add-update-event.html.j2', event=event, sizes=sizes, planner=event.planner,
-                           customers=customer_list, planners=planner_list, new=False,
+                           customers=customer_list, planners=planner_list, new=False, imported=imported,
                            date=convert_time(event.time), cancel_redirect=url_for('events.list_events'))
 
 
@@ -70,7 +72,7 @@ def handle_post(event, new):
     customer_list = Customer.query.all()
     sizes = TableSize.query.all()
     button = request.form.get('button')
-
+    imported = True if Guest.query.filter_by(event_id=event.id) else False
     if button == 'save':
         is_valid = validate_and_save(event, request)
         if is_valid:
@@ -78,10 +80,10 @@ def handle_post(event, new):
             return redirect(url_for('events.list_events'))
         else:
             return render_template('add-update-event.html.j2', event=event, sizes=sizes, planner=event.planner,
-                                   customers=customer_list, planners=planner_list, new=new,
+                                   customers=customer_list, planners=planner_list, new=new, imported=imported,
                                    date=convert_time(event.time), cancel_redirect=url_for('events.list_events'))
     elif button == 'cancel':
-        redirect(url_for('events.list_events'))
+        return redirect(url_for('events.list_events'))
     elif button == 'seat':
         return redirect(url_for('events.print_seating_chart', id=event.id))
     elif button == 'attendance':
@@ -92,8 +94,9 @@ def handle_post(event, new):
         is_valid = validate_and_save(event, request)
         if is_valid:
             upload_file(event, request)
+            imported = True
         return render_template('add-update-event.html.j2', event=event, sizes=sizes, planner=event.planner,
-                               customers=customer_list, planners=planner_list,
+                               customers=customer_list, planners=planner_list, new=new, imported=imported,
                                date=convert_time(event.time), cancel_redirect=url_for('events.list_events'))
 
 
