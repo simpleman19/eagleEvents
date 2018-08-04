@@ -330,3 +330,8 @@ TABLE SEATING CHART
 .form-customer{ 
     width: 350px;
 }
+
+
+.click-row {
+    cursor: pointer;
+}
