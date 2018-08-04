@@ -10,7 +10,7 @@ customers_blueprint = Blueprint('customers', __name__)
 @customers_blueprint.route('/listCustomers')
 @multi_auth.login_required
 def list_customers():
-    customers = Customer.query.all();
+    customers = g.current_user.company.customers;
     return render_template('customer.html.j2', customers = customers)
 
 
