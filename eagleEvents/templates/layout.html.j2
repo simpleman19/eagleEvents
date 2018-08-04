@@ -13,26 +13,30 @@
     <script src = "/static/bootstable.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <script>
+    $(".nav a").on("click", function(){
+    $(".nav").find(".active").removeClass("active");
+    $(this).parent().addClass("active");});
+    </script>
 
     {% block head_content %}
       <title>Eagle Events Layout</title>
     {% endblock %}
   </head>
-  <body class="main">
-      {% block nav_content %} 
+      {% block nav_content %}
         <nav class="navbar navbar-default">
           <div class="container-fluid">
             <div class="navbar-header">
               <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#myNavbar">
                 <span class="icon-bar"></span>
                 <span class="icon-bar"></span>
-                <span class="icon-bar"></span>                        
+                <span class="icon-bar"></span>
               </button>
-              <a class="navbar-brand" href="/listEvents">Eagle Event Planner</a>
+              <a class="navbar-brand" href="event.html.j2">Eagle Event Planner</a>
             </div>
             <div class="collapse navbar-collapse" id="myNavbar">
               <ul class="nav navbar-nav">
-                <li><a href="/listEvents">Events</a></li>
+                <li class="active"><a href="/listEvents">Events</a></li>
                 <li><a href="/listCustomers">Customers</a></li>
                 <li><a href="/listEventPlanners">Event Planners</a></li>
               </ul>
@@ -56,10 +60,9 @@
         {% block body_content %}
         {% endblock %}
     </div>
-
       <footer>
-      {% block footer_content %} 
-        
+      {% block footer_content %}
+
         {% endblock %}
       </footer>
   </body>
