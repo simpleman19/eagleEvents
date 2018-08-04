@@ -331,19 +331,7 @@ TABLE SEATING CHART
     width: 350px;
 }
 
-/*********************
-TABLE USER LIST
-**********************/
-.dynamic-wrapper-list {
-    min-height: 340px;
-    background-color: white;;
-}
 
-
-.table-scroll {
-    overflow: hidden;
-    height: 100%;
-    width: 100%;
-    background-color: white;
-    border: 1px transparent;
+.click-row {
+    cursor: pointer;
 }

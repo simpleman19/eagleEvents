@@ -1,5 +1,4 @@
 from flask import abort, Blueprint, redirect, render_template, g, request, url_for, flash
-import urllib.parse
 
 from eagleEvents import db
 from eagleEvents.auth import multi_auth
@@ -10,7 +9,7 @@ event_planners_blueprint = Blueprint('event_planners', __name__)
 @event_planners_blueprint.route('/listEventPlanners')
 @multi_auth.login_required
 def list_event_planners():
-    users = User.query.all();
+    users = g.current_user.company.users;
     return render_template('user.html.j2', users=users)
 
 
@@ -37,11 +36,9 @@ def add_event_planner():
 @event_planners_blueprint.route('/modifyEventPlanner/<user_id>', methods=['GET', 'POST'])
 @multi_auth.login_required
 def modify_event_planner(user_id):
-    user_id_new = urllib.parse.urlparse(user_id).path
-    user_id_new = user_id_new[3:]
     if not g.current_user.is_admin:
         abort(401)
-    user = User.query.get(user_id_new)
+    user = User.query.get(user_id)
     if request.method == 'GET':
         return render_template('add-update-user.html.j2', user=user,
                                cancel_redirect=url_for('event_planners.list_event_planners'))
