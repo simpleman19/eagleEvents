@@ -131,69 +131,71 @@ def seed_db():
     want_a_bunch_of_stuff = input("Want a bunch of stuff? y - Yes or n - No :")
     if want_a_bunch_of_stuff == "y":
         # Users created (Emily, Jacob, Dee Dee, Paresa, Chance)
-        user = User(company)
-        user.username = 'ePielemeier'
-        user.name = 'Emily Pielemier'
-        user.set_password('password0')
-        user.is_admin = True
-        user.is_active = True
-        db.session.add(user)
+        user0 = User(company)
+        user0.username = 'ePielemeier'
+        user0.name = 'Emily Pielemier'
+        user0.set_password('password0')
+        user0.is_admin = True
+        user0.is_active = True
+        db.session.add(user0)
         db.session.commit()
-        user = User(company)
-        user.username = 'jCollins'
-        user.name = 'Jacob Collins'
-        user.set_password('password1')
-        user.is_admin = True
-        user.is_active = True
-        db.session.add(user)
+        user1 = User(company)
+        user1.username = 'jCollins'
+        user1.name = 'Jacob Collins'
+        user1.set_password('password1')
+        user1.is_admin = True
+        user1.is_active = True
+        db.session.add(user1)
         db.session.commit()
-        user = User(company)
-        user.username = 'dMcCroskey'
-        user.name = 'Dee Dee McCroskey'
-        user.set_password('password2')
-        user.is_admin = True
-        user.is_active = True
-        db.session.add(user)
+        user2 = User(company)
+        user2.username = 'dMcCroskey'
+        user2.name = 'Dee Dee McCroskey'
+        user2.set_password('password2')
+        user2.is_admin = True
+        user2.is_active = True
+        db.session.add(user2)
         db.session.commit()
-        user = User(company)
-        user.username = 'pNoorossana'
-        user.name = 'Paresa Noorossana'
-        user.set_password('password3')
-        user.is_admin = True
-        user.is_active = True
-        db.session.add(user)
+        user3 = User(company)
+        user3.username = 'pNoorossana'
+        user3.name = 'Paresa Noorossana'
+        user3.set_password('password3')
+        user3.is_admin = True
+        user3.is_active = True
+        db.session.add(user3)
         db.session.commit()
-        user = User(company)
-        user.username = 'cTurner'
-        user.name = 'Chance Turner'
-        user.set_password('password4')
-        user.is_admin = True
-        user.is_active = True
-        db.session.add(user)
+        user4 = User(company)
+        user4.username = 'cTurner'
+        user4.name = 'Chance Turner'
+        user4.set_password('password4')
+        user4.is_admin = True
+        user4.is_active = True
+        db.session.add(user4)
         db.session.commit()
-        user = User(company)
-        user.username = 'planner'
-        user.name = 'Planner'
-        user.set_password('password')
-        user.is_admin = False
-        user.is_active = True
-        db.session.add(user)
+        user5 = User(company)
+        user5.username = 'planner'
+        user5.name = 'Planner'
+        user5.set_password('password')
+        user5.is_admin = False
+        user5.is_active = True
+        db.session.add(user5)
         db.session.commit()
-        user.username = 'admin'
-        user.name = 'Admin'
-        user.set_password('password')
-        user.is_admin = True
-        user.is_active = True
-        db.session.add(user)
+        user6 = User(company)
+        user6.username = 'admin'
+        user6.name = 'Admin'
+        user6.set_password('password')
+        user6.is_admin = True
+        user6.is_active = True
+        db.session.add(user6)
         db.session.commit()
-        user = User(company)
-        user.username = 'tSwift'
-        user.name = 'Taylor Swift'
-        user.set_password('password5')
-        user.is_admin = False
-        user.is_active = False
-        db.session.add(user)
+        user7 = User(company)
+        user7.username = 'tSwift'
+        user7.name = 'Taylor Swift'
+        user7.set_password('password5')
+        user7.is_admin = False
+        user7.is_active = False
+        db.session.add(user7)
         db.session.commit()
+        users = [user1, user2, user3, user4, user5, user6, user7]
 
         # create customers 
         for x in range(10):
@@ -207,6 +209,8 @@ def seed_db():
             # create events for customers
             for y in range(3):
                 event = Event(customer)
+                rand = randint(0,6)
+                event.planner = users[rand]
                 event.name = __get_company_name(x) + "'s Awesome Event " + str(y)
                 event.venue = __get_company_name(x) + "'s Venue"
                 event.company = company
@@ -251,30 +255,31 @@ def seed_db():
             db.session.commit()
     else:
         # Users created (planner & admin)
-        user = User(company)
-        user.username = 'planner'
-        user.name = 'Planner'
-        user.set_password('password')
-        user.is_admin = False
-        user.is_active = True
-        db.session.add(user)
+        userA = User(company)
+        userA.username = 'planner'
+        userA.name = 'Planner'
+        userA.set_password('password')
+        userA.is_admin = False
+        userA.is_active = True
+        db.session.add(userA)
         db.session.commit()
-        user = User(company)
-        user.username = 'admin'
-        user.name = 'Admin'
-        user.set_password('password')
-        user.is_admin = True
-        user.is_active = True
-        db.session.add(user)
+        userB = User(company)
+        userB.username = 'admin'
+        userB.name = 'Admin'
+        userB.set_password('password')
+        userB.is_admin = True
+        userB.is_active = True
+        db.session.add(userB)
         db.session.commit()
-        user = User(company)
-        user.username = 'fired planner'
-        user.name = 'Fired Planner'
-        user.set_password('password')
-        user.is_admin = False
-        user.is_active = False
-        db.session.add(user)
+        userC = User(company)
+        userC.username = 'fired planner'
+        userC.name = 'Fired Planner'
+        userC.set_password('password')
+        userC.is_admin = False
+        userC.is_active = False
+        db.session.add(userC)
         db.session.commit()
+        users2 = [userA, userB, userC]
 
         # create customers 
         for x in range(5):
@@ -288,6 +293,8 @@ def seed_db():
             # create events for customers
             for y in range(2):
                 event = Event(customer)
+                rand = randint(0,2)
+                event.planner = users2[rand]
                 event.name = __get_company_name(x) + "'s Awesome Event " + str(y)
                 event.venue = __get_company_name(x) + "'s Venue"
                 event.company = company
