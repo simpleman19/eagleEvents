@@ -45,6 +45,7 @@ class SeatingChartGA:
         self.mutation()
         if self.COLLECT_STATS:
             self.statistics()
+        self.hall_of_fame = tools.ParetoFront()
 
     def pooled_map(self, fun, it, chunksize=5):
         with ThreadPoolExecutor() as executor:
@@ -88,7 +89,7 @@ class SeatingChartGA:
         self.logbook.chapters["like"].header = "avg", "std", "min", "max"
 
     def should_terminate(self, population, generation_number):
-        found_optimal_solution = len(population) > 0 and self.toolbox.select(population, 1)[0].fitness.values == (0, self.total_like_preferences)
+        found_optimal_solution = len(self.hall_of_fame) > 0 and self.hall_of_fame[0].fitness.values == (0, self.total_like_preferences)
         return found_optimal_solution or generation_number > self.NGEN
 
     def update_fitnesses(self, population):
@@ -113,6 +114,7 @@ class SeatingChartGA:
         while not self.should_terminate(pop, generation_number):
             pop[:] = self.do_generation(pop)
             self.update_stats(generation_number, pop)
+            self.hall_of_fame.update(pop)
             generation_number += 1
 
         return pop
