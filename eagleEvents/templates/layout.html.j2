@@ -20,7 +20,7 @@
     {% endblock %}
   </head>
   <body class="main">
-      {% block nav_content %} 
+      {% block nav_content %}
 
 <nav class="navbar navbar-default">
   <div class="container-fluid">
@@ -28,7 +28,7 @@
       <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#myNavbar">
         <span class="icon-bar"></span>
         <span class="icon-bar"></span>
-        <span class="icon-bar"></span>                        
+        <span class="icon-bar"></span>
       </button>
       <a class="navbar-brand" href="event.html.j2">Eagle Event Planner</a>
     </div>
@@ -36,7 +36,7 @@
       <ul class="nav navbar-nav">
         <li class="active"><a href="/listEvents">Events</a></li>
         <li><a href="/listCustomers">Customers</a></li>
-        <li><a href="event-planner.html.j2">Event Planners</a></li>
+        <li><a href="/listEventPlanners">Event Planners</a></li>
       </ul>
       <ul class="nav navbar-nav navbar-right">
         <li><a href="#"><span class="glyphicon glyphicon-log-in"></span> Logout</a></li>
@@ -61,8 +61,8 @@
     </div>
 
       <footer>
-      {% block footer_content %} 
-        
+      {% block footer_content %}
+
         {% endblock %}
       </footer>
   </body>
