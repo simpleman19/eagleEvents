@@ -37,9 +37,12 @@
                        <div class="buttons-event">
                            <button class="btn btn-lg btn-success btn-block btn-event-function"
                                        onclick="document.getElementById('file').click();" type="button" name="button" value="import">Import Guests</button>
-                           <button class="btn btn-lg btn-success btn-block btn-event-function" type="submit" name="button" value="seat">Seating Chart</button>
-                           <button class="btn btn-lg btn-success btn-block btn-event-function" type="submit" name="button" value="attendance">Print Attendance List</button>
-                           <button class="btn btn-lg btn-success btn-block btn-event-function" type="submit" name="button" value="table">Print Table Cart</button>
+                           <button class="btn btn-lg btn-success btn-block btn-event-function" type="submit" name="button" value="seat"
+                                   style={{ "display:none;" if new == true}}>Seating Chart</button>
+                           <button class="btn btn-lg btn-success btn-block btn-event-function" type="submit" name="button" value="attendance"
+                                   style={{ "display:none;" if new == true}}>Print Attendance List</button>
+                           <button class="btn btn-lg btn-success btn-block btn-event-function" type="submit" name="button" value="table"
+                                   style={{ "display:none;" if new == true}} >Print Table Cart</button>
                            <input type=file id="file" name="file" onchange="this.form.submit()" style="display:none;"/>
                     </div>
             </div>

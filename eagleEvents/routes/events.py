@@ -37,12 +37,12 @@ def add_event():
     # if the method is post, handle that the same way as modify event
     if request.method == 'POST':
         # let the function tell us how we should be directed
-        handler = handle_post(event)
+        handler = handle_post(event, True)
         # handle the redirection
         return handler
     # if this is GET, handle that for first time event creation
     return render_template('add-update-event.html.j2', event=event, sizes=sizes, planner=g.current_user,
-                           customers=customer_list, planners=planner_list,
+                           customers=customer_list, planners=planner_list, new=True,
                            date=convert_time(event.time), cancel_redirect=url_for('events.list_events'))
 
 
@@ -56,16 +56,16 @@ def modify_event(event_id):
     # if the method is post, handle that the same way as add event
     if request.method == 'POST':
         # let the function tell us how we should be directed
-        handler = handle_post(event)
+        handler = handle_post(event, False)
         # handle the redirection
         return handler
     # if this is GET, handle that for event modification
     return render_template('add-update-event.html.j2', event=event, sizes=sizes, planner=event.planner,
-                           customers=customer_list, planners=planner_list,
+                           customers=customer_list, planners=planner_list, new=False,
                            date=convert_time(event.time), cancel_redirect=url_for('events.list_events'))
 
 
-def handle_post(event):
+def handle_post(event, new):
     planner_list = User.query.all()
     customer_list = Customer.query.all()
     sizes = TableSize.query.all()
@@ -78,7 +78,7 @@ def handle_post(event):
             return redirect(url_for('events.list_events'))
         else:
             return render_template('add-update-event.html.j2', event=event, sizes=sizes, planner=event.planner,
-                                   customers=customer_list, planners=planner_list,
+                                   customers=customer_list, planners=planner_list, new=new,
                                    date=convert_time(event.time), cancel_redirect=url_for('events.list_events'))
     elif button == 'cancel':
         redirect(url_for('events.list_events'))
