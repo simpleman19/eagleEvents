@@ -18,14 +18,13 @@ events_blueprint = Blueprint('events', __name__)
 @multi_auth.login_required
 def list_events():
     show_all = request.args.get("show_all")
-    current_user = g.current_user
-    company_id_user = current_user.company_id
-    events_of_company = Event.query.filter_by(company_id=company_id_user).order_by(Event.time.desc())
+    company_id_user = g.current_user.company_id
+    events_of_company = Event.query.filter_by(company_id = company_id_user).order_by(Event.time.desc())
     if show_all is not None:
         events = events_of_company
     else:
-        events = events_of_company.filter_by(planner_id=current_user.id)
-    return render_template('event.html.j2', events=events, currentUser=current_user)
+        events = events_of_company.filter_by(planner_id = g.current_user.id)
+    return render_template('event.html.j2', events=events, currentUser = g.current_user)
 
 
 @events_blueprint.route('/addEvent', methods=['GET', 'POST'])

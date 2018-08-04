@@ -8,26 +8,24 @@
             <button class="btn btn-primary active" id="refreshButton" onclick="refresh()">Refresh</button>
         </div>
             <div class="card card-container-2">
-                <div class="dynamic-wrapper-list">
-                    <table id="listTable" class="table table-bordered table-hover">
-                        <thead>
-                            <tr>
-                                <th>Name</th>
-                                <th>Username</th>
-                                <th>Active</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for user in users %}
-                            <tr class = "click-row" data-href="modifyEventPlanner/ + {{ user.id }}">
-                                <td>{{user.name}}</td>
-                                <td>{{user.username}}</td>
-                                <td><input type="checkbox" value="" {{'checked="checked"' if user.is_active}} disabled></td>
-                            </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
-                </div>
+                <table id="listTable" class="table table-bordered table-hover">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Username</th>
+                            <th>Active</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for user in users %}
+                        <tr class = "click-row" data-href="modifyEventPlanner/{{ user.id }}">
+                            <td>{{user.name}}</td>
+                            <td>{{user.username}}</td>
+                            <td><input type="checkbox" value="" {{'checked="checked"' if user.is_active}} disabled></td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
             </div>
                 <div class="buttons-action">
             <input type="button" class="btn btn-primary active btn-add" onclick="window.location.href='/addEventPlanner'" value="Add"/>
