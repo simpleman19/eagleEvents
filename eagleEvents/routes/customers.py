@@ -1,4 +1,5 @@
 from flask import Blueprint, redirect, render_template, request, url_for, g, flash
+
 from eagleEvents import db
 from eagleEvents.auth import multi_auth
 from eagleEvents.models import Customer
@@ -8,8 +9,8 @@ customers_blueprint = Blueprint('customers', __name__)
 @customers_blueprint.route('/listCustomers')
 @multi_auth.login_required
 def list_customers():
-    # TODO List customers
-    return render_template('customer.html.j2')
+    customers = g.current_user.company.customers;
+    return render_template('customer.html.j2', customers = customers)
 
 
 @customers_blueprint.route('/addCustomer', methods=['GET', 'POST'])

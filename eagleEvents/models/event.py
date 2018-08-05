@@ -10,7 +10,7 @@ from typing import List
 class Event(db.Model):
     __tablename__ = 'event'
     id = db.Column(UUIDType(binary=False), primary_key=True, default=uuid.uuid4)
-    time = db.Column(db.DateTime, nullable=False, default=datetime.datetime.now())
+    time = db.Column(db.DateTime, nullable=False)
     is_done = db.Column(db.Boolean, nullable=False, default=False)
     venue = db.Column(db.String(150), nullable=False, default="")
     name = db.Column(db.String(150), nullable=False, default="")
@@ -25,7 +25,7 @@ class Event(db.Model):
     table_size_id = db.Column(db.Integer, db.ForeignKey('table_sizes.id'), nullable=True)
     table_size = db.relationship('TableSize', lazy=False)
     _guests: List[Guest] = db.relationship('Guest', lazy=True,
-                    backref=db.backref('guests', lazy='subquery'))
+                                           backref=db.backref('guests', lazy='subquery'))
 
     def __init__(self, customer):
         self.customer = customer
