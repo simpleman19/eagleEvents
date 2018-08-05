@@ -3,7 +3,8 @@
       <title>Eagle Events Seating Chart</title>
 {% endblock %}
 {% block body_content %}
-<a class="btn btn-lg btn-success btn-block" style="width: 300px;" href="/modifyEvent/{{ tables[0].event_id }}">Return to Event</a>
+    <a class="btn btn-lg btn-success btn-block" style="width: 300px;" href="/modifyEvent/{{ tables[0].event_id }}">Return to Event</a>
+    <a class="btn btn-lg btn-success btn-block" style="width: 300px;" href="/printSeatingChart/{{ tables[0].event_id }}" target="_blank">Print Seating Chart</a>
     <h1>Table Seating Chart</h1>
     <h4 style="color: white; text-align: center;">Table Seating Capacity: {{tables[0].seating_capacity}}</h4>
     {% for table in tables %}
