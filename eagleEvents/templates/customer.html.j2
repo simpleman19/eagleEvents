@@ -37,6 +37,7 @@
     $('table').SetEditable({onBeforeDelete: deleteCustomer});
 
     function deleteCustomer(row) {
+      $('#loading').modal('show');
       if (window.confirm("You are about to delete: " + document.getElementById(row[0].id).getElementsByClassName("name")[0].innerHTML)) {
         fetch('/deleteCustomer/' + row[0].id, {
         credentials: "same-origin",
@@ -52,8 +53,6 @@
 
 
     function refresh() {
-      //$('#loading').modal('show');
-
       url = window.location.href;
       window.location = url;
 

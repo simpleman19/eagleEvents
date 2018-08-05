@@ -176,7 +176,6 @@ def print_seating_chart(id):
     return seating_chart_print(id)
 
 
-
 @events_blueprint.route('/deleteEvent/<id>', methods=['DELETE'])
 @multi_auth.login_required
 def delete_event(id):
