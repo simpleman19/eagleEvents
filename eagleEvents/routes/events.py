@@ -1,7 +1,8 @@
 from eagleEvents.printing.chart import seating_chart_print
 from pathlib import Path
-from flask import Blueprint, render_template, flash, request, redirect, g
+from flask import Blueprint, render_template, flash, request, redirect, g, abort, jsonify
 from eagleEvents.models.event import Event
+from eagleEvents.models import db
 import os
 from werkzeug.utils import secure_filename
 from eagleEvents.auth import multi_auth
@@ -91,7 +92,22 @@ def print_seating_chart(id):
    return seating_chart_print(id)
 
 
-
-
-    
- 
+@events_blueprint.route('/deleteEvent/<id>', methods=['DELETE'])
+@multi_auth.login_required
+def delete_event(id):
+    event = None
+    name = ""
+    try:
+        event = Event.query.filter_by(id=id, company=g.current_user.company).one_or_none()
+    except Exception as e:
+        print(e)
+        abort(404)
+    if event:
+        name = event.name
+        db.session.delete(event)
+        db.session.commit()
+    else:
+        print("Could not find event to delete")
+        abort(404)
+    flash('Successfully deleted event: ' + name)
+    return jsonify({'success': "Successfully deleted event: " + name}), 200

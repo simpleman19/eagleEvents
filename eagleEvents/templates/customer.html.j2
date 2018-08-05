@@ -1,7 +1,7 @@
 {% extends "layout.html.j2" %}
 {% block head_content %}
     <title>Eagle Events Customers</title>
-{% endblock %}   
+{% endblock %}
 {% block body_content %}
     <h1>Customers</h1>
     <div class="container">
@@ -18,8 +18,8 @@
                     </thead>
                     <tbody>
                         {% for customer in customers %}
-                        <tr class = "click-row" data-href="modifyCustomer/{{ customer.id }}">
-                            <td>{{customer.name}}</td>
+                        <tr class = "click-row" data-href="modifyCustomer/{{ customer.id }}" id="{{ customer.id }}">
+                            <td class="name">{{customer.name}}</td>
                             <td>{{customer.phone_number}}</td>
                             <td>{{customer.email}}</td>
                         </tr>
@@ -36,14 +36,29 @@
 <script>
     $('table').SetEditable({onBeforeDelete: deleteCustomer});
 
-    function deleteCustomer() {
-        console.log("delete");
+    function deleteCustomer(row) {
+      if (window.confirm("You are about to delete: " + document.getElementById(row[0].id).getElementsByClassName("name")[0].innerHTML)) {
+        fetch('/deleteCustomer/' + row[0].id, {
+        credentials: "same-origin",
+        headers: {
+            'Content-Type': "application/json",
+        },
+        method: "DELETE",
+        }).catch(error => console.error('Error:', error)).then(refresh);
+      } else {
+        refresh(); // This is required because the table library doesn't support canceling a delete event
+      }
     }
 
 
     function refresh() {
-        url = window.location.href;
-        window.location = url;
+      //$('#loading').modal('show');
+
+      url = window.location.href;
+      window.location = url;
+
+       // Add this after api conversion
+       //$('#loading').modal('show');
     }
 
     $(".click-row").click(function() {
@@ -51,4 +66,3 @@
     });
 </script>
 {% endblock %}
-
