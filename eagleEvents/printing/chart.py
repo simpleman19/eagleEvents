@@ -12,10 +12,15 @@ def seating_chart_print(id_event):
     e = Event.query.filter(Event.id == id_event)[0]
     tables = Table.query.filter(Table.event_id == id_event)
     guests = Guest.query.filter(Guest.event_id == id_event)
-    directory = os.path.join(os.getcwd(), 'temp')
+    current_directory = os.getcwd();
+    final_directory = os.path.join(current_directory, 'temp')
+    if not os.path.exists(final_directory):
+        os.makedirs(final_directory);
+
     file_name = 'seatingChart.pdf'
 
-    c = canvas.Canvas(os.path.join(directory , file_name))
+    c = canvas.Canvas(os.path.join(final_directory , file_name))
+    c.setTitle(str(e.name) + "-" + str(e.time.date()) + ".pdf")
 
     c.setLineWidth(.3)
     c.setFont("Helvetica", 12)
@@ -33,33 +38,57 @@ def seating_chart_print(id_event):
     # chart
     x = 40
     y = 370
+    small_table_factor = 150
     for t in tables:
         guests_for_table = guests.filter(Guest.table_id == t.id)
         guests_for_table = guests_for_table.order_by(Guest.last_name)
-        c.roundRect(x, y, 250, 300, 4, stroke=1, fill=0)
-        shift_x = 10
-        shift_y = 275
+        if t.seating_capacity <= 5:
+            c.roundRect(x, y + small_table_factor, 250, 150, 4, stroke=1, fill=0)
+            shift_x = 10
+            shift_y = 135
+        else:
+            small_table_factor = 0;
+            c.roundRect(x, y + small_table_factor, 250, 300, 4, stroke=1, fill=0)
+            shift_x = 10
+            shift_y = 275
         c.setFont("Helvetica-Bold", 12)
-        c.drawString(x + shift_x, y + shift_y, "Table " + str(t.number))
+        c.drawString(x + shift_x, y + shift_y + small_table_factor, "Table " + str(t.number))
         shift_y += -20
-        c.drawString(x + shift_x, y + shift_y, "Last Name  ")
-        c.drawString(x + shift_x + 90, y + shift_y, "First Name  ")
-        c.drawString(x + shift_x + 180, y + shift_y, "Title")
+        c.drawString(x + shift_x, y + shift_y + small_table_factor, "Last Name  ")
+        c.drawString(x + shift_x + 90, y + shift_y + small_table_factor, "First Name  ")
+        c.drawString(x + shift_x + 180, y + shift_y + small_table_factor, "Title")
         shift_y += -20
         c.setFont("Helvetica", 10)
         for guest in guests_for_table:
-            c.drawString(x + shift_x, y + shift_y, guest.last_name)
-            c.drawString(x + shift_x + 90, y + shift_y, guest.first_name)
-            c.drawString(x + shift_x + 180, y + shift_y, guest.title)
+            last_name_to_print = guest.last_name
+            if(len(last_name_to_print) > 11):
+                last_name_to_print = last_name_to_print[:11] + "..."
+            c.drawString(x + shift_x, y + shift_y + small_table_factor, last_name_to_print)
+
+
+            first_name_to_print = guest.first_name
+            if(len(first_name_to_print) > 10):
+                first_name_to_print = first_name_to_print[:10] + "..."
+            c.drawString(x + shift_x + 90, y + shift_y + small_table_factor, first_name_to_print)
+
+            title_to_print = guest.title
+            if(len(title_to_print) > 10):
+                title_to_print = title_to_print[:8] + "..."
+            c.drawString(x + shift_x + 180, y + shift_y + small_table_factor, title_to_print)
+
             shift_y += -20
         c.setFont("Helvetica", 12)
         x += 255
         if x >= 500:
             x = 40
             y += -310
-        if y <= 50:
+            if small_table_factor != 0: 
+                small_table_factor += 150;
+        if y <= 50 and small_table_factor == 0 or y <= -300 and small_table_factor != 0:
             c.showPage()
             x = 40
             y = 500
+            if small_table_factor != 0: 
+                small_table_factor = 150;
     c.save();
-    return send_from_directory(directory=directory, filename=file_name)
+    return send_from_directory(directory=final_directory, filename=file_name)
