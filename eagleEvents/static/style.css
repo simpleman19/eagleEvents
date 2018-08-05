@@ -86,7 +86,7 @@ th,td{
     text-transform: uppercase;
 }
 
-.flashes {
+.flashes li {
     width: 50%;
     margin: auto;
     background: linear-gradient(rgb(55, 162, 69), #3eb94f, rgb(55, 162, 69));
@@ -95,6 +95,10 @@ th,td{
     font-size: 1.5em;
     list-style-type: none;
     border-radius: 5px;
+}
+
+.flashes li.error {
+    background: linear-gradient(#e5381e, #c25a4a, #e5381e);
 }
 
 /*
@@ -252,6 +256,10 @@ th,td{
     transition: all 0.218s;
 }
 
+a.btn.btn-cancel {
+    padding-top: 10px;
+}
+
 .btn.btn-delete {
     padding: 7px 30px;
     font-weight: 700;
@@ -316,20 +324,29 @@ th,td{
     color: #fff;
 }
 
-
 /*********************
 TABLE SEATING CHART
 **********************/
 
 .table-seating {
-  padding: 8px;
+  padding: 4px;
   line-height: 1.42857143;
   vertical-align: top;
   border-top: 1px solid #ddd;
-  margin-left: 23px;
+  width: 100%;
 }
 
+.table-seating td {
+  width: 33%;
+}
 
+.table-seating tr {
+    background-color: #FFFFFF;
+}
+
+.table-seating tbody tr:hover {
+    background-color: #E5E8E8;
+}
 
 .form-control-event{
     width: 50%;
@@ -343,4 +360,9 @@ TABLE SEATING CHART
 
 .form-customer{
     width: 350px;
+}
+
+
+.click-row {
+    cursor: pointer;
 }
