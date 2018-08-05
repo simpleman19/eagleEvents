@@ -33,7 +33,7 @@ def add_event():
     user_company_id = g.current_user.company.id
     planner_list = User.query.filter_by(company_id=user_company_id).all()
     customer_list = Customer.query.filter_by(company_id=user_company_id).all()
-    sizes = TableSize.query.all()
+    sizes = TableSize.query.filter_by(company_id=user_company_id).all()
     # create a new event on the first customer in the list
     event = Event(customer_list[0])
     # set the default time to 7 days from now at 7 PM
@@ -59,7 +59,7 @@ def modify_event(event_id):
     event = Event.query.get(event_id)
     planner_list = User.query.filter_by(company_id=user_company_id).all()
     customer_list = Customer.query.filter_by(company_id=user_company_id).all()
-    sizes = TableSize.query.all()
+    sizes = TableSize.query.filter_by(company_id=user_company_id).all()
     imported = True if Guest.query.filter_by(event_id=event.id).count() > 0 else False
     # if the method is post, handle that the same way as add event
     if request.method == 'POST':
@@ -77,7 +77,7 @@ def handle_post(event, new):
     user_company_id = g.current_user.company.id
     planner_list = User.query.filter_by(company_id=user_company_id).all()
     customer_list = Customer.query.filter_by(company_id=user_company_id).all()
-    sizes = TableSize.query.all()
+    sizes = TableSize.query.filter_by(company_id=user_company_id).all()
     button = request.form.get('button')
     imported = True if Guest.query.filter_by(event_id=event.id).count() > 0 else False
     if button == 'save':
