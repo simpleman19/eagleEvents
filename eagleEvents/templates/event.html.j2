@@ -64,7 +64,12 @@
     }
 
     function refresh() {
+      $('#deletionModal').modal('hide');
       $('#loading').modal('show');
+
+      url = window.location.href;
+      window.location = url;
+
 
       url = window.location.href;
       window.location = url;
@@ -93,17 +98,22 @@
     }
 
     function deleteEvent(row) {
-      if (window.confirm("You are about to delete: " + document.getElementById(row[0].id).getElementsByClassName("name")[0].innerHTML)) {
-        fetch('/deleteEvent/' + row[0].id, {
+      document.getElementById('itemToDelete').innerHTML = document.getElementById(row[0].id).getElementsByClassName("name")[0].innerHTML;
+      document.getElementById('deleteDeletionModal').onclick = function() { doDeletion(row); };
+      document.getElementById('cancelDeletionModal').onclick = function() { refresh(row); };
+      $('#deletionModal').modal('show');
+    }
+
+    function doDeletion(row) {
+      $('#deletionModal').modal('hide');
+      $('#loading').modal('show');
+      fetch('/deleteCustomer/' + row[0].id, {
         credentials: "same-origin",
         headers: {
             'Content-Type': "application/json",
         },
         method: "DELETE",
         }).catch(error => console.error('Error:', error)).then(refresh);
-      } else {
-        refresh(); // This is required because the table library that we are using doesn't support canceling a delete event
-      }
     }
 
     function filter() {

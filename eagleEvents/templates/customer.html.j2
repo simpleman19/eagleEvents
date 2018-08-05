@@ -57,7 +57,8 @@
 
     function refresh() {
       $('#deletionModal').modal('hide');
-
+      $('#loading').modal('show');
+      
       url = window.location.href;
       window.location = url;
 
