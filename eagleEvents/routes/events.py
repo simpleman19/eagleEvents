@@ -276,7 +276,10 @@ def change_seats():
                 response['error'] = "Guests and tables are not part of the same event"
                 return_code = 400
                 return jsonify(response), return_code
-
+            if sel_guest.event.company_id != g.current_user.company.id:
+                response['error'] = "You are not authorized to alter an event from another company"
+                return_code = 401
+                return jsonify(response), return_code
             # If swapping then move other guest
             if other_guest:
                 other_guest.assigned_table = sel_guest.assigned_table
