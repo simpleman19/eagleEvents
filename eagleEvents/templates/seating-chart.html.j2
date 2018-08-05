@@ -3,250 +3,176 @@
       <title>Eagle Events Seating Chart</title>
 {% endblock %}
 {% block body_content %}
+    <a class="btn btn-lg btn-success btn-block" style="width: 300px;" href="/modifyEvent/{{ tables[0].event_id }}">Return to Event</a>
+    <a class="btn btn-lg btn-success btn-block" style="width: 300px;" href="/printSeatingChart/{{ tables[0].event_id }}" target="_blank">Print Seating Chart</a>
     <h1>Table Seating Chart</h1>
-<div class="container">
-    <div class="card card-container-2 col-sm-4">
-    <table class="table-seating table-bordered">
-        <h3>Table 1</h3>
-        <thead>
-        <tr>
-            <th>First Name</th>
-            <th>Last Name</th>
-            <th>Title</th>
-        </tr>
-        </thead>
-        <tbody>
-        <tr data-toggle="modal" data-id="1" data-target="#myModal">
-            <td>John</td>
-            <td>Green</td>
-            <td>Project Manager</td>
-        </tr>
-        <tr data-toggle="modal" data-id="2" data-target="#myModal">
-            <td>Don</td>
-            <td>Henson</td>
-            <td>Doctor</td>
-        </tr>
-        <tr data-toggle="modal" data-id="3" data-target="#myModal">
-            <td>July</td>
-            <td>Smith</td>
-            <td>CEO</td>
-        </tr>
-        </tbody>
-  </table>
-  </div>
-    <div class="card card-container-2 col-sm-4 ">
-    <table class="table-seating table-bordered">
-        <h3>Table 2</h3>
-        <thead>
-        <tr>
-            <th>First Name</th>
-            <th>Last Name</th>
-            <th>Title</th>
-        </tr>
-        </thead>
-        <tbody>
-        <tr data-toggle="modal" data-id="1" data-target="#myModal">
-            <td>John</td>
-            <td>Green</td>
-            <td>Project Manager</td>
-        </tr>
-        <tr data-toggle="modal" data-id="2" data-target="#myModal">
-            <td>Don</td>
-            <td>Henson</td>
-            <td>Doctor</td>
-        </tr>
-        <tr data-toggle="modal" data-id="3" data-target="#myModal">
-            <td>July</td>
-            <td>Smith</td>
-            <td>CEO</td>
-        </tr>
-        </tbody>
-  </table>
-  </div>
-    <div class="card card-container-2 col-sm-4">
-    <table class="table-seating table-bordered">
-        <h3>Table 3</h3>
-        <thead>
-        <tr>
-            <th>First Name</th>
-            <th>Last Name</th>
-            <th>Title</th>
-        </tr>
-        </thead>
-        <tbody>
-        <tr data-toggle="modal" data-id="1" data-target="#myModal">
-            <td>John</td>
-            <td>Green</td>
-            <td>Project Manager</td>
-        </tr>
-        <tr data-toggle="modal" data-id="2" data-target="#myModal">
-            <td>Don</td>
-            <td>Henson</td>
-            <td>Doctor</td>
-        </tr>
-        <tr data-toggle="modal" data-id="3" data-target="#myModal">
-            <td>July</td>
-            <td>Smith</td>
-            <td>CEO</td>
-        </tr>
-        </tbody>
-  </table>
-  </div>
-    </div>
-    <div class="container">
-    <div class="card card-container-2 col-sm-4">
-    <table class="table-seating table-bordered">
-        <h3>Table 4</h3>
-        <thead>
-        <tr>
-            <th>First Name</th>
-            <th>Last Name</th>
-            <th>Title</th>
-        </tr>
-        </thead>
-        <tbody>
-        <tr data-toggle="modal" data-id="1" data-target="#myModal">
-            <td>John</td>
-            <td>Green</td>
-            <td>Project Manager</td>
-        </tr>
-        <tr data-toggle="modal" data-id="2" data-target="#myModal">
-            <td>Don</td>
-            <td>Henson</td>
-            <td>Doctor</td>
-        </tr>
-        <tr data-toggle="modal" data-id="3" data-target="#myModal">
-            <td>July</td>
-            <td>Smith</td>
-            <td>CEO</td>
-        </tr>
-        </tbody>
-  </table>
-  </div>
-    <div class="card card-container-2 col-sm-4">
-    <table class="table-seating table-bordered">
-        <h3>Table 5</h3>
-        <thead>
-        <tr>
-            <th>First Name</th>
-            <th>Last Name</th>
-            <th>Title</th>
-        </tr>
-        </thead>
-        <tbody>
-        <tr data-toggle="modal" data-id="1" data-target="#myModal">
-            <td >John</td>
-            <td>Green</td>
-            <td>Project Manager</td>
-        </tr>
-        <tr data-toggle="modal" data-id="2" data-target="#myModal">
-            <td>Don</td>
-            <td>Henson</td>
-            <td>Doctor</td>
-        </tr>
-        <tr data-toggle="modal" data-id="3" data-target="#myModal">
-            <td>July</td>
-            <td>Smith</td>
-            <td>CEO</td>
-        </tr>
-        </tbody>
-  </table>
-  </div>
-    <div class="card card-container-2 col-sm-4">
-    <table class="table-seating table-bordered">
-        <h3>Table 6</h3>
-        <thead>
-        <tr>
-            <th>First Name</th>
-            <th>Last Name</th>
-            <th>Title</th>
-        </tr>
-        </thead>
-        <tbody>
-        <tr data-toggle="modal" data-id="1" data-target="#myModal">
-            <td>John</td>
-            <td>Green</td>
-            <td>Project Manager</td>
-        </tr>
-        <tr data-toggle="modal" data-id="2" data-target="#myModal">
-            <td>Don</td>
-            <td>Henson</td>
-            <td>Doctor</td>
-        </tr>
-        <tr data-toggle="modal" data-id="3" data-target="#myModal">
-            <td>July</td>
-            <td>Smith</td>
-            <td>CEO</td>
-        </tr>
-        </tbody>
-  </table>
-  </div>
-    </div>
-        <!-- Modal -->
-  <div class="modal fade" id="myModal" role="dialog">
+    <h4 style="color: white; text-align: center;">Table Seating Capacity: {{tables[0].seating_capacity}}</h4>
+    {% for table in tables %}
+        <div class="card card-container-2 col-xs-4" style="height: {{tables[0].seating_capacity * 30 + 120}}px;">
+            <table id="{{ table.id }}" class="table-seating table-bordered">
+                <h3>Table {{ table.number }}</h3>
+                <thead>
+                <tr>
+                    <th>First Name</th>
+                    <th>Last Name</th>
+                    <th>Title</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for guest in table.guests %}
+                    <tr id="{{ guest.id }}" onClick="modifySeating('{{ guest.id }}')">
+                        <td class="first_name">{{ guest.first_name }}</td>
+                        <td class="last_name">{{ guest.last_name }}</td>
+                        <td class="title">{{ guest.title }}</td>
+                        <td class="id" style="display:none;">{{ guest.id }}</td>
+                        <td class="table_id" style="display:none;">{{ guest.table_id }}</td>
+                        <td class="event_id" style="display:none;">{{ guest.event_id }}</td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+          </table>
+      </div>
+    {% endfor %}
+  <!-- Modal -->
+  <div class="modal fade" id="seatingModificationModal" role="dialog">
     <div class="modal-dialog">
-    
+
       <!-- Modal content-->
       <div class="modal-content">
         <div class="modal-header">
-          <button type="button" class="close" data-dismiss="modal">&times;</button>
+          <button type="button" class="close" onClick="resetModal()">&times;</button>
           <div class="container-table">
             <h2>Move Guest</h2>
             <div class="row_">
-                <h3>Guest: Jacie Dryden</h3>
+                <h3 id="sel-guest-name">Guest: Loading...</h3>
             </div>
             <div class="row-1">
             <form class="form-customer">
+              <input id="sel-guest-id" type="hidden" value="" />
                    <div class="form-group row">
                         <label for="example-number-input" class="col-2 col-form-label">Table</label>
                             <div class="col-10">
-                                <input class="form-control form-control-event" type="number" value="50" id="example-number-input">
+                                <select class="form-control form-control-event" id="table-select" onChange="reloadGuestsAtTable()">
+                                  {% for table in tables %}
+                                    <option value="{{ table.id }}">Table {{ table.number }}</option>
+                                  {% endfor %}
+                                </select>
                             </div>
                     </div>
                     <div class="form-group row">
                         <label for="exampleFormControlSelect2">Guests</label>
-                            <select multiple class="form-control" id="exampleFormControlSelect2">
-                                <option>Joe Exotic</option>
-                                <option>Jacob Collins</option>
-                                <option>Chance Turner</option>
-                                <option>Dee Dee McCroskey</option>
-                                <option>Emily P.</option>
-                                 <option>Paresa N.</option>
-                                <option>Empty Seat</option>
-                                </select>
+                            <select class="form-control" id="guest-select">
+                                <option>Loading...</option>
+                            </select>
                     </div>
                 </form>
             </div>
-            
-        
-                </div>
-               
+          </div>
         <div class="modal-footer">
-            <button class="btn btn-lg btn-primary btn-save" type="submit">Save</button>
-            <button class="btn btn-lg btn-danger btn-cancel" type="cancel">Cancel</button>       
+            <button class="btn btn-lg btn-primary btn-save" type="button" onClick="swapSeats()">Save</button>
+            <button class="btn btn-lg btn-danger btn-cancel" type="cancel" onClick="resetModal()">Cancel</button>
         </div>
       </div>
-      
+
     </div>
   </div>
     </div>
-<script src="https://code.jquery.com/jquery-1.12.4.min.js"></script>
-<script src="bootstable.js"></script>
+<script src="/static/bootstable.js"></script>
 <script>
- $('table').SetEditable();
-    
-    
-$(function(){
-$('#myModal').modal({
-    keyboard: true,
-    backdrop: "static",
-    show:false,
+  function modifySeating(selGuestId) {
+    document.getElementById('sel-guest-id').value = selGuestId
+    document.getElementById('sel-guest-name').innerHTML = "Guest: " + document.getElementById(selGuestId).getElementsByClassName('last_name')[0].innerHTML + ", " + document.getElementById(selGuestId).getElementsByClassName('first_name')[0].innerHTML;
+    reloadGuestsAtTable();
+    $('#seatingModificationModal').modal('show');
+  }
 
-}).on('show', function(){
-      var getIdFromRow = $(event.target).closest('tr').data('id');
-    //make your ajax call populate items or what even you need
-    $(this).find('#orderDetails').html($('<b> Order Id selected: ' + getIdFromRow  + '</b>'))
-});
-});
+  function reloadGuestsAtTable() {
+    $('#loading').modal('show');
+    var selGuestId = document.getElementById('sel-guest-id').value;
+    var tableId = document.getElementById('table-select').value;
+    fetch('/api/table/guests?table=' + tableId, {
+        credentials: "same-origin",
+        method: "GET",
+    }).catch(error => console.error('Error:', error))
+      .then(res => res.json())
+      .then(json => {
+        var option, i;
+        var selectbox = document.getElementById('guest-select');
+        for(i = selectbox.options.length - 1 ; i >= 0 ; i--)
+        {
+            selectbox.remove(i);
+        }
+        for (i = 0; i < json.guests.length; i++){
+          if (json.guests[i].id != selGuestId) {
+            option = document.createElement( 'option' );
+            option.value = json.guests[i].id;
+            option.text = json.guests[i].full_name;
+            selectbox.add(option);
+          }
+        }
+        if (json.empty_seat) {
+          option = document.createElement( 'option' );
+          option.value = "-1";
+          option.text = "Empty Seat";
+          selectbox.add(option);
+        }
+        $('#loading').modal('hide');
+      });
+  }
+
+  function swapSeats() {
+    $('#loading').modal('show');
+    var selectbox = document.getElementById('guest-select');
+    if (selectbox.value == "-1") {
+      payload = {
+        'selectedGuest': document.getElementById('sel-guest-id').value,
+        'destinationTable': document.getElementById('table-select').value
+      }
+    } else {
+      payload = {
+        'selectedGuest': document.getElementById('sel-guest-id').value,
+        'otherGuest': selectbox.value
+      }
+    }
+
+
+    fetch('/changeSeat', {
+        credentials: "same-origin",
+        headers: {
+            'Content-Type': "application/json",
+        },
+        method: "POST",
+        body: JSON.stringify( payload )
+    }).catch(error => console.error('Error:', error))
+      .then(res => {
+        resetModal();
+        reloadTables();
+      });
+    }
+
+  function reloadTables() {
+    // Useful for API conversion later
+    url = window.location.href;
+    window.location = url;
+    // Add this back in when api is finished
+    //$('#loading').modal('hide');
+
+  }
+
+  function resetModal() {
+    var option, i;
+    var selectbox = document.getElementById('guest-select');
+    for(i = selectbox.options.length - 1 ; i >= 0 ; i--)
+    {
+        selectbox.remove(i);
+    }
+    option = document.createElement( 'option' );
+    option.value = option.text = "Loading";
+    selectbox.add(option);
+
+    document.getElementById('sel-guest-name').innerHTML = "Guest: Loading..."
+
+    $('#seatingModificationModal').modal('hide');
+  }
 </script>
 {% endblock %}

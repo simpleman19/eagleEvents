@@ -2,15 +2,18 @@ import time
 from sqlalchemy_utils import UUIDType
 
 from eagleEvents.seating_chart_ga import SeatingChartGA
-from eagleEvents.models import Event
+from eagleEvents.models import Event, db
+
 
 def run():
-    ga = SeatingChartGA(Event.query.get('3508863751a449b28799cc1b657f5890'))
+    event = Event.query.get('eeb9544ec3c041ff95f59e897cf61eec')
+    ga = SeatingChartGA(event)
     ga.COLLECT_STATS = True
 
     ga.setup()
     start = time.time()
     tables = ga.get_seating_chart_tables()
+
     end = time.time()
     print(ga.logbook)
     print("Execution time: {time}".format(time=end-start))
@@ -24,3 +27,28 @@ def run():
                     print("\t{pref} {other}".format(pref=pref_display, other=p.other_guest.number))
         print("\n")
 
+
+def run_all():
+    for event in Event.query.all():
+        try:
+            # Removal all tables from event
+            [db.session.delete(table) for table in event.tables]
+            db.session.commit()
+
+            ga = SeatingChartGA(event)
+            ga.COLLECT_STATS = True
+
+            ga.setup()
+            start = time.time()
+            tables = ga.get_seating_chart_tables()
+
+            # Commit tables to DB
+            [db.session.add(table) for table in tables]
+            db.session.commit()
+            print("Event id: " + str(event.id))
+            end = time.time()
+            print(ga.logbook)
+            print("Execution time: {time}".format(time=end-start))
+        except Exception as e:
+            print("Ga threw an exception on event: " + str(event.id))
+            print(e)
