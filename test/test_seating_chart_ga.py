@@ -176,6 +176,34 @@ def test_when_populating_with_odd_percent_then_it_returns_individuals_containing
     assert count == num_empty_seats
 
 
+@pytest.mark.filterwarnings('ignore::RuntimeWarning')
+def test_when_calling_get_individual_guess_then_it_returns_individuals_containing_all_guest_numbers(monkeypatch):
+    e = mock_event(monkeypatch)
+    guest_numbers = [x.number for x in e._guests]
+
+    ga = SeatingChartGA(e)
+    ga.initialization()
+    ga.population()
+    result = ga.toolbox.population_guess(n=100, pct_heuristic=1)
+
+    all_in_list_once(guest_numbers, result[25])
+
+
+@pytest.mark.filterwarnings('ignore::RuntimeWarning')
+def test_when_calling_get_individual_guess_then_it_returns_individuals_containing_enough_empty_seats(monkeypatch):
+    e = mock_event(monkeypatch)
+    monkeypatch.setattr(e, "percent_extra_seats", .83)
+    num_empty_seats = get_empty_seat_count(e)
+    ga = SeatingChartGA(e)
+    ga.initialization()
+    ga.population()
+
+    result = ga.toolbox.population_guess(n=100, pct_heuristic=1)
+
+    count = len(list(filter(lambda x: x == Table.EMPTY_SEAT, result[25])))
+    assert count == num_empty_seats
+
+
 ##
 # Evaluation
 ##
@@ -269,13 +297,12 @@ def test_when_calling_evaluate_it_returns_a_tuple_containing_the_count_of_likes_
 
     def mock_count(_):
         return 5
-    monkeypatch.setattr(ga, "total_like_preferences", 100)
     monkeypatch.setattr(ga, "count_likes_in_list", mock_count)
 
     individual = ga.toolbox.population(n=1)[0]
     score = ga.evaluate(individual)
 
-    assert score[1] == 100 - (5 * ga.num_tables)
+    assert score[1] == 5 * ga.num_tables
 
 
 ##
@@ -303,6 +330,7 @@ def test_when_calling_crossover_and_mutate_it_returns_a_mated_population(monkeyp
     ga.crossover()
     ga.mutation()
 
+    monkeypatch.setattr(ga, "NIND", 10)
     monkeypatch.setattr(ga, "CXPB", 1)
     monkeypatch.setattr(ga, "MUTPB", 0)
 
@@ -335,6 +363,7 @@ def test_when_calling_crossover_and_mutate_it_returns_a_mutated_population(monke
 
     monkeypatch.setattr(ga, "CXPB", 0)
     monkeypatch.setattr(ga, "MUTPB", 1)
+    monkeypatch.setattr(ga, "NIND", 10)
 
     population = ga.toolbox.population(n=10)
     mutated = ga.crossover_and_mutate(population)
@@ -355,6 +384,7 @@ def test_when_calling_should_terminate_it_returns_true_after_NGEN(monkeypatch):
     ga = SeatingChartGA(e)
     ga.selection()
     monkeypatch.setattr(ga, "NGEN", 10)
+    monkeypatch.setattr(ga, "hall_of_fame", [])
 
     assert not (ga.should_terminate([], -1))
     assert not (ga.should_terminate([], 0))
@@ -377,6 +407,7 @@ def test_when_calling_do_generation_it_returns_offspring_with_fitness_values(mon
     def mock_count(list):
         return (1,)
     monkeypatch.setattr(ga, "evaluate", mock_count)
+    monkeypatch.setattr(ga, "NIND", 5)
 
     ga.setup()
 
@@ -409,7 +440,7 @@ def test_when_calling_do_generation_it_returns_offspring_not_in_the_parent_popul
     def mock_count(list):
         return float(random()),
     monkeypatch.setattr(ga, "evaluate", mock_count)
-
+    monkeypatch.setattr(ga, "NIND", 5)
     ga.setup()
 
     population = ga.toolbox.population(n=5)

@@ -12,7 +12,7 @@ from numpy import max, mean, min, std
 
 
 class SeatingChartGA:
-    CXPB, MUTPB, INDPB, TOURNSIZE, NIND, NGEN = 0.5, 0.15, 0.2, 20, 500, 50
+    INIT_PCT_GUESS, CXPB, MUTPB, INDPB, TOURNSIZE, NIND, NGEN = 0.1, 0.5, 0.15, 0.2, 20, 100, 50
     COLLECT_STATS = False
 
     def __init__(self, event):
@@ -31,10 +31,11 @@ class SeatingChartGA:
         self.num_guests = len(self.guest_numbers)
         num_extra_seats = floor(len(event._guests) * event.percent_extra_seats)
         # account for table size
-        num_extra_seats = num_extra_seats + (event.table_size.size - (len(event._guests) + num_extra_seats) % event.table_size.size)
-        self.table_assignments = self.guest_numbers + [Table.EMPTY_SEAT for _ in range(num_extra_seats)]
+        self.num_extra_seats = num_extra_seats + (event.table_size.size - (len(event._guests) + num_extra_seats) % event.table_size.size)
+        self.table_assignments = self.guest_numbers + [Table.EMPTY_SEAT for _ in range(self.num_extra_seats)]
         self.num_tables = ceil(len(self.table_assignments) / event.table_size.size)
         self.toolbox = base.Toolbox()
+        self.hall_of_fame = tools.ParetoFront()
 
     def setup(self):
         self.initialization()
@@ -45,7 +46,6 @@ class SeatingChartGA:
         self.mutation()
         if self.COLLECT_STATS:
             self.statistics()
-        self.hall_of_fame = tools.ParetoFront()
 
     def pooled_map(self, fun, it, chunksize=5):
         with ThreadPoolExecutor() as executor:
@@ -62,6 +62,30 @@ class SeatingChartGA:
 
     def population(self):
         self.toolbox.register("population", tools.initRepeat, list, self.toolbox.individual)
+        self.toolbox.register("population_guess", self.init_population, list, creator.Individual, self.get_individual_guess)
+
+    def get_individual_guess(self):
+        heuristic = []
+        for guest_number in random.sample(self.guest_numbers, len(self.guest_numbers)):
+            if guest_number == Table.EMPTY_SEAT:
+                heuristic.append(guest_number)
+                continue
+            if guest_number in heuristic:
+                continue
+            heuristic.append(guest_number)
+            pref_dict = self.guest_lookup[guest_number]
+            if pref_dict is None:
+                continue
+            for other_guest_num, seating_pref_value in pref_dict.items():
+                if seating_pref_value == SeatingPreference.LIKE.value and not (other_guest_num in heuristic):
+                    heuristic.append(other_guest_num)
+        heuristic += [Table.EMPTY_SEAT for _ in range(self.num_extra_seats)]
+        return heuristic
+
+    def init_population(self, pcls, ind_init, ind_guess_func, n, pct_heuristic):
+        heuristics = list([creator.Individual(ind_guess_func()) for _ in range(floor(n * pct_heuristic))])
+        randoms = list(creator.Individual(self.toolbox.indices()) for _ in range(n - len(heuristics)))
+        return heuristics + randoms
 
     def evaluation(self):
         self.toolbox.register("evaluate", self.evaluate)
@@ -104,8 +128,7 @@ class SeatingChartGA:
 
     # from http://deap.readthedocs.io/en/master/overview.html#algorithms
     def do_generations(self):
-        pop = self.toolbox.population(n=self.NIND)
-
+        pop = self.toolbox.population_guess(n=self.NIND, pct_heuristic=self.INIT_PCT_GUESS)
         # Evaluate the first generation
         self.update_fitnesses(pop)
         self.update_stats(0, pop)
