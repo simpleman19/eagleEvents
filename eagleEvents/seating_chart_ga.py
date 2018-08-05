@@ -98,7 +98,7 @@ class SeatingChartGA:
     # See http://www.rubicite.com/Tutorials/GeneticAlgorithms/CrossoverOperators/Order1CrossoverOperator.aspx
     def ordered_crossover(self, ind1, ind2):
         size = min([len(ind1), len(ind2)])
-        num1, num2 = random.randint(0, size), random.randint(0, size)
+        num1, num2 = random.sample(range(0, size), 2)
         start = min([num1, num2])
         stop = max([num1, num2])
 
@@ -170,7 +170,7 @@ class SeatingChartGA:
     def get_seating_chart_tables(self):
         self.setup()
         population = self.do_generations()
-        winner = self.toolbox.select(population, 1)[0]
+        winner = self.hall_of_fame[0]
         tables = []
         for t in range(self.num_tables):
             table = Table(self.event)
