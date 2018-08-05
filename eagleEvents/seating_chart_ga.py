@@ -10,36 +10,8 @@ from math import floor, ceil
 from concurrent.futures import ProcessPoolExecutor, ThreadPoolExecutor
 from numpy import max, mean, min, std
 
-random.seed(5)
-
-def all_in_list_once(numbers_expected, actual_list):
-    already_checked = []
-    for x in actual_list:
-        if x == Table.EMPTY_SEAT:
-            continue
-        try:
-            assert not (x in already_checked)
-            assert x in numbers_expected
-        except AssertionError:
-            print(x)
-            assert False
-        already_checked.append(x)
-
-def assert_valid_population(guest_numbers, pop, log_message):
-    #print(log_message)
-    #print(pop)
-    for individual in pop:
-        try:
-            all_in_list_once(guest_numbers, individual)
-        except AssertionError:
-            print("assertion failed at {msg}".format(msg=log_message))
-            print(individual)
-
-    #print("assertion passed")
-
 class SeatingChartGA:
-    INIT_PCT_GUESS, CXPB, MUTPB, INDPB, TOURNSIZE, NIND, NGEN = 0, 0.99, 0, 0.2, 20, 100, 25
-    #INIT_PCT_GUESS, CXPB, MUTPB, INDPB, TOURNSIZE, NIND, NGEN = 0.1, 0.5, 0.15, 0.2, 20, 100, 50
+    INIT_PCT_GUESS, CXPB, MUTPB, INDPB, TOURNSIZE, NIND, NGEN = 0.2, 0.5, 0.15, 0.2, 100, 200, 15
     COLLECT_STATS = False
 
     def __init__(self, event):
@@ -123,6 +95,7 @@ class SeatingChartGA:
     def crossover(self):
         self.toolbox.register("mate", self.ordered_crossover)
 
+    # See http://www.rubicite.com/Tutorials/GeneticAlgorithms/CrossoverOperators/Order1CrossoverOperator.aspx
     def ordered_crossover(self, ind1, ind2):
         size = min([len(ind1), len(ind2)])
         num1, num2 = random.randint(0, size), random.randint(0, size)
@@ -180,11 +153,9 @@ class SeatingChartGA:
     # from http://deap.readthedocs.io/en/master/overview.html#algorithms
     def do_generations(self):
         pop = self.toolbox.population_guess(n=self.NIND, pct_heuristic=self.INIT_PCT_GUESS)
-        #assert_valid_population(self.guest_numbers, pop, "Asserting population_guess")
 
         # Evaluate the first generation
         self.update_fitnesses(pop)
-        #assert_valid_population(self.guest_numbers, pop, "Asserting update_fitnesses")
         self.update_stats(0, pop)
 
         generation_number = 1
@@ -213,16 +184,11 @@ class SeatingChartGA:
     def do_generation(self, population):
         # from http://deap.readthedocs.io/en/master/tutorials/basic/part2.html#variations
         offspring = self.toolbox.select(population, len(population))
-        #assert_valid_population(self.guest_numbers, offspring, "Asserting select for offspring")
         offspring = list(self.toolbox.map(self.toolbox.clone, offspring))
-        #assert_valid_population(self.guest_numbers, offspring, "Asserting clone for offspring")
 
         offspring = self.crossover_and_mutate(offspring)
-        assert(len(offspring) == len(population))
-        assert_valid_population(self.guest_numbers, offspring, "Asserting crossover_and_mutate for offspring")
         invalid_ind = [ind for ind in offspring if not ind.fitness.valid]
         self.update_fitnesses(invalid_ind)
-        #assert_valid_population(self.guest_numbers, offspring, "Asserting update_fitnesses for offspring")
 
         return offspring
 
