@@ -1,9 +1,9 @@
 {% extends "layout.html.j2" %}
 {% block head_content %}
       <title>Eagle Events -Add Event</title>
-{% endblock %}  
+{% endblock %}
 {% block body_content %}
-    <form method="post" enctype="multipart/form-data">
+    <form method="post" enctype="multipart/form-data" onsubmit="$('#loading').modal('show');">
     <div class="container">
         <div class="card card-container-2">
             <h2>Event</h2>
@@ -43,7 +43,7 @@
                                    style={{ "display:none;" if imported == false}}>Print Attendance List</button>
                            <button class="btn btn-lg btn-success btn-block btn-event-function" type="submit" name="button" value="table"
                                    style={{ "display:none;" if imported == false}} >Print Table Cart</button>
-                           <input type=file id="file" name="file" onchange="this.form.submit()" style="display:none;"/>
+                           <input type=file id="file" name="file" onchange="this.form.submit(); $('#loading').modal('show');" style="display:none;"/>
                     </div>
             </div>
         </div>

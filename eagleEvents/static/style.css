@@ -53,6 +53,12 @@ th,td{
     text-align: center;
 }
 
+.loading-icon {
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+}
+
 .login-header h1{
     padding-top: 0;
     text-align: center;
@@ -308,14 +314,24 @@ TABLE SEATING CHART
 **********************/
 
 .table-seating {
-  padding: 8px;
+  padding: 4px;
   line-height: 1.42857143;
   vertical-align: top;
   border-top: 1px solid #ddd;
-  margin-left: 23px;
+  width: 100%;
 }
 
+.table-seating td {
+  width: 33%;
+}
 
+.table-seating tr {
+    background-color: #FFFFFF;
+}
+
+.table-seating tbody tr:hover {
+    background-color: #E5E8E8;
+}
 
 .form-control-event{
     width: 50%;
@@ -327,7 +343,7 @@ TABLE SEATING CHART
     justify-content: space-around;
 }
 
-.form-customer{ 
+.form-customer{
     width: 350px;
 }
 

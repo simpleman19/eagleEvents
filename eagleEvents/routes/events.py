@@ -1,17 +1,22 @@
 from eagleEvents.printing.chart import seating_chart_print
 from pathlib import Path
-from flask import Blueprint, render_template, flash, request, redirect, g, url_for
+from flask import Blueprint, render_template, flash, request, redirect, url_for, g, jsonify, abort
 from eagleEvents.models.event import Event
 from eagleEvents.models.customer import Customer
 from eagleEvents.models.user import User
+from eagleEvents.models.table import Table
 from eagleEvents.models.company import TableSize
 from eagleEvents.models.guest import Guest
+from eagleEvents.auth import multi_auth
 from eagleEvents import db
 import os, config, datetime
 from werkzeug.utils import secure_filename
-from eagleEvents.auth import multi_auth
 
 events_blueprint = Blueprint('events', __name__)
+
+
+def allowed_file(filename):
+    return '.' in filename and filename.rsplit('.', 1)[1].lower() in set(['csv'])
 
 
 @events_blueprint.route('/listEvents')
@@ -135,7 +140,14 @@ def upload_file(event, request):
 def seating_chart(event_id):
     # TODO Seating Chart
     # UI Seating Chart
-    return render_template('seating-chart.html.j2')
+    event = None
+    try:
+        event = Event.query.filter_by(id=event_id).one_or_none()
+    except Exception:
+        abort(404)
+    if event is None:
+        abort(404)
+    return render_template('seating-chart.html.j2', tables=sorted(event.tables, key=lambda x: x.number))
 
 
 @events_blueprint.route('/tableCards')
@@ -158,7 +170,7 @@ def print_seating_chartTest():
     return render_template('print.html.j2')
 
 
-@events_blueprint.route('/printSeatingChart/<id>', methods=['POST'])
+@events_blueprint.route('/printSeatingChart/<id>', methods=['GET', 'POST'])
 def print_seating_chart(id):
     # Print Seating Chart
     return seating_chart_print(id)
@@ -202,6 +214,122 @@ def convert_time(time):
     return date
 
 
-def allowed_file(filename):
-    return '.' in filename and filename.rsplit('.', 1)[1].lower() in set(['csv'])
+"""
+    API endpoint to change guest seat
+    Method: POST
+    
+    Allows user to manually move guests between tables and even swap guests if needed
+    
+    Expected JSON to move guest to open seat:
+    {
+        'selectedGuest' : '<UUID>'     # REQUIRED, This is the guest initially selected to move
+        'destinationTable' : '<UUID>'  # REQUIRED, This is the table that the selected guest is moving to
+    }
+    
+    Expected JSON to swap guests
+    {
+        'selectedGuest' : '<UUID>'     # REQUIRED, This is the guest initially selected to move
+        'otherGuest' : '<UUID>'     # REQUIRED, This is used if swapping 2 guests
+    }
+
+    Response JSON:
+    {
+        'error' : '<This field will contain any error messages to show user>'
+        'success' : '<This field will contain any success messages to show user>'
+    }
+"""
+@events_blueprint.route('/changeSeat', methods=['POST'])
+@multi_auth.login_required
+def change_seats():
+    response = {
+        'error': '',
+        'success': ''
+    }
+    return_code = 500
+    json = request.json
+    # Validate JSON
+    if not json:
+        response['error'] = "Error, invalid json in request"
+        return jsonify(response), 400
+    if not (('selectedGuest' in json and 'destinationTable' in json) or ('selectedGuest' in json and 'otherGuest' in json)):
+        response['error'] = "Missing required fields in request JSON"
+        return jsonify(response), 400
+    try:
+        # Find guest
+        sel_guest: Guest = Guest.query.filter_by(id=json['selectedGuest']).one_or_none()
+        # Find table if not swapping
+        if 'otherGuest' not in json:
+            other_guest = None
+            dest_table: Table = Table.query.filter_by(id=json['destinationTable']).one_or_none()
+        # Find other guests and get table from other guest
+        else:
+            other_guest: Guest = Guest.query.filter_by(id=json['otherGuest']).one_or_none()
+            # Ensure other guest is found before trying to get table
+            if other_guest:
+                dest_table = other_guest.assigned_table
+            else:
+                dest_table = None  # This will break next if statement if table or guest not found
+        # Ensure everything was found in database
+        if sel_guest and dest_table and (other_guest or 'otherGuest' not in json):
+            # Ensure guests and tables are all part of the same event
+            if sel_guest.event_id != dest_table.event_id or (other_guest and sel_guest.event_id != other_guest.event_id):
+                response['error'] = "Guests and tables are not part of the same event"
+                return_code = 400
+                return jsonify(response), return_code
+            if sel_guest.event.company_id != g.current_user.company.id:
+                response['error'] = "You are not authorized to alter an event from another company"
+                return_code = 401
+                return jsonify(response), return_code
+            # If swapping then move other guest
+            if other_guest:
+                other_guest.assigned_table = sel_guest.assigned_table
+
+            # Swap main guests
+            sel_guest.assigned_table = dest_table
+            db.session.commit()
+
+            # Return message depending on whether it was a swap or not
+            if other_guest:
+                response['success'] = "Successfully moved {} to table # {} and {} to table # {}"\
+                    .format(sel_guest.full_name, dest_table.number, other_guest.full_name, other_guest.assigned_table.number)
+            else:
+                response['success'] = "Successfully moved {} to table # {}" \
+                    .format(sel_guest.full_name, dest_table.number)
+            return_code = 200
+        else:
+            response['error'] = 'Error finding table or a guest'
+            return_code = 404
+        return jsonify(response), return_code
+    # If anything threw an exception (Probably a filter_by statement)
+    except Exception:
+        response['error'] = 'Error finding table or a guest, exception thrown'
+        return jsonify(response), 404
+
+
+@events_blueprint.route('/api/table/guests', methods=['GET'])
+@multi_auth.login_required
+def get_guests_for_table():
+    table_id = request.args.get('table')
+    response = {
+        'guests': []
+    }
+    if table_id is not None:
+        try:
+            table = Table.query.filter_by(id=table_id).one_or_none()
+            if table is not None:
+                response['guests'] = [{
+                    'full_name': g.full_name,
+                    'id': str(g.id),
+                    'first_name': g.first_name,
+                    'last_name': g.last_name
+                } for g in table.guests]
+                response['empty_seat'] = table.seating_capacity > len(table.guests)
+                return jsonify(response), 200
+            else:
+                return jsonify({'error': 'Error finding table'}), 404
+        # If anything threw an exception (Probably a sql statement)
+        except Exception:
+            return jsonify({'error': 'Error finding table, exception thrown'}), 404
+    else:
+        abort(404)
 

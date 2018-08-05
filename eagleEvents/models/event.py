@@ -21,7 +21,7 @@ class Event(db.Model):
     company = db.relationship('Company', lazy=False)
     planner_id = db.Column(UUIDType(binary=False), db.ForeignKey('users.id'), nullable=True)
     planner = db.relationship('User', lazy=False)
-    tables = db.relationship('Table', lazy=False)
+    tables = db.relationship('Table', lazy=True)
     table_size_id = db.Column(db.Integer, db.ForeignKey('table_sizes.id'), nullable=True)
     table_size = db.relationship('TableSize', lazy=False)
     _guests: List[Guest] = db.relationship('Guest', lazy=True,
