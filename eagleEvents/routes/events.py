@@ -170,7 +170,7 @@ def print_seating_chartTest():
     return render_template('print.html.j2')
 
 
-@events_blueprint.route('/printSeatingChart/<id>', methods=['POST'])
+@events_blueprint.route('/printSeatingChart/<id>', methods=['GET', 'POST'])
 def print_seating_chart(id):
     # Print Seating Chart
     return seating_chart_print(id)
