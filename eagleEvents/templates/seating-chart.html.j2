@@ -7,7 +7,7 @@
     <h1>Table Seating Chart</h1>
     <h4 style="color: white; text-align: center;">Table Seating Capacity: {{tables[0].seating_capacity}}</h4>
     {% for table in tables %}
-        <div class="card card-container-2 col-xs-4" style="height: {{tables[0].seating_capacity * 25 + 120}}px;">
+        <div class="card card-container-2 col-xs-4" style="height: {{tables[0].seating_capacity * 30 + 120}}px;">
             <table id="{{ table.id }}" class="table-seating table-bordered">
                 <h3>Table {{ table.number }}</h3>
                 <thead>
