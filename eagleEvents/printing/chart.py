@@ -60,15 +60,16 @@ def seating_chart_print(id_event):
         shift_y += -20
         c.setFont("Helvetica", 10)
         for guest in guests_for_table:
+            last_name_to_print = guest.last_name
+            if(len(last_name_to_print) > 11):
+                last_name_to_print = last_name_to_print[:11] + "..."
+            c.drawString(x + shift_x, y + shift_y + small_table_factor, last_name_to_print)
+
+
             first_name_to_print = guest.first_name
             if(len(first_name_to_print) > 10):
-                first_name_to_print = first_name_to_print[:8] + "..."
-            c.drawString(x + shift_x, y + shift_y + small_table_factor, first_name_to_print)
-
-            last_name_to_print = guest.last_name
-            if(len(last_name_to_print) > 10):
-                last_name_to_print = last_name_to_print[:8] + "..."
-            c.drawString(x + shift_x + 90, y + shift_y + small_table_factor, last_name_to_print)
+                first_name_to_print = first_name_to_print[:10] + "..."
+            c.drawString(x + shift_x + 90, y + shift_y + small_table_factor, first_name_to_print)
 
             title_to_print = guest.title
             if(len(title_to_print) > 10):
