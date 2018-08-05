@@ -53,12 +53,6 @@ th,td{
     text-align: center;
 }
 
-.loading-icon {
-  display: block;
-  margin-left: auto;
-  margin-right: auto;
-}
-
 .login-header h1{
     padding-top: 0;
     text-align: center;
@@ -86,7 +80,7 @@ th,td{
     text-transform: uppercase;
 }
 
-.flashes li {
+.flashes {
     width: 50%;
     margin: auto;
     background: linear-gradient(rgb(55, 162, 69), #3eb94f, rgb(55, 162, 69));
@@ -97,9 +91,6 @@ th,td{
     border-radius: 5px;
 }
 
-.flashes li.error {
-    background: linear-gradient(#e5381e, #c25a4a, #e5381e);
-}
 /*
  * Card component
  */
@@ -255,10 +246,20 @@ th,td{
     transition: all 0.218s;
 }
 
-a.btn.btn-cancel {
-    padding-top: 10px;
+.btn.btn-delete {
+    padding: 7px 30px;
+    font-weight: 700;
+    font-size: 14px;
+    height: 36px;
+    -moz-border-radius: 3px;
+    -webkit-border-radius: 3px;
+    border-radius: 3px;
+    border: none;
+    -o-transition: all 0.218s;
+    -moz-transition: all 0.218s;
+    -webkit-transition: all 0.218s;
+    transition: all 0.218s;
 }
-
 .button-add{
     display: flex;
     justify-content: center;
@@ -309,29 +310,20 @@ a.btn.btn-cancel {
     color: #fff;
 }
 
+
 /*********************
 TABLE SEATING CHART
 **********************/
 
 .table-seating {
-  padding: 4px;
+  padding: 8px;
   line-height: 1.42857143;
   vertical-align: top;
   border-top: 1px solid #ddd;
-  width: 100%;
+  margin-left: 23px;
 }
 
-.table-seating td {
-  width: 33%;
-}
 
-.table-seating tr {
-    background-color: #FFFFFF;
-}
-
-.table-seating tbody tr:hover {
-    background-color: #E5E8E8;
-}
 
 .form-control-event{
     width: 50%;
@@ -345,9 +337,4 @@ TABLE SEATING CHART
 
 .form-customer{
     width: 350px;
-}
-
-
-.click-row {
-    cursor: pointer;
 }

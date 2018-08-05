@@ -31,28 +31,33 @@
                 <button class="btn btn-lg btn-primary btn-add" onclick="window.location.href='/addCustomer'" type="button">Add</button>
             </div>
         </div>
-<script src="https://code.jquery.com/jquery-1.12.4.min.js"></script>
 <script src="static/bootstable.js"></script>
 <script>
     $('table').SetEditable({onBeforeDelete: deleteCustomer});
 
     function deleteCustomer(row) {
+      document.getElementById('itemToDelete').innerHTML = document.getElementById(row[0].id).getElementsByClassName("name")[0].innerHTML;
+      document.getElementById('deleteDeletionModal').onclick = function() { doDeletion(row); };
+      document.getElementById('cancelDeletionModal').onclick = function() { refresh(row); };
+      $('#deletionModal').modal('show');
+    }
+
+    function doDeletion(row) {
+      $('#deletionModal').modal('hide');
       $('#loading').modal('show');
-      if (window.confirm("You are about to delete: " + document.getElementById(row[0].id).getElementsByClassName("name")[0].innerHTML)) {
-        fetch('/deleteCustomer/' + row[0].id, {
+      fetch('/deleteCustomer/' + row[0].id, {
         credentials: "same-origin",
         headers: {
             'Content-Type': "application/json",
         },
         method: "DELETE",
         }).catch(error => console.error('Error:', error)).then(refresh);
-      } else {
-        refresh(); // This is required because the table library doesn't support canceling a delete event
-      }
     }
 
 
     function refresh() {
+      $('#deletionModal').modal('hide');
+
       url = window.location.href;
       window.location = url;
 
