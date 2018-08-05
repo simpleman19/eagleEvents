@@ -1,6 +1,7 @@
 import math
 
 import pytest
+from deap import creator
 from numpy import count_nonzero, array_equal
 
 from eagleEvents.seating_chart_ga import SeatingChartGA
@@ -308,6 +309,27 @@ def test_when_calling_evaluate_it_returns_a_tuple_containing_the_count_of_likes_
 ##
 # Crossover / Mutate
 ##
+
+@pytest.mark.filterwarnings('ignore::RuntimeWarning')
+def test_when_calling_ordered_crossover_it_returns_crossovered_individuals(monkeypatch):
+    e = mock_event(monkeypatch)
+    db = mock_db(monkeypatch)
+
+    ga = SeatingChartGA(e)
+    ga.initialization()
+    ga.population()
+    ga.evaluation()
+    ga.crossover()
+
+    ind1 = creator.Individual([1, 2, 3, 4, 5, 6])
+    ind2 = creator.Individual([6, 5, 4, 3, 2, 1])
+
+    child1, child2 = ga.toolbox.mate(ind1, ind2)
+
+    assert(len(child1) == len(child2) == len(ind1) == len(ind2))
+
+    all_in_list_once([1, 2, 3, 4, 5, 6], child1)
+    all_in_list_once([1, 2, 3, 4, 5, 6], child2)
 
 
 @flaky(max_runs=5,min_passes=1)

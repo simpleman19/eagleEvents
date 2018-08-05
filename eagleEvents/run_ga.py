@@ -17,6 +17,7 @@ def run():
     print("Execution time: {time}".format(time=end-start))
     print("Number of likes: {likes}\nNumber of dislikes: {dislikes}".format(
         likes=ga.total_like_preferences, dislikes=ga.total_dislike_preferences))
+    print("Ending best Pareto front: {a} dislikes, {b} likes".format(a=ga.hall_of_fame[0].fitness.values[0], b=ga.hall_of_fame[0].fitness.values[1]))
     #for t in tables:
     #    print("Table {number}".format(number=t.number))
     #    for g in t.guests:

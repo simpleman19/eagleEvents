@@ -121,8 +121,31 @@ class SeatingChartGA:
         self.toolbox.register("select", tools.selTournament, tournsize=self.TOURNSIZE, fit_attr="fitness")
 
     def crossover(self):
-        self.toolbox.register("mate", tools.cxOrdered)
-        #self.toolbox.register("mate", tools.cxUniformPartialyMatched, indpb=self.INDPB)
+        self.toolbox.register("mate", self.ordered_crossover)
+
+    def ordered_crossover(self, ind1, ind2):
+        size = min([len(ind1), len(ind2)])
+        num1, num2 = random.randint(0, size), random.randint(0, size)
+        start = min([num1, num2])
+        stop = max([num1, num2])
+
+        cur_child1_i, cur_child2_i = 0, 0
+        child1, child2 = self.toolbox.clone(ind1), self.toolbox.clone(ind2)
+        for i in range(size):
+            # don't touch copied-down range
+            if i > start and i < stop:
+                # jump to the next relevant index
+                cur_child1_i, cur_child2_i = stop, stop
+                continue
+            # drop down all other elements not in the copied range
+            cur_el1, cur_el2 = ind1[i], ind2[i]
+            if not(cur_el2 in child1):
+                child1[cur_child1_i] = cur_el2
+            if not(cur_el1 in child2):
+                child2[cur_child2_i] = cur_el1
+        # technically this was supposed to happen in-place
+        ind1, ind2 = child1, child2
+        return ind1, ind2
 
     def mutation(self):
         self.toolbox.register("mutate", tools.mutShuffleIndexes, indpb=self.INDPB)
