@@ -49,9 +49,7 @@
 <script src="/static/bootstable.js"></script>
 
 <script>
-    if("{{currentUser.is_admin}}" == "True") {
-        $('table').SetEditable({editButton: false, onBeforeDelete: deleteEvent});
-    }
+    $('table').SetEditable({editButton: false, onBeforeDelete: deleteEvent});
 
     window.onload = onDocumentReload;
 
