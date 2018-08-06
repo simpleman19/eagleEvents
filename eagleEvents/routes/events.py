@@ -196,6 +196,7 @@ def delete_event(id):
     flash('Successfully deleted event: ' + name)
     return jsonify({'success': "Successfully deleted event: " + name}), 200
 
+
 def validate_and_save(event, request):
     event.company = g.current_user.company
     event.planner = User.query.filter_by(id=request.form['planner']).one_or_none()
@@ -258,6 +259,8 @@ def convert_time(time):
         'success' : '<This field will contain any success messages to show user>'
     }
 """
+
+
 @events_blueprint.route('/changeSeat', methods=['POST'])
 @multi_auth.login_required
 def change_seats():
