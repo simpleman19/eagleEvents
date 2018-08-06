@@ -198,6 +198,7 @@ def delete_event(id):
 
 
 def validate_and_save(event, request):
+    regen_seating_chart = False
     event.company = g.current_user.company
     event.planner = User.query.filter_by(id=request.form['planner']).one_or_none()
     event.customer = Customer.query.filter_by(id=request.form['customer']).one_or_none()
@@ -208,8 +209,16 @@ def validate_and_save(event, request):
     # convert it into python datetime
     event.time = datetime.datetime(*[int(v) for v in date_in.replace('T', '-').replace(':', '-').split('-')])
     event.is_done = True if request.form['status'] == "Done" else False
-    event.table_size = TableSize.query.filter_by(id=request.form['table_size']).one_or_none()
-    event.percent_extra_seats = request.form['extra']
+    new_table_size = TableSize.query.filter_by(id=request.form['table_size']).one_or_none()
+    if new_table_size.id != event.table_size_id:
+        regen_seating_chart = True
+    event.table_size = new_table_size
+    if event.percent_extra_seats != request.form['extra']:
+        regen_seating_chart = True
+    event.percent_extra_seats = float(request.form['extra'])
+
+    if regen_seating_chart:
+        event.generate_seating_chart()
 
     if event.name is None or len(event.name) == 0:
         flash("Name is required", "error")
@@ -220,7 +229,7 @@ def validate_and_save(event, request):
     elif event.time is None or event.time < datetime.datetime.now():
         flash("Valid Date and Time is required", "error")
         return False
-    elif event.percent_extra_seats is None or len(event.percent_extra_seats) == 0:
+    elif event.percent_extra_seats is None:
         flash("Extra Seating Percentage is required", "error")
         return False
     else:
