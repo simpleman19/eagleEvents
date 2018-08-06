@@ -233,7 +233,7 @@ def validate_and_save(event, request):
         flash("Extra Seating Percentage is required", "error")
         return False
 
-    if regen_seating_chart:
+    if regen_seating_chart and len(event._guests) > 0:
         event.generate_seating_chart()
 
     db.session.add(event)
