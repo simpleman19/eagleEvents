@@ -198,6 +198,9 @@ def delete_event(id):
 
 
 def validate_and_save(event, request):
+    if float(request.form['extra']) > .99:
+        flash("Percent value must be less than 1", "error")
+        return False
     regen_seating_chart = False
     event.company = g.current_user.company
     event.planner = User.query.filter_by(id=request.form['planner']).one_or_none()
@@ -217,9 +220,6 @@ def validate_and_save(event, request):
         regen_seating_chart = True
     event.percent_extra_seats = float(request.form['extra'])
 
-    if regen_seating_chart:
-        event.generate_seating_chart()
-
     if event.name is None or len(event.name) == 0:
         flash("Name is required", "error")
         return False
@@ -232,10 +232,13 @@ def validate_and_save(event, request):
     elif event.percent_extra_seats is None:
         flash("Extra Seating Percentage is required", "error")
         return False
-    else:
-        db.session.add(event)
-        db.session.commit()
-        return True
+
+    if regen_seating_chart:
+        event.generate_seating_chart()
+
+    db.session.add(event)
+    db.session.commit()
+    return True
 
 
 def convert_time(time):
