@@ -1,7 +1,7 @@
 {% extends "layout.html.j2" %}
 {% block head_content %}
     <title>Eagle Events Customers</title>
-{% endblock %}   
+{% endblock %}
 {% block body_content %}
     <h1>Customers</h1>
     <div class="container">
@@ -18,8 +18,8 @@
                     </thead>
                     <tbody>
                         {% for customer in customers %}
-                        <tr class = "click-row" data-href="modifyCustomer/{{ customer.id }}">
-                            <td>{{customer.name}}</td>
+                        <tr class = "click-row" data-href="modifyCustomer/{{ customer.id }}" id="{{ customer.id }}">
+                            <td class="name">{{customer.name}}</td>
                             <td>{{customer.phone_number}}</td>
                             <td>{{customer.email}}</td>
                         </tr>
@@ -31,19 +31,39 @@
                 <button class="btn btn-lg btn-primary btn-add" onclick="window.location.href='/addCustomer'" type="button">Add</button>
             </div>
         </div>
-<script src="https://code.jquery.com/jquery-1.12.4.min.js"></script>
 <script src="static/bootstable.js"></script>
 <script>
     $('table').SetEditable({onBeforeDelete: deleteCustomer});
 
-    function deleteCustomer() {
-        console.log("delete");
+    function deleteCustomer(row) {
+      document.getElementById('itemToDelete').innerHTML = document.getElementById(row[0].id).getElementsByClassName("name")[0].innerHTML;
+      document.getElementById('deleteDeletionModal').onclick = function() { doDeletion(row); };
+      document.getElementById('cancelDeletionModal').onclick = function() { refresh(row); };
+      $('#deletionModal').modal('show');
+    }
+
+    function doDeletion(row) {
+      $('#deletionModal').modal('hide');
+      $('#loading').modal('show');
+      fetch('/deleteCustomer/' + row[0].id, {
+        credentials: "same-origin",
+        headers: {
+            'Content-Type': "application/json",
+        },
+        method: "DELETE",
+        }).catch(error => console.error('Error:', error)).then(refresh);
     }
 
 
     function refresh() {
-        url = window.location.href;
-        window.location = url;
+      $('#deletionModal').modal('hide');
+      $('#loading').modal('show');
+      
+      url = window.location.href;
+      window.location = url;
+
+       // Add this after api conversion
+       //$('#loading').modal('show');
     }
 
     $(".click-row").click(function() {
@@ -51,4 +71,3 @@
     });
 </script>
 {% endblock %}
-
