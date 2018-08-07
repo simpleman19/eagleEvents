@@ -1,4 +1,5 @@
 from eagleEvents.printing.chart import seating_chart_print
+from eagleEvents.printing.attendance import attendance_list_print
 from pathlib import Path
 from flask import Blueprint, render_template, flash, request, redirect, url_for, g, jsonify, abort
 from eagleEvents.models.event import Event
@@ -174,6 +175,11 @@ def print_seating_chartTest():
 def print_seating_chart(id):
     # Print Seating Chart
     return seating_chart_print(id)
+
+@events_blueprint.route('/printAttendanceList/<id>', methods=['GET', 'POST'])
+def print_attendance_list(id):
+    # Print Seating Chart
+    return attendance_list_print(id)
 
 
 @events_blueprint.route('/deleteEvent/<id>', methods=['DELETE'])
