@@ -9,19 +9,19 @@ from deap import tools
 from math import floor, ceil
 from concurrent.futures import ProcessPoolExecutor, ThreadPoolExecutor
 from numpy import max, mean, min, std
-import multiprocessing
+
 
 class SeatingChartGA:
-    INIT_PCT_GUESS, CXPB, MUTPB, INDPB, TOURNSIZE, NIND, NGEN = 0, 0.5, 0.15, 0.2, 3, 200, 10
-    HALL_OF_FAME_SIZE = 20
+    INIT_PCT_GUESS, CXPB, MUTPB, INDPB, TOURNSIZE, NIND, NGEN = 0, 0.5, 0.25, 0.2, 3, 400, 50
+    HALL_OF_FAME_SIZE = 50
     COLLECT_STATS = False
 
     def __init__(self, event, log_output=False):
-        if(event._guests is None or len(event._guests) == 0):
+        if event._guests is None or len(event._guests) == 0:
             raise ValueError("No guests for this event!")
-        if (event.table_size is None):
+        if event.table_size is None:
             raise ValueError("No table_size for this event!")
-        if (event.percent_extra_seats is None):
+        if event.percent_extra_seats is None:
             raise ValueError("No percent_extra_seats for this event!")
         self.log_output = log_output
         self.event = event
@@ -37,8 +37,7 @@ class SeatingChartGA:
         self.table_assignments = self.guest_numbers + [Table.EMPTY_SEAT for _ in range(self.num_extra_seats)]
         self.num_tables = ceil(len(self.table_assignments) / event.table_size.size)
         self.toolbox = base.Toolbox()
-        self.hall_of_fame = tools.HallOfFame(maxsize=self.HALL_OF_FAME_SIZE)
-        self.pool = multiprocessing.Pool()
+        self.hall_of_fame = []
 
     def setup(self):
         self.initialization()
@@ -47,8 +46,6 @@ class SeatingChartGA:
         self.selection()
         self.crossover()
         self.mutation()
-        # Multiprocessing
-        # self.toolbox.register("map", self.pool.map)
         if self.COLLECT_STATS:
             self.statistics()
 
@@ -99,31 +96,41 @@ class SeatingChartGA:
         self.toolbox.register("select", tools.selTournament, tournsize=self.TOURNSIZE, fit_attr="fitness")
 
     def crossover(self):
-        self.toolbox.register("mate", self.ordered_crossover)
+        self.toolbox.register("mate", self.table_crossover)
 
     # See http://www.rubicite.com/Tutorials/GeneticAlgorithms/CrossoverOperators/Order1CrossoverOperator.aspx
-    def ordered_crossover(self, ind1, ind2):
+    def table_crossover(self, ind1, ind2):
         size = min([len(ind1), len(ind2)])
-        num1, num2 = random.sample(range(0, size), 2)
+        num1, num2, in_out = random.sample(range(0, size), 3)
         start = min([num1, num2])
         stop = max([num1, num2])
 
-        cur_child1_i, cur_child2_i = 0, 0
+        swaps = {}
         child1, child2 = self.toolbox.clone(ind1), self.toolbox.clone(ind2)
-        for i in range(size):
-            # don't touch copied-down range
-            if i > start and i < stop:
-                # jump to the next relevant index
-                cur_child1_i, cur_child2_i = stop, stop
-                continue
-            # drop down all other elements not in the copied range
-            cur_el1, cur_el2 = ind1[i], ind2[i]
-            if not(cur_el2 in child1):
-                child1[cur_child1_i] = cur_el2
-            if not(cur_el1 in child2):
-                child2[cur_child2_i] = cur_el1
-        # technically this was supposed to happen in-place
-        ind1, ind2 = child1, child2
+        for i in range(start, stop):
+            if random.randint(0, 3) == 0:
+                if child1[i] != child2[i] and child1[i] != -1 and child2[i] != -1:
+                    swaps[child1[i]] = child2[i]
+        for k, v in swaps.items():
+            first_1, first_2 = -1, -1
+            second_1, second_2 = -1, -1
+            for i in range(size):
+                if child1[i] == v:
+                    first_1 = i
+                elif child1[i] == k:
+                    second_1 = i
+                if child2[i] == k:
+                    first_2 = i
+                elif child2[i] == v:
+                    second_2 = i
+                if first_1 != -1 and second_1 != -1 and first_2 != -1 and second_2 != -1:
+                    break
+            if first_1 != -1 and second_1 != -1 and first_2 != -1 and second_2 != -1:
+                child1[first_1], child1[second_1] = child1[second_1], child1[first_1]
+                child2[first_2], child2[second_2] = child2[second_2], child2[first_2]
+
+        ind1 = child1
+        ind2 = child2
         return ind1, ind2
 
     def mutation(self):
@@ -143,11 +150,12 @@ class SeatingChartGA:
         self.logbook.chapters["like"].header = "avg", "std", "min", "max"
 
     def should_terminate(self, population, generation_number):
+        return False
         found_optimal_solution = len(self.hall_of_fame) > 0 and self.hall_of_fame[0].fitness.values == (0, self.total_like_preferences)
         return found_optimal_solution or generation_number > self.NGEN
 
     def update_fitnesses(self, population):
-        fitnesses = self.pool.map(self.toolbox.evaluate, population)
+        fitnesses = self.toolbox.map(self.toolbox.evaluate, population)
         for ind, fit in zip(population, fitnesses):
             ind.fitness.values = fit
 
@@ -165,15 +173,20 @@ class SeatingChartGA:
         self.update_stats(0, pop)
 
         generation_number = 1
-        while not self.should_terminate(pop, generation_number):
-            if self.log_output:
-                print("Generation: {}".format(generation_number))
+        while not self.should_terminate(pop, generation_number) and generation_number <= self.NGEN:
             pop[:] = self.do_generation(pop)
             self.update_stats(generation_number, pop)
-            self.hall_of_fame.update(pop)
+            self.update_hall_of_fame(pop)
+            if self.log_output:
+                print("Generation: {}".format(generation_number))
+                print("Current Best: {a} dislikes, {b} likes".format(a=self.hall_of_fame[0].fitness.values[0],
+                                                                     b=self.hall_of_fame[0].fitness.values[1]))
             generation_number += 1
-
         return pop
+
+    def update_hall_of_fame(self, pop):
+        self.hall_of_fame = sorted(pop, key=lambda indiv: indiv.fitness.values[1] - (indiv.fitness.values[0] * 2),
+                                   reverse=True)[:self.HALL_OF_FAME_SIZE]
 
     def get_seating_chart_tables(self):
         self.setup()
@@ -206,10 +219,25 @@ class SeatingChartGA:
     def crossover_and_mutate(self, offspring):
         return algorithms.varOr(list(offspring), self.toolbox, cxpb=self.CXPB, mutpb=self.MUTPB, lambda_=self.NIND)
 
+    @staticmethod
+    def valid_seating(individual):
+        valid = True
+        seen = set()
+        for i in individual:
+            if i != -1 and i in seen:
+                valid = False
+            seen.add(i)
+        if len(seen) != max(individual) + 1:
+            valid = False
+        return valid
+
     def evaluate(self, individual):
         dislike_score = 0
         like_score = 0
         tables_to_check = range(self.num_tables)
+        if not self.valid_seating(individual):
+            print("Invalid seating...")
+            return 100, 0
         for t in tables_to_check:
             guests_at_table = individual[t*self.event.table_size.size:(t + 1)*self.event.table_size.size]
             dislike_score += self.count_dislikes_in_list(guests_at_table)
