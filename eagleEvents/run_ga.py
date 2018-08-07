@@ -6,7 +6,7 @@ from eagleEvents.models import Event, SeatingPreference
 
 
 def run():
-    ga = SeatingChartGA(Event.query.get('3508863751a449b28799cc1b657f5890'))
+    ga = SeatingChartGA(Event.query.get('3508863751a449b28799cc1b657f5890'), log_output=True)
     ga.COLLECT_STATS = True
 
     ga.setup()
