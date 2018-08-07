@@ -11,7 +11,7 @@ from concurrent.futures import ProcessPoolExecutor, ThreadPoolExecutor
 from numpy import max, mean, min, std
 
 class SeatingChartGA:
-    INIT_PCT_GUESS, CXPB, MUTPB, INDPB, TOURNSIZE, NIND, NGEN = 0.2, 0.5, 0.15, 0.2, 100, 200, 15
+    INIT_PCT_GUESS, CXPB, MUTPB, INDPB, TOURNSIZE, NIND, NGEN = .1, 0.5, 0.15, 0.2, 3, 200, 50
     COLLECT_STATS = False
 
     def __init__(self, event):
@@ -186,7 +186,13 @@ class SeatingChartGA:
         offspring = self.toolbox.select(population, len(population))
         offspring = list(self.toolbox.map(self.toolbox.clone, offspring))
 
+        del offspring[:5]
+        for good_individual in list(self.hall_of_fame)[:5]:#random.sample(list(self.hall_of_fame), min([5, len(list(self.hall_of_fame))])):
+            offspring.append(good_individual)
+
         offspring = self.crossover_and_mutate(offspring)
+
+
         invalid_ind = [ind for ind in offspring if not ind.fitness.valid]
         self.update_fitnesses(invalid_ind)
 
