@@ -100,6 +100,7 @@ th,td{
 .flashes li.error {
     background: linear-gradient(#e5381e, #c25a4a, #e5381e);
 }
+
 /*
  * Card component
  */
@@ -259,6 +260,20 @@ a.btn.btn-cancel {
     padding-top: 10px;
 }
 
+.btn.btn-delete {
+    padding: 7px 30px;
+    font-weight: 700;
+    font-size: 14px;
+    height: 36px;
+    -moz-border-radius: 3px;
+    -webkit-border-radius: 3px;
+    border-radius: 3px;
+    border: none;
+    -o-transition: all 0.218s;
+    -moz-transition: all 0.218s;
+    -webkit-transition: all 0.218s;
+    transition: all 0.218s;
+}
 .button-add{
     display: flex;
     justify-content: center;

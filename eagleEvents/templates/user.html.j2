@@ -1,7 +1,7 @@
 {% extends "layout.html.j2" %}
 {% block head_content %}
     <title>Eagle Events Users</title>
-{% endblock %}   
+{% endblock %}
 {% block body_content %}
     <h1>Users</h1>
         <div class="container">
@@ -38,10 +38,11 @@
         window.location = url;
     }
 
-    $(".click-row").click(function() {
-        window.location = $(this).data("href");
-    });
+    {% if g.current_user.is_admin %} 
+      $(".click-row").click(function() {
+          window.location = $(this).data("href");
+      });
+    {% endif %}
 
 </script>
 {% endblock %}
-

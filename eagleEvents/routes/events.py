@@ -176,7 +176,32 @@ def print_seating_chart(id):
     return seating_chart_print(id)
 
 
+@events_blueprint.route('/deleteEvent/<id>', methods=['DELETE'])
+@multi_auth.login_required
+def delete_event(id):
+    event = None
+    name = ""
+    try:
+        event = Event.query.filter_by(id=id, company=g.current_user.company).one_or_none()
+    except Exception as e:
+        print(e)
+        abort(404)
+    if event:
+        name = event.name
+        db.session.delete(event)
+        db.session.commit()
+    else:
+        print("Could not find event to delete")
+        abort(404)
+    flash('Successfully deleted event: ' + name)
+    return jsonify({'success': "Successfully deleted event: " + name}), 200
+
+
 def validate_and_save(event, request):
+    if float(request.form['extra']) > .99:
+        flash("Percent value must be less than 1", "error")
+        return False
+    regen_seating_chart = False
     event.company = g.current_user.company
     event.planner = User.query.filter_by(id=request.form['planner']).one_or_none()
     event.customer = Customer.query.filter_by(id=request.form['customer']).one_or_none()
@@ -187,8 +212,13 @@ def validate_and_save(event, request):
     # convert it into python datetime
     event.time = datetime.datetime(*[int(v) for v in date_in.replace('T', '-').replace(':', '-').split('-')])
     event.is_done = True if request.form['status'] == "Done" else False
-    event.table_size = TableSize.query.filter_by(id=request.form['table_size']).one_or_none()
-    event.percent_extra_seats = request.form['extra']
+    new_table_size = TableSize.query.filter_by(id=request.form['table_size']).one_or_none()
+    if new_table_size.id != event.table_size_id:
+        regen_seating_chart = True
+    event.table_size = new_table_size
+    if event.percent_extra_seats != request.form['extra']:
+        regen_seating_chart = True
+    event.percent_extra_seats = float(request.form['extra'])
 
     if event.name is None or len(event.name) == 0:
         flash("Name is required", "error")
@@ -199,18 +229,19 @@ def validate_and_save(event, request):
     elif event.time is None or event.time < datetime.datetime.now():
         flash("Valid Date and Time is required", "error")
         return False
-    elif event.percent_extra_seats is None or len(event.percent_extra_seats) == 0:
+    elif event.percent_extra_seats is None:
         flash("Extra Seating Percentage is required", "error")
         return False
-    else:
-        db.session.add(event)
-        db.session.commit()
-        return True
+
+    if regen_seating_chart and len(event._guests) > 0:
+        event.generate_seating_chart()
+
+    db.session.add(event)
+    db.session.commit()
+    return True
 
 
 def convert_time(time):
     time=str(time).replace(" ", "T")
     date = (time[:16]) if len(time) > 16 else time
     return date
-
-

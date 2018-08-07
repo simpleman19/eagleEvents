@@ -1,7 +1,7 @@
 {% extends "layout.html.j2" %}
 {% block head_content %}
     <title>Eagle Events Events</title>
-{% endblock %}   
+{% endblock %}
 {% block body_content %}
     <h1>Events</h1>
         <div class="container">
@@ -14,13 +14,13 @@
             <br>
             <br>
             <button class="btn btn-primary active" id="refreshButton" onclick="refresh()">Refresh</button>
-          
+
             <div class="card card-container-2">
                 <div style="margin: 5px">
                     <input class="form-control" style="display: inline; width: 30%" type="text" id="filter" onkeyup="filter()" placeholder="Filter by events, planner, or date..">
                     <button type="button" class="btn btn-light"><i class="fa fa-filter" aria-hidden="true"></i></button>
                 </div>
-                <table id="listTable" class="table table-bordered table-hover" 
+                <table id="listTable" class="table table-bordered table-hover"
                 data-pagination="true"
                 data-id-field="name"
                 data-page-list="[5, 10, 25, 50, 100, ALL]">
@@ -33,8 +33,8 @@
                     </thead>
                     <tbody>
                         {% for event in events %}
-                        <tr class = "click-row" data-href="modifyEvent/{{event.id}}">
-                            <td>{{event.name}}</td>
+                        <tr class = "click-row" data-href="modifyEvent/{{event.id}}" id="{{event.id}}">
+                            <td class="name">{{event.name}}</td>
                             <td>{{event.planner.name}}</td>
                             <td>{{event.time.date()}}</td>
                         </tr>
@@ -46,13 +46,10 @@
                 <button id="addEvent" class="btn btn-lg btn-primary btn-add" type="button">Add</button>
             </div>
         </div>
-<script src="https://code.jquery.com/jquery-1.12.4.min.js"></script>
 <script src="/static/bootstable.js"></script>
 
 <script>
-    if("{{currentUser.is_admin}}" == "True") {
-        $('table').SetEditable({editButton: false, onBeforeDelete: deleteEvent});
-    }
+    $('table').SetEditable({editButton: false, onBeforeDelete: deleteEvent});
 
     window.onload = onDocumentReload;
 
@@ -65,8 +62,18 @@
     }
 
     function refresh() {
-       url = window.location.href;
-       window.location = url;
+      $('#deletionModal').modal('hide');
+      $('#loading').modal('show');
+
+      url = window.location.href;
+      window.location = url;
+
+
+      url = window.location.href;
+      window.location = url;
+
+       // Add this after api conversion
+       //$('#loading').modal('show');
     }
 
     $(".click-row").click(function() {
@@ -88,8 +95,23 @@
         }
     }
 
-    function deleteEvent() {
-        console.log("delete");
+    function deleteEvent(row) {
+      document.getElementById('itemToDelete').innerHTML = document.getElementById(row[0].id).getElementsByClassName("name")[0].innerHTML;
+      document.getElementById('deleteDeletionModal').onclick = function() { doDeletion(row); };
+      document.getElementById('cancelDeletionModal').onclick = function() { refresh(row); };
+      $('#deletionModal').modal('show');
+    }
+
+    function doDeletion(row) {
+      $('#deletionModal').modal('hide');
+      $('#loading').modal('show');
+      fetch('/deleteEvent/' + row[0].id, {
+        credentials: "same-origin",
+        headers: {
+            'Content-Type': "application/json",
+        },
+        method: "DELETE",
+        }).catch(error => console.error('Error:', error)).then(refresh);
     }
 
     function filter() {
@@ -103,16 +125,16 @@
             tdName = tr[i].getElementsByTagName("td")[0];
             tdPlanner = tr[i].getElementsByTagName("td")[1];
             tdDate = tr[i].getElementsByTagName("td")[2];
-            
+
             if (tdName || tdPlanner || tdDate) {
-                if (tdName.innerHTML.toUpperCase().indexOf(filter) > -1 || 
+                if (tdName.innerHTML.toUpperCase().indexOf(filter) > -1 ||
                 tdPlanner.innerHTML.toUpperCase().indexOf(filter) > -1 ||
                 tdDate.innerHTML.toUpperCase().indexOf(filter) > -1) {
                     tr[i].style.display = "";
                 } else {
                     tr[i].style.display = "none";
                 }
-            } 
+            }
         }
     }
 

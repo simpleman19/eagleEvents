@@ -21,11 +21,11 @@ class Event(db.Model):
     company = db.relationship('Company', lazy=False)
     planner_id = db.Column(UUIDType(binary=False), db.ForeignKey('users.id'), nullable=True)
     planner = db.relationship('User', lazy=False)
-    tables = db.relationship('Table', lazy=True)
+    tables = db.relationship('Table', lazy=False, cascade='delete')
     table_size_id = db.Column(db.Integer, db.ForeignKey('table_sizes.id'), nullable=True)
     table_size = db.relationship('TableSize', lazy=False)
     _guests: List[Guest] = db.relationship('Guest', lazy=True,
-                                           backref=db.backref('guests', lazy='subquery'))
+                    backref=db.backref('guests', lazy='subquery'), cascade='delete')
 
     def __init__(self, customer):
         self.customer = customer
@@ -33,18 +33,18 @@ class Event(db.Model):
 
     def set_guests(self, guests: List['Event']):
         _guests = guests
-        new_tables = SeatingChartGA(self).get_seating_chart_tables()
+        self.generate_seating_chart()
+
+    def generate_seating_chart(self):
         # delete old tables
         for t in self.tables:
-            db.session.remove(t)
+            db.session.delete(t)
+        db.session.commit()
+
+        new_tables = SeatingChartGA(self).get_seating_chart_tables()
+
         # add new tables
         for t in new_tables:
             db.session.add(t)
         self.tables = new_tables
         db.session.commit()
-
-    def generate_seating_chart(self):
-        pass
-
-    def _generate_genetic_algo(self):
-        pass
