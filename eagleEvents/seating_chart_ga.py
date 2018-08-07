@@ -118,7 +118,7 @@ class SeatingChartGA:
         tables = []
         for t in range(self.num_tables):
             table = Table(self.event)
-            table.number = t + 1
+            table.number = 0
             guest_numbers_at_table = winner[t * self.event.table_size.size: (t + 1) * self.event.table_size.size]
             table.guests = list(filter(lambda g: g.number in guest_numbers_at_table, self.event._guests))
             tables.append(table)

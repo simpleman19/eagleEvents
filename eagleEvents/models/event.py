@@ -36,10 +36,13 @@ class Event(db.Model):
         self.generate_seating_chart()
 
     def generate_seating_chart(self):
-        new_tables = SeatingChartGA(self).get_seating_chart_tables()
         # delete old tables
         for t in self.tables:
             db.session.delete(t)
+        db.session.commit()
+
+        new_tables = SeatingChartGA(self).get_seating_chart_tables()
+
         # add new tables
         for t in new_tables:
             db.session.add(t)
