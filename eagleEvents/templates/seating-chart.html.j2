@@ -9,7 +9,7 @@
     <h4 style="color: white; text-align: center;">Table Seating Capacity: {{tables[0].seating_capacity}}</h4>
     {% for table in tables %}
         <div class="card card-container-2 col-xs-4" style="height: {{tables[0].seating_capacity * 30 + 120}}px;">
-            <table id="{{ table.id }}" class="table-seating table-bordered">
+            <table id={{ table.id }} class="table-seating table-bordered">
                 <h3>Table {{ table.number }}</h3>
                 <thead>
                 <tr>
@@ -61,7 +61,7 @@
                     </div>
                     <div class="form-group row">
                         <label for="exampleFormControlSelect2">Guests</label>
-                            <select class="form-control" id="guest-select">
+                            <select class="form-control" id="guest-select" onChange="checkPrefs()">
                                 <option>Loading...</option>
                             </select>
                     </div>
@@ -69,6 +69,13 @@
             </div>
           </div>
         <div class="modal-footer">
+            <table id="warnings" class="table-seating table-bordered">
+                <h3>Warnings</h3>
+                <thead>
+                <tr>
+                </tr>
+                </thead>
+                <tbody>
             <button class="btn btn-lg btn-primary btn-save" type="button" onClick="swapSeats()">Save</button>
             <button class="btn btn-lg btn-danger btn-cancel" type="cancel" onClick="resetModal()">Cancel</button>
         </div>
@@ -86,39 +93,87 @@
     $('#seatingModificationModal').modal('show');
   }
 
-  function reloadGuestsAtTable() {
-    $('#loading').modal('show');
-    var selGuestId = document.getElementById('sel-guest-id').value;
-    var tableId = document.getElementById('table-select').value;
-    fetch('/api/table/guests?table=' + tableId, {
-        credentials: "same-origin",
-        method: "GET",
-    }).catch(error => console.error('Error:', error))
-      .then(res => res.json())
-      .then(json => {
-        var option, i;
-        var selectbox = document.getElementById('guest-select');
-        for(i = selectbox.options.length - 1 ; i >= 0 ; i--)
-        {
-            selectbox.remove(i);
-        }
-        for (i = 0; i < json.guests.length; i++){
-          if (json.guests[i].id != selGuestId) {
-            option = document.createElement( 'option' );
-            option.value = json.guests[i].id;
-            option.text = json.guests[i].full_name;
-            selectbox.add(option);
-          }
-        }
-        if (json.empty_seat) {
-          option = document.createElement( 'option' );
-          option.value = "-1";
-          option.text = "Empty Seat";
-          selectbox.add(option);
-        }
-        $('#loading').modal('hide');
-      });
+  function checkPrefs() {
+      let selGuestId = document.getElementById('sel-guest-id').value;
+      let table1 = document.getElementById(selGuestId).getElementsByClassName('table_id')[0].innerHTML;
+      let table2 = document.getElementById('table-select').value;
+      fetch('/api/table/prefs?table1=' + table1 + '&table2=' + table2, {
+            credentials: "same-origin",
+            method: "GET",
+      }).catch(error => console.error('Error:', error))
+          .then(res => res.json())
+          .then(json => {
+              let warnings = document.getElementById('warnings');
+              console.log(json);
+              for (i=0; i <= warnings.rows -1; i++){
+              //    warnings.deleteRow();
+              }
+            for (i = 0; i <= json.likes.length; i++){
+                var tr = warnings.insertRow();
+                var td = tr.insertCell();
+                //td.innerHTML = json.likes[i].guest1 + " likes " + json.likes[i].guest2;
+
+            }
+            for (i = 0; i <= json.likes.length; i++){
+                warnings.insertRow(json.dislikes[i]);
+            }
+          });
   }
+
+function reloadGuestsAtTable() {
+  $('#loading').modal('show');
+  let selGuestId = document.getElementById('sel-guest-id').value;
+  let selectbox = document.getElementById('guest-select');
+  let tableBox = document.getElementById('table-select');
+  let guestTableId = document.getElementById(selGuestId).getElementsByClassName('table_id')[0].innerHTML;
+  if (tableBox.value == guestTableId){
+      if (tableBox.selectedIndex == tableBox.length-1){
+          tableBox.selectedIndex = 0;
+      }
+      else{
+          tableBox.selectedIndex = tableBox.selectedIndex + 1;
+      }
+  }
+  let tableId = document.getElementById('table-select').value;
+  fetch('/api/table/guests?table=' + tableId,{
+      credentials: "same-origin",
+      method: "GET",
+  }).catch(error => console.error('Error:', error))
+    .then(res => res.json())
+    .then(json => {
+        var option, i;
+        var tableBox = document.getElementById('table-select');
+      for (i = tableBox.options.length -1 ; i >=0 ; i--){
+          tableBox.remove(i);
+      }
+      for(i = selectbox.options.length - 1 ; i >= 0 ; i--)
+      {
+          selectbox.remove(i);
+      }
+      for (i = 0; i < json.tables.length; i++){
+          if (json.tables[i].id != guestTableId){
+              option = document.createElement('option');
+              option.value = json.tables[i].id;
+              option.text = "Table " + json.tables[i].number;
+              tableBox.add(option);
+          }
+      }
+      tableBox.value = tableId;
+      for (i = 0; i < json.guests.length; i++){
+          option = document.createElement( 'option' );
+          option.value = json.guests[i].id;
+          option.text = json.guests[i].full_name;
+          selectbox.add(option);
+      }
+      if (json.empty_seat) {
+        option = document.createElement( 'option' );
+        option.value = "-1";
+        option.text = "Empty Seat";
+        selectbox.add(option);
+      }
+      $('#loading').modal('hide');
+    });
+}
 
   function swapSeats() {
     $('#loading').modal('show');

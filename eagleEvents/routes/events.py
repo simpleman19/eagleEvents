@@ -341,22 +341,61 @@ def change_seats():
         return jsonify(response), 404
 
 
+@events_blueprint.route('/api/table/prefs', methods=['GET'])
+@multi_auth.login_required
+def get_prefs_for_table():
+    response = {
+        'likes': [],
+        'dislikes': []
+    }
+    table1_id = request.args.get('table1')
+    table2_id = request.args.get('table2')
+
+    table1 = Table.query.filter_by(id=table1_id).one_or_none()
+    table2 = Table.query.filter_by(id=table2_id).one_or_none()
+
+    g1 = table1.guests
+    g2 = table2.guests
+
+    for g in g1:
+        for d in g2:
+            if g.likes(d):
+                response['likes'].append({
+                    'guest1': g.full_name,
+                    'guest2': d.full_name
+                })
+            elif g.dislikes(d):
+                response['dislikes'].append({
+                    'guest1': g.full_name,
+                    'guest2': d.full_name
+                })
+    return jsonify(response)
+
+
 @events_blueprint.route('/api/table/guests', methods=['GET'])
 @multi_auth.login_required
 def get_guests_for_table():
     table_id = request.args.get('table')
+    selected_guest = request.args.get('selGuest')
     response = {
-        'guests': []
+        'guests': [],
+        'tables': [],
     }
     if table_id is not None:
         try:
             table = Table.query.filter_by(id=table_id).one_or_none()
+            event = table.event
             if table is not None:
+                response['tables'] = [{
+                    'number': t.number,
+                    'id': t.id
+                } for t in event.tables]
                 response['guests'] = [{
                     'full_name': g.full_name,
                     'id': str(g.id),
                     'first_name': g.first_name,
-                    'last_name': g.last_name
+                    'last_name': g.last_name,
+                    'table_id': g.table_id
                 } for g in table.guests]
                 response['empty_seat'] = table.seating_capacity > len(table.guests)
                 return jsonify(response), 200
