@@ -34,6 +34,7 @@
     }
 
     function buildList() {
+        $('#loading').modal('show');
         let userTable = document.getElementById('listTable-body');
             fetch('/api/user/users', {
             credentials: "same-origin",
@@ -63,6 +64,7 @@
                 {% endif %}
             }
           });
+        $('#loading').modal('hide');
     }
 
     window.onload = buildList;
