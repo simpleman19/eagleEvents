@@ -12,15 +12,16 @@ from concurrent.futures import ProcessPoolExecutor, ThreadPoolExecutor
 from numpy import max, mean, min, std
 from multiprocessing import Pool
 
-INIT_PCT_GUESS, CXPB, MUTPB, INDPB, TOURNSIZE, NIND, NGEN = 0, 0.55, 0.2, 0.2, 10, 150, 100
+INIT_PCT_GUESS, CXPB, MUTPB, INDPB, TOURNSIZE = 0, 0.5, 0.5, 0.2, 6
 HALL_OF_FAME_SIZE = 30
-
-toolbox = base.Toolbox()
 
 creator.create("FitnessMulti", base.Fitness, weights=(-0.2, 1.0))
 creator.create("Individual", list, fitness=creator.FitnessMulti)
 
+toolbox = base.Toolbox()
 
+
+# Crossover algo
 # See http://www.rubicite.com/Tutorials/GeneticAlgorithms/CrossoverOperators/Order1CrossoverOperator.aspx
 def table_crossover(ind1, ind2):
     size = min([len(ind1), len(ind2)])
@@ -45,20 +46,16 @@ def table_crossover(ind1, ind2):
     return ind1, ind2
 
 
-def valid_seating(individual):
-    valid = True
-    seen = set()
-    for i in individual:
-        if i != -1 and i in seen:
-            valid = False
-        seen.add(i)
-    if len(seen) != max(individual) + 1:
-        valid = False
-    return valid
-
-
-def get_preferences_by_guest_number(guest_lookup, number):
-    return guest_lookup[number]
+# Preference counting
+def count_preferences(guest_dict, seating_preference):
+    count = 0
+    for number, guest_preference_dict in guest_dict.items():
+        if guest_preference_dict is None:
+            continue
+        for other_number, preference_number in guest_preference_dict.items():
+            if preference_number == seating_preference.value:
+                count += 1
+    return count
 
 
 def count_preferences_in_list(guest_lookup, guest_numbers, preference_number):
@@ -66,7 +63,7 @@ def count_preferences_in_list(guest_lookup, guest_numbers, preference_number):
     for i in range(len(guest_numbers)):
         if guest_numbers[i] == Table.EMPTY_SEAT:
             continue
-        guest_preferences = get_preferences_by_guest_number(guest_lookup, guest_numbers[i])
+        guest_preferences = guest_lookup[guest_numbers[i]]
         if guest_preferences is None or len(guest_preferences) == 0:
             continue
         for j in range(len(guest_numbers)):
@@ -90,6 +87,7 @@ def count_likes_in_list(guest_lookup, guest_numbers):
     return count_preferences_in_list(guest_lookup, guest_numbers, SeatingPreference.LIKE.value)
 
 
+# Seating chart evaluation
 def evaluate(indiv_and_else):
     table_size = indiv_and_else['size']
     guest_lookup = indiv_and_else['lookup']
@@ -108,36 +106,7 @@ def evaluate(indiv_and_else):
     return dislike_score, like_score
 
 
-def count_preferences(guest_dict, seating_preference):
-    count = 0
-    for number, guest_preference_dict in guest_dict.items():
-        if guest_preference_dict is None:
-            continue
-        for other_number, preference_number in guest_preference_dict.items():
-            if preference_number == seating_preference.value:
-                count += 1
-    return count
-
-
-def guest_list_to_nested_dict(guests):
-    guests_dict = dict()
-    for guest in guests:
-        if not (guest.seating_preferences is None) and len(guest.seating_preferences) > 0:
-            pref_dict = dict()
-            for pref in guest.seating_preferences:
-                if pref.other_guest is None:
-                    continue #FIXME: remove this before I commit
-                    #raise ValueError("Cannot find other_guest with id {other_id} for seating preference {pref_id} on guest {guest_id}".format(
-                    #    other_id=pref.other_guest_id,
-                    #    pref_id=pref.id,
-                    #    guest_id=guest.id))
-                pref_dict[pref.other_guest.number] = pref.preference.value
-        else:
-            pref_dict = None
-        guests_dict[guest.number] = pref_dict
-    return guests_dict
-
-
+# Update fitness value for seating chart
 def update_fitnesses(lookup_and_size, population):
     for item, indiv in zip(lookup_and_size, population):
         item["indiv"] = indiv
@@ -146,28 +115,68 @@ def update_fitnesses(lookup_and_size, population):
         ind.fitness.values = fit
 
 
-def crossover_and_mutate(toolbox, offspring):
-    return algorithms.varOr(list(offspring), toolbox, cxpb=CXPB, mutpb=MUTPB, lambda_=NIND)
-
-
+# Record stats if collecting
 def update_stats(mstats, logbook, generation_number, population):
     record = mstats.compile(population)
     logbook.record(gen=generation_number, **record)
 
 
-def init_population(pcls, ind_init, ind_guess_func, n, pct_heuristic):
-    global toolbox
-    heuristics = list([creator.Individual(ind_guess_func()) for _ in range(floor(n * pct_heuristic))])
-    randoms = list(creator.Individual(toolbox.indices()) for _ in range(n - len(heuristics)))
-    return heuristics + randoms
+# Register functions for DEAP
+toolbox.register("evaluate", evaluate)
+toolbox.register("select", tools.selTournament, tournsize=TOURNSIZE, fit_attr="fitness")
+toolbox.register("mate", table_crossover)
+toolbox.register("mutate", tools.mutShuffleIndexes, indpb=INDPB)
 
 
-def should_terminate(hall_of_fame, generation_number, total_likes):
-    found_optimal_solution = len(hall_of_fame) > 0 and hall_of_fame[0].fitness.values == (0, total_likes)
-    return found_optimal_solution or generation_number > NGEN
+# VarOr function from DEAP with multithreading
+def varOr(population, toolbox, lambda_, cxpb, mutpb):
+    multithreaded = True
+    assert (cxpb + mutpb) <= 1.0, (
+        "The sum of the crossover and mutation probabilities must be smaller "
+        "or equal to 1.0.")
+    if multithreaded:
+        populations = [population for i in range(lambda_)]
+
+        offspring = toolbox.map(rand_mut_cross, populations)
+    else:
+        offspring = []
+        for _ in range(lambda_):
+            op_choice = random.random()
+            if op_choice < cxpb:  # Apply crossover
+                ind1, ind2 = list(map(toolbox.clone, random.sample(population, 2)))
+                ind1, ind2 = toolbox.mate(ind1, ind2)
+                del ind1.fitness.values
+                offspring.append(ind1)
+            elif op_choice < cxpb + mutpb:  # Apply mutation
+                ind = toolbox.clone(random.choice(population))
+                ind, = toolbox.mutate(ind)
+                del ind.fitness.values
+                offspring.append(ind)
+            else:  # Apply reproduction
+                offspring.append(random.choice(population))
+
+    return offspring
 
 
-def do_generation(hall_of_fame, lookup_and_size, population):
+# Get mutation/crossover/repoduction
+def rand_mut_cross(population):
+    op_choice = random.random()
+    if op_choice < CXPB:  # Apply crossover
+        ind1, ind2 = list(map(toolbox.clone, random.sample(population, 2)))
+        ind1, ind2 = toolbox.mate(ind1, ind2)
+        del ind1.fitness.values
+        offspring = ind1
+    elif op_choice < CXPB + MUTPB:  # Apply mutation
+        ind = toolbox.clone(random.choice(population))
+        ind, = toolbox.mutate(ind)
+        del ind.fitness.values
+        offspring = ind
+    else:  # Apply reproduction
+        offspring = random.choice(population)
+    return offspring
+
+
+def do_generation(hall_of_fame, lookup_and_size, population, NIND):
     # from http://deap.readthedocs.io/en/master/tutorials/basic/part2.html#variations
     offspring = toolbox.select(population, len(population))
     offspring = list(toolbox.map(toolbox.clone, offspring))
@@ -175,7 +184,7 @@ def do_generation(hall_of_fame, lookup_and_size, population):
     del offspring[-HALL_OF_FAME_SIZE:]
     offspring.extend(hall_of_fame)
 
-    offspring = crossover_and_mutate(toolbox, offspring)
+    offspring = varOr(list(offspring), toolbox, cxpb=CXPB, mutpb=MUTPB, lambda_=NIND)
 
     invalid_ind = [ind for ind in offspring if not ind.fitness.valid]
     update_fitnesses(lookup_and_size, invalid_ind)
@@ -183,7 +192,7 @@ def do_generation(hall_of_fame, lookup_and_size, population):
     return offspring
 
 
-pool = Pool()
+pool = Pool(processes=2)
 toolbox.register("map", pool.map)
 
 
@@ -209,6 +218,16 @@ def get_seating_chart_tables(event, log_output=False, collect_stats=False):
     table_assignments = guest_numbers + [Table.EMPTY_SEAT for _ in range(num_extra_seats)]
     num_tables = ceil(len(table_assignments) / event.table_size.size)
     table_size = event.table_size.size
+
+    # Default size
+    NIND, NGEN = 250, 100
+
+    # Lower size if large num of guests
+    if len(event._guests) > 1500:
+        NIND, NGEN = 150, 50
+    elif len(event._guests) > 600:
+        NIND, NGEN = 200, 75
+
     lookup_and_size = [{"size": table_size, "lookup": guest_lookup, "indiv": []} for i in
                             range(NIND)]
     hall_of_fame = []
@@ -243,16 +262,10 @@ def get_seating_chart_tables(event, log_output=False, collect_stats=False):
                 heuristic.append(other_guest_num)
     heuristic += [Table.EMPTY_SEAT for _ in range(num_extra_seats)]
 
-    toolbox.register("evaluate", evaluate)
-    toolbox.register("select", tools.selTournament, tournsize=TOURNSIZE, fit_attr="fitness")
-    toolbox.register("mate", table_crossover)
-    creator.create("FitnessMulti", base.Fitness, weights=(-0.2, 1.0))
-    creator.create("Individual", list, fitness=creator.FitnessMulti)
     toolbox.register("indices", random.sample, table_assignments, len(table_assignments))
     toolbox.register("individual", tools.initIterate, creator.Individual, toolbox.indices)
     toolbox.register("population", tools.initRepeat, list, toolbox.individual)
     toolbox.register("population_guess", init_population, list, creator.Individual, heuristic)
-    toolbox.register("mutate", tools.mutShuffleIndexes, indpb=INDPB)
 
     pop = toolbox.population_guess(n=NIND, pct_heuristic=INIT_PCT_GUESS)
 
@@ -262,8 +275,8 @@ def get_seating_chart_tables(event, log_output=False, collect_stats=False):
         update_stats(mstats, logbook, 0, pop)
 
     generation_number = 1
-    while not should_terminate(hall_of_fame, generation_number, total_like_preferences) and generation_number <= NGEN:
-        pop[:] = do_generation(hall_of_fame, lookup_and_size, pop)
+    while not should_terminate(hall_of_fame, generation_number, total_like_preferences, NGEN):
+        pop[:] = do_generation(hall_of_fame, lookup_and_size, pop, NIND)
         if collect_stats:
             update_stats(mstats, logbook, generation_number, pop)
         pop.extend(hall_of_fame)
@@ -283,5 +296,50 @@ def get_seating_chart_tables(event, log_output=False, collect_stats=False):
         guest_numbers_at_table = winner[t * event.table_size.size: (t + 1) * event.table_size.size]
         table.guests = list(filter(lambda g: g.number in guest_numbers_at_table, event._guests))
         tables.append(table)
-    return tables, logbook, winner, total_like_preferences, total_dislike_preferences
+    if collect_stats:
+        return tables, logbook, winner, total_like_preferences, total_dislike_preferences
+    else:
+        return tables
 
+
+def guest_list_to_nested_dict(guests):
+    guests_dict = dict()
+    for guest in guests:
+        if not (guest.seating_preferences is None) and len(guest.seating_preferences) > 0:
+            pref_dict = dict()
+            for pref in guest.seating_preferences:
+                if pref.other_guest is None:
+                    continue #FIXME: remove this before I commit
+                    #raise ValueError("Cannot find other_guest with id {other_id} for seating preference {pref_id} on guest {guest_id}".format(
+                    #    other_id=pref.other_guest_id,
+                    #    pref_id=pref.id,
+                    #    guest_id=guest.id))
+                pref_dict[pref.other_guest.number] = pref.preference.value
+        else:
+            pref_dict = None
+        guests_dict[guest.number] = pref_dict
+    return guests_dict
+
+
+def should_terminate(hall_of_fame, generation_number, total_likes, NGEN):
+    found_optimal_solution = len(hall_of_fame) > 0 and hall_of_fame[0].fitness.values == (0, total_likes)
+    return found_optimal_solution or generation_number > NGEN
+
+
+def valid_seating(individual):
+    valid = True
+    seen = set()
+    for i in individual:
+        if i != -1 and i in seen:
+            valid = False
+        seen.add(i)
+    if len(seen) != max(individual) + 1:
+        valid = False
+    return valid
+
+
+def init_population(pcls, ind_init, ind_guess_func, n, pct_heuristic):
+    global toolbox
+    heuristics = list([creator.Individual(ind_guess_func()) for _ in range(floor(n * pct_heuristic))])
+    randoms = list(creator.Individual(toolbox.indices()) for _ in range(n - len(heuristics)))
+    return heuristics + randoms

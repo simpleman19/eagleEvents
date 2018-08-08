@@ -42,7 +42,7 @@ class Event(db.Model):
             db.session.delete(t)
         db.session.commit()
 
-        new_tables, _, _, _, _ = new_tables = get_seating_chart_tables(self)
+        new_tables = get_seating_chart_tables(self)
 
         # add new tables
         for t in new_tables:
