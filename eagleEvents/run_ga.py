@@ -7,7 +7,7 @@ from eagleEvents.models import Event, SeatingPreference
 
 def run():
     start = time.time()
-    tables, logbook, best, total_likes, total_dislikes = get_seating_chart_tables(Event.query.get('3508863751a449b28799cc1b657f5890'), log_output=True, collect_stats=True)
+    tables, logbook, best, total_likes, total_dislikes = get_seating_chart_tables(Event.query.get('3508863751a449b28799cc1b657f5890'), log_output=False, collect_stats=True)
     end = time.time()
     print(logbook)
     print("Execution time: {time}".format(time=end-start))

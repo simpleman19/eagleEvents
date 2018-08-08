@@ -12,8 +12,8 @@ from concurrent.futures import ProcessPoolExecutor, ThreadPoolExecutor
 from numpy import max, mean, min, std
 from multiprocessing import Pool
 
-INIT_PCT_GUESS, CXPB, MUTPB, INDPB, TOURNSIZE, NIND, NGEN = 0, 0.55, 0.2, 0.2, 6, 200, 60
-HALL_OF_FAME_SIZE = 60
+INIT_PCT_GUESS, CXPB, MUTPB, INDPB, TOURNSIZE, NIND, NGEN = 0, 0.55, 0.2, 0.2, 10, 150, 100
+HALL_OF_FAME_SIZE = 30
 
 toolbox = base.Toolbox()
 
@@ -24,7 +24,7 @@ creator.create("Individual", list, fitness=creator.FitnessMulti)
 # See http://www.rubicite.com/Tutorials/GeneticAlgorithms/CrossoverOperators/Order1CrossoverOperator.aspx
 def table_crossover(ind1, ind2):
     size = min([len(ind1), len(ind2)])
-    num1, num2, in_out = random.sample(range(0, size), 3)
+    num1, num2 = random.sample(range(0, size), 2)
     start = min([num1, num2])
     stop = max([num1, num2])
 
@@ -98,9 +98,9 @@ def evaluate(indiv_and_else):
     dislike_score = 0
     like_score = 0
     tables_to_check = range(num_tables)
-    if not valid_seating(individual):
-        print("Invalid seating...")
-        return 100, 0
+    # if not valid_seating(individual):
+    #     print("Invalid seating...")
+    #     return 100, 0
     for t in tables_to_check:
         guests_at_table = individual[t*table_size:(t + 1)*table_size]
         dislike_score += count_dislikes_in_list(guest_lookup, guests_at_table)
@@ -268,7 +268,7 @@ def get_seating_chart_tables(event, log_output=False, collect_stats=False):
             update_stats(mstats, logbook, generation_number, pop)
         pop.extend(hall_of_fame)
         hall_of_fame = sorted(pop, key=lambda indiv: indiv.fitness.values[1] - (indiv.fitness.values[0] * 2),
-                                   reverse=True)[:HALL_OF_FAME_SIZE]
+                              reverse=True)[:HALL_OF_FAME_SIZE]
         if log_output:
             print("Generation: {}".format(generation_number))
             print("Current Best: {a} dislikes, {b} likes".format(a=hall_of_fame[0].fitness.values[0],
