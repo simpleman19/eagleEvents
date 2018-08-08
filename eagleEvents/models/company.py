@@ -92,6 +92,7 @@ class Company(db.Model):
         os.remove(file_name)
         if not os.path.isfile(file_name):
             print(file_name, ' removed')
+        event.generate_seating_chart()
         stop = timeit.default_timer()
         print('Import Complete', stop-start)
 

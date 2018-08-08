@@ -1,4 +1,5 @@
-from flask import Blueprint, redirect, render_template, request, url_for, g, flash
+from flask import Blueprint, redirect, render_template, request, url_for, g, flash, abort, jsonify
+
 from eagleEvents import db
 from eagleEvents.auth import multi_auth
 from eagleEvents.models import Customer
@@ -8,8 +9,8 @@ customers_blueprint = Blueprint('customers', __name__)
 @customers_blueprint.route('/listCustomers')
 @multi_auth.login_required
 def list_customers():
-    # TODO List customers
-    return render_template('customer.html.j2')
+    customers = g.current_user.company.customers;
+    return render_template('customer.html.j2', customers = customers)
 
 
 @customers_blueprint.route('/addCustomer', methods=['GET', 'POST'])
@@ -57,3 +58,24 @@ def validate_and_save(customer, request):
         db.session.add(customer)
         db.session.commit()
         return True
+
+
+@customers_blueprint.route('/deleteCustomer/<id>', methods=['DELETE'])
+@multi_auth.login_required
+def delete_customer(id):
+    customer = None
+    name = ""
+    try:
+        customer = Customer.query.filter_by(id=id, company=g.current_user.company).one_or_none()
+    except Exception as e:
+        print(e)
+        abort(404)
+    if customer:
+        name = customer.name
+        db.session.delete(customer)
+        db.session.commit()
+    else:
+        print("Could not find customer to delete")
+        abort(404)
+    flash('Successfully deleted customer: ' + name)
+    return jsonify({'success': "Successfully deleted customer: " + name}), 200

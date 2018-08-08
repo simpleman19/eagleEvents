@@ -46,6 +46,10 @@ class Guest(db.Model):
     def __str__(self):
         return 'guest: {}, number: {}'.format(self.id, self.number)
 
+    @property
+    def full_name(self):
+        return '{}, {}'.format(self.last_name, self.first_name)
+
     # TODO stubbed but not fully tested
     def likes(self, guest: 'Guest') -> bool:
         if self.seating_preferences is not None and len(self.seating_preferences) > 0:

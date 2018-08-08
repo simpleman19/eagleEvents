@@ -1,17 +1,14 @@
 {% extends "layout.html.j2" %}
 {% block head_content %}
     <title>Eagle Events Users</title>
-{% endblock %}   
+{% endblock %}
 {% block body_content %}
     <h1>Users</h1>
         <div class="container">
-            <div class="checkbox">
-                <label>
-                    <input type="checkbox" value="">Show All
-                </label>
-            </div>
+            <button class="btn btn-primary active" id="refreshButton" onclick="refresh()">Refresh</button>
+        </div>
             <div class="card card-container-2">
-                <table class="table table-bordered">
+                <table id="listTable" class="table table-bordered table-hover">
                     <thead>
                         <tr>
                             <th>Name</th>
@@ -20,32 +17,32 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <tr>
-                            <td>John</td>
-                            <td>john_1</td>
-                            <td><input type="checkbox" value=""></td>
+                        {% for user in users %}
+                        <tr class = "click-row" data-href="modifyEventPlanner/{{ user.id }}">
+                            <td>{{user.name}}</td>
+                            <td>{{user.username}}</td>
+                            <td><input type="checkbox" value="" {{'checked="checked"' if user.is_active}} disabled></td>
                         </tr>
-                        <tr>
-                            <td>Mary</td>
-                            <td>mary_2</td>
-                            <td><input type="checkbox" value=""></td>
-                        </tr>
-                        <tr>
-                            <td>July</td>
-                            <td>july_3</td>
-                            <td><input type="checkbox" value=""></td>
-                        </tr>
+                        {% endfor %}
                     </tbody>
                 </table>
             </div>
                 <div class="buttons-action">
-                <button class="btn btn-lg btn-primary btn-add" type="submit">Add</button>
-            </div>
+            <input type="button" class="btn btn-primary active btn-add" onclick="window.location.href='/addEventPlanner'" value="Add"/>
         </div>
-<script src="https://code.jquery.com/jquery-1.12.4.min.js"></script>
-<script src="static/bootstable.js"></script>
+    </div>
 <script>
-    $('table').SetEditable();
+
+    function refresh() {
+        url = window.location.href;
+        window.location = url;
+    }
+
+    {% if g.current_user.is_admin %} 
+      $(".click-row").click(function() {
+          window.location = $(this).data("href");
+      });
+    {% endif %}
+
 </script>
 {% endblock %}
-

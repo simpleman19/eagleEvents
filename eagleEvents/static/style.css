@@ -17,21 +17,11 @@ body, html {
     background-size: cover;
     background-repeat: no-repeat;
     background: #004770;
-    background-repeat:no-repeat;
-    background: -webkit-linear-gradient( to left top, #360033, #0b8793);
-    background: -moz-linear-gradient( to left top, #360033, #0b8793);
-    background: -ms-linear-gradient( to left top, #360033, #0b8793);
-    background: -o-linear-gradient( to left top, #360033, #0b8793);
-    background: linear-gradient( to left top, #360033, #0b8793);
 }
 
 .main{
     padding-bottom: 30%;
 }
-.current{
-    background-color: #2D3C8A;  
-    color: #fff;
-  }
 
 #bEdit{
     display: none;
@@ -61,6 +51,12 @@ h2,h3{
 
 th,td{
     text-align: center;
+}
+
+.loading-icon {
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 .login-header h1{
@@ -104,6 +100,7 @@ th,td{
 .flashes li.error {
     background: linear-gradient(#e5381e, #c25a4a, #e5381e);
 }
+
 /*
  * Card component
  */
@@ -263,6 +260,20 @@ a.btn.btn-cancel {
     padding-top: 10px;
 }
 
+.btn.btn-delete {
+    padding: 7px 30px;
+    font-weight: 700;
+    font-size: 14px;
+    height: 36px;
+    -moz-border-radius: 3px;
+    -webkit-border-radius: 3px;
+    border-radius: 3px;
+    border: none;
+    -o-transition: all 0.218s;
+    -moz-transition: all 0.218s;
+    -webkit-transition: all 0.218s;
+    transition: all 0.218s;
+}
 .button-add{
     display: flex;
     justify-content: center;
@@ -272,6 +283,13 @@ a.btn.btn-cancel {
 .btn.btn-primary{
     padding: 7px 40px;
     text-transform: uppercase;
+    margin-right: 50px;
+}
+
+.buttons{
+    display:  flex;
+    justify-content: center;
+    text-align:  center;
 }
 
 .buttons-action{
@@ -306,20 +324,29 @@ a.btn.btn-cancel {
     color: #fff;
 }
 
-
 /*********************
 TABLE SEATING CHART
 **********************/
 
 .table-seating {
-  padding: 8px;
+  padding: 4px;
   line-height: 1.42857143;
   vertical-align: top;
   border-top: 1px solid #ddd;
-  margin-left: 23px;
+  width: 100%;
 }
 
+.table-seating td {
+  width: 33%;
+}
 
+.table-seating tr {
+    background-color: #FFFFFF;
+}
+
+.table-seating tbody tr:hover {
+    background-color: #E5E8E8;
+}
 
 .form-control-event{
     width: 50%;
@@ -331,7 +358,11 @@ TABLE SEATING CHART
     justify-content: space-around;
 }
 
-.form-customer{ 
+.form-customer{
     width: 350px;
 }
 
+
+.click-row {
+    cursor: pointer;
+}

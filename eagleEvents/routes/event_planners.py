@@ -3,15 +3,14 @@ from flask import abort, Blueprint, redirect, render_template, g, request, url_f
 from eagleEvents import db
 from eagleEvents.auth import multi_auth
 from eagleEvents.models import User
-
 event_planners_blueprint = Blueprint('event_planners', __name__)
 
 
 @event_planners_blueprint.route('/listEventPlanners')
 @multi_auth.login_required
 def list_event_planners():
-    # TODO List event planners
-    return render_template('user.html.j2')
+    users = g.current_user.company.users;
+    return render_template('user.html.j2', users=users)
 
 
 @event_planners_blueprint.route('/addEventPlanner', methods=['GET', 'POST'])
