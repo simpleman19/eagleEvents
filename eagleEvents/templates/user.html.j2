@@ -21,7 +21,9 @@
                 </table>
             </div>
                 <div class="buttons-action">
-            <input type="button" class="btn btn-primary active btn-add" onclick="window.location.href='/addEventPlanner'" value="Add"/>
+                {% if g.current_user.is_admin %}
+                    <input type="button" class="btn btn-primary active btn-add" onclick="window.location.href='/addEventPlanner'" value="Add"/>
+                {% endif %}
         </div>
     </div>
 <script>
@@ -30,12 +32,6 @@
         url = window.location.href;
         window.location = url;
     }
-
-    {% if g.current_user.is_admin %} 
-      $(".click-row").click(function() {
-          window.location = $(this).data("href");
-      });
-    {% endif %}
 
     function buildList() {
         let userTable = document.getElementById('listTable-body');
@@ -60,9 +56,11 @@
                 let td = tr.insertCell()
                 td.appendChild(checkbox);
                 let userId = json.users[i].id;
-                tr.addEventListener('click', function(){
-                    location.href = "/modifyEventPlanner/" + userId;
-                });
+                {% if g.current_user.is_admin %}
+                    tr.addEventListener('click', function(){
+                        location.href = "/modifyEventPlanner/" + userId;
+                    });
+                {% endif %}
             }
           });
     }
