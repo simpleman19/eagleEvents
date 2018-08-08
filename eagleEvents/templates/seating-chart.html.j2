@@ -42,7 +42,7 @@
         <div class="modal-header">
           <button type="button" class="close" onClick="resetModal()">&times;</button>
           <div class="container-table">
-            <h2>Move Guest</h2>
+            <h2 id="table-name">Move Guest</h2>
             <div class="row_">
                 <h3 id="sel-guest-name">Guest: Loading...</h3>
             </div>
@@ -89,9 +89,10 @@
 
   function checkPrefs() {
       let selGuestId = document.getElementById('sel-guest-id').value;
+      let swapGuestId = document.getElementById('guest-select').value;
       let table1 = document.getElementById(selGuestId).getElementsByClassName('table_id')[0].innerHTML;
       let table2 = document.getElementById('table-select').value;
-      fetch('/api/table/prefs?table1=' + table1 + '&table2=' + table2, {
+      fetch('/api/table/prefs?table1=' + table1 + '&table2=' + table2 + '&guest1=' + selGuestId + '&guest2=' + swapGuestId, {
             credentials: "same-origin",
             method: "GET",
       }).catch(error => console.error('Error:', error))
@@ -101,8 +102,7 @@
               console.log(json);
               warnings.innerHTML = '';
             for (i = 0; i <= json.prefs.length-1; i++){
-                warnings.insertRow().insertCell().innerHTML = json.prefs[i].notice +
-                    json.prefs[i].guest1 + json.prefs[i].type + json.prefs[i].guest2;
+                warnings.insertRow().insertCell().innerHTML = json.prefs[i].message;
             }
           });
   }
@@ -130,7 +130,6 @@ function reloadGuestsAtTable() {
     .then(json => {
         var option, i;
         var tableBox = document.getElementById('table-select');
-        checkPrefs();
       for (i = tableBox.options.length -1 ; i >=0 ; i--){
           tableBox.remove(i);
       }
@@ -139,15 +138,17 @@ function reloadGuestsAtTable() {
           selectbox.remove(i);
       }
       for (i = 0; i < json.tables.length; i++){
-          if (json.tables[i].id != guestTableId){
               option = document.createElement('option');
               option.value = json.tables[i].id;
               option.text = "Table " + json.tables[i].number;
               tableBox.add(option);
+          if (json.tables[i].id == guestTableId) {
+            tableBox.options[i].disabled = true;
+            document.getElementById('table-name').innerText = "Move Guest From " + tableBox.options[i].text;
           }
       }
       tableBox.value = tableId;
-      for (i = 0; i < json.guests.length; i++){
+      for (i = 0; i < json.guests.length; i++) {
           option = document.createElement( 'option' );
           option.value = json.guests[i].id;
           option.text = json.guests[i].full_name;
@@ -159,6 +160,7 @@ function reloadGuestsAtTable() {
         option.text = "Empty Seat";
         selectbox.add(option);
       }
+        checkPrefs();
       $('#loading').modal('hide');
     });
 }

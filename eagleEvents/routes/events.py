@@ -349,29 +349,25 @@ def get_prefs_for_table():
     }
     table1_id = request.args.get('table1')
     table2_id = request.args.get('table2')
-
+    guest1 = request.args.get('guest1')
+    guest2 = request.args.get('guest2')
     table1 = Table.query.filter_by(id=table1_id).one_or_none()
     table2 = Table.query.filter_by(id=table2_id).one_or_none()
 
-    g1 = table1.guests
-    g2 = table2.guests
-
-    for g in g1:
-        for d in g2:
-            if g.likes(d) or d.likes(g):
-                response['prefs'].append({
-                    'Notice': "Notice: ",
-                    'guest1': g.full_name,
-                    'type': " likes ",
-                    'guest2': d.full_name
-                })
-            elif g.dislikes(d) or d.dislikes(g):
-                response['prefs'].append({
-                    'Notice': "Warning: ",
-                    'guest1': g.full_name,
-                    'type': " dislikes ",
-                    'guest2': d.full_name
-                })
+    for g1 in table1.guests:
+        for g2 in table2.guests:
+            if g1.likes(g2) or g2.likes(g1):
+                if str(g1.id) == guest1 or str(g1.id) == guest2 or str(g2.id) == guest1 or str(g2.id) == guest2:
+                    response['prefs'].append({
+                        'message': "Notice: " + g1.first_name + " " + g1.last_name + " and "\
+                                   + g2.first_name + " " + g2.last_name + " would like to sit together."
+                    })
+            elif g1.dislikes(g2) or g2.dislikes(g1):
+                if str(g1.id) == guest1 or str(g1.id) == guest2 or str(g2.id) == guest1 or str(g2.id) == guest2:
+                    response['prefs'].append({
+                        'message': "Warning: " + g1.first_name + " " + g1.last_name + " and " \
+                                   + g2.first_name + " " + g2.last_name + " should not sit together."
+                    })
     return jsonify(response)
 
 
