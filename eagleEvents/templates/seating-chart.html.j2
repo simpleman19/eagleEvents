@@ -87,26 +87,6 @@
     $('#seatingModificationModal').modal('show');
   }
 
-  function checkPrefs() {
-      let selGuestId = document.getElementById('sel-guest-id').value;
-      let swapGuestId = document.getElementById('guest-select').value;
-      let table1 = document.getElementById(selGuestId).getElementsByClassName('table_id')[0].innerHTML;
-      let table2 = document.getElementById('table-select').value;
-      fetch('/api/table/prefs?table1=' + table1 + '&table2=' + table2 + '&guest1=' + selGuestId + '&guest2=' + swapGuestId, {
-            credentials: "same-origin",
-            method: "GET",
-      }).catch(error => console.error('Error:', error))
-          .then(res => res.json())
-          .then(json => {
-              let warnings = document.getElementById('warnings');
-              console.log(json);
-              warnings.innerHTML = '';
-            for (i = 0; i <= json.prefs.length-1; i++){
-                warnings.insertRow().insertCell().innerHTML = json.prefs[i].message;
-            }
-          });
-  }
-
 function reloadGuestsAtTable() {
   $('#loading').modal('show');
   let selGuestId = document.getElementById('sel-guest-id').value;
@@ -202,6 +182,26 @@ function reloadGuestsAtTable() {
     // Add this back in when api is finished
     //$('#loading').modal('hide');
 
+  }
+
+  function checkPrefs() {
+      let selGuestId = document.getElementById('sel-guest-id').value;
+      let swapGuestId = document.getElementById('guest-select').value;
+      let table1 = document.getElementById(selGuestId).getElementsByClassName('table_id')[0].innerHTML;
+      let table2 = document.getElementById('table-select').value;
+      fetch('/api/table/prefs?table1=' + table1 + '&table2=' + table2 + '&guest1=' + selGuestId + '&guest2=' + swapGuestId, {
+            credentials: "same-origin",
+            method: "GET",
+      }).catch(error => console.error('Error:', error))
+          .then(res => res.json())
+          .then(json => {
+              let warnings = document.getElementById('warnings');
+              console.log(json);
+              warnings.innerHTML = '';
+            for (i = 0; i <= json.prefs.length-1; i++){
+                warnings.insertRow().insertCell().innerHTML = json.prefs[i].message;
+            }
+          });
   }
 
   function resetModal() {
