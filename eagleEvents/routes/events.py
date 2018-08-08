@@ -345,8 +345,7 @@ def change_seats():
 @multi_auth.login_required
 def get_prefs_for_table():
     response = {
-        'likes': [],
-        'dislikes': []
+        'prefs': []
     }
     table1_id = request.args.get('table1')
     table2_id = request.args.get('table2')
@@ -359,14 +358,18 @@ def get_prefs_for_table():
 
     for g in g1:
         for d in g2:
-            if g.likes(d):
-                response['likes'].append({
+            if g.likes(d) or d.likes(g):
+                response['prefs'].append({
+                    'Notice': "Notice: ",
                     'guest1': g.full_name,
+                    'type': " likes ",
                     'guest2': d.full_name
                 })
-            elif g.dislikes(d):
-                response['dislikes'].append({
+            elif g.dislikes(d) or d.dislikes(g):
+                response['prefs'].append({
+                    'Notice': "Warning: ",
                     'guest1': g.full_name,
+                    'type': " dislikes ",
                     'guest2': d.full_name
                 })
     return jsonify(response)
