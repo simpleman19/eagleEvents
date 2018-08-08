@@ -1,4 +1,4 @@
-from eagleEvents.seating_chart_ga import SeatingChartGA
+from eagleEvents.seating_chart_ga import get_seating_chart_tables
 from . import db
 from eagleEvents.models import Guest
 import uuid
@@ -32,7 +32,7 @@ class Event(db.Model):
 
     def set_guests(self, guests: List['Event']):
         _guests = guests
-        new_tables = SeatingChartGA(self).get_seating_chart_tables()
+        new_tables = get_seating_chart_tables(self)
         # delete old tables
         for t in self.tables:
             db.session.remove(t)

@@ -1,23 +1,19 @@
 import time
 from sqlalchemy_utils import UUIDType
 
-from eagleEvents.seating_chart_ga import SeatingChartGA
+from eagleEvents.seating_chart_ga import get_seating_chart_tables
 from eagleEvents.models import Event, SeatingPreference
 
 
 def run():
-    ga = SeatingChartGA(Event.query.get('3508863751a449b28799cc1b657f5890'), log_output=True)
-    ga.COLLECT_STATS = True
-
-    ga.setup()
     start = time.time()
-    tables = ga.get_seating_chart_tables()
+    tables, logbook, best, total_likes, total_dislikes = get_seating_chart_tables(Event.query.get('3508863751a449b28799cc1b657f5890'), log_output=True, collect_stats=True)
     end = time.time()
-    print(ga.logbook)
+    print(logbook)
     print("Execution time: {time}".format(time=end-start))
     print("Number of likes: {likes}\nNumber of dislikes: {dislikes}".format(
-        likes=ga.total_like_preferences, dislikes=ga.total_dislike_preferences))
-    print("Ending best Pareto front: {a} dislikes, {b} likes".format(a=ga.hall_of_fame[0].fitness.values[0], b=ga.hall_of_fame[0].fitness.values[1]))
+        likes=total_likes, dislikes=total_dislikes))
+    print("Ending best Pareto front: {a} dislikes, {b} likes".format(a=best.fitness.values[0], b=best.fitness.values[1]))
     #for t in tables:
     #    print("Table {number}".format(number=t.number))
     #    for g in t.guests:
