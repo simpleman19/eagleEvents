@@ -1,6 +1,6 @@
 from uuid import UUID
 
-from flask import Blueprint, request, jsonify, abort
+from flask import Blueprint, request, jsonify, abort, flash, g
 from eagleEvents.models import db, Customer, Company
 from eagleEvents.auth import multi_auth
 from eagleEvents.routes.api import bad_request, validation_error
@@ -80,3 +80,23 @@ def add_update_customer(customer_id=None):
     else:
         return response, 200
 
+
+@customers_api_blueprint.route('<customer_id>', methods=['DELETE'])
+@multi_auth.login_required
+def delete_customer(customer_id):
+    customer = None
+    name = ""
+    try:
+        customer = Customer.query.filter_by(id=customer_id, company=g.current_user.company).one_or_none()
+    except Exception as e:
+        print(e)
+        abort(404)
+    if customer:
+        name = customer.name
+        db.session.delete(customer)
+        db.session.commit()
+    else:
+        print("Could not find customer to delete")
+        abort(404)
+    flash('Successfully deleted customer: ' + name)
+    return jsonify({'success': "Successfully deleted customer: " + name}), 200

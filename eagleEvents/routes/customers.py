@@ -50,23 +50,3 @@ def modify_customer(customer_id):
             return render_template('add-update-customer.html.j2', customer=customer,
                                    cancel_redirect=url_for('customers.list_customers'))
 
-
-@customers_blueprint.route('/deleteCustomer/<id>', methods=['DELETE'])
-@multi_auth.login_required
-def delete_customer(id):
-    customer = None
-    name = ""
-    try:
-        customer = Customer.query.filter_by(id=id, company=g.current_user.company).one_or_none()
-    except Exception as e:
-        print(e)
-        abort(404)
-    if customer:
-        name = customer.name
-        db.session.delete(customer)
-        db.session.commit()
-    else:
-        print("Could not find customer to delete")
-        abort(404)
-    flash('Successfully deleted customer: ' + name)
-    return jsonify({'success': "Successfully deleted customer: " + name}), 200
