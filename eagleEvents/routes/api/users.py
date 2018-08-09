@@ -14,6 +14,7 @@ def get_all_users():
         'users': []
     }
     if company and len(company.users) > 0:
+        reason_code = 200
         response['users'] = [{
             'id': u.id,
             'name': u.name,
@@ -22,8 +23,9 @@ def get_all_users():
             'admin': u.is_admin
         } for u in company.users]
     else:
+        reason_code = 404
         response = {'error': "No Users Found for " + company.name}
-    return jsonify(response)
+    return jsonify(response), reason_code
 
 
 @user_api_blueprint.route('/', methods=['GET', 'POST'])
@@ -33,6 +35,7 @@ def get_user():
     userid = request.args.get('userId')
     if company and userid:
         user = User.query.filter_by(company_id=company, id=userid).one_or_none()
+        reason_code = 200
         response = {
             'id': user.id,
             'name': user.name,
@@ -41,20 +44,20 @@ def get_user():
             'active': user.is_active
         }
     else:
+        reason_code = 404
         response = {
             'id': '',
-            'name': request.args.get('name'),
-            'username': request.args.get('username'),
-            'admin': request.args.get('admin'),
-            'active': request.args.get('active')
+            'name': '',
+            'username': '',
+            'admin': False,
+            'active': True
         }
-        print(response)
-    return jsonify(response)
+    return jsonify(response), reason_code
 
 
 @user_api_blueprint.route('/save', methods=['POST'])
 @multi_auth.login_required
-def validate_and_save_user():
+def post_user():
     response = {
         'error': '',
         'success': ''
@@ -73,7 +76,6 @@ def validate_and_save_user():
         is_valid = True
         user.name = json['name']
         user.username = json['username']
-        print(json['password'])
         if json['password']:
             user.set_password(json['password'], user.password)
         user.is_admin = json['admin']
@@ -81,7 +83,7 @@ def validate_and_save_user():
         if user.name is None or len(user.name) == 0:
             flash("Name is required", "error")
             is_valid = False
-        if user.username is None or len(user.username) == 0:
+        elif user.username is None or len(user.username) == 0:
             flash("Username is required", "error")
             is_valid = False
         else:
@@ -93,16 +95,19 @@ def validate_and_save_user():
                 flash("Username {username} is already taken".format(username=user.username), "error")
                 is_valid = False
             # Require password on add
-            if len(users_with_username) == 0 and (user.password is None or user.password == ''):
+            elif len(users_with_username) == 0 and (user.password is None or user.password == ''):
                 flash("Password is required", "error")
         if is_valid:
             db.session.add(user)
             db.session.commit()
             response['success'] = "User saved to database"
-            return_code = 200
+            return_code = 202
             flash("User Modifications Complete")
+        else:
+            response['error'] = "Failed to save user"
         return jsonify(response), return_code
     # If anything threw an exception (Probably a filter_by statement
     except Exception:
         response['error'] = 'Error storing user, exception thrown'
         return jsonify(response), 404
+
