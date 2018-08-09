@@ -89,14 +89,12 @@ def delete_customer(customer_id):
     try:
         customer = Customer.query.filter_by(id=customer_id, company=g.current_user.company).one_or_none()
     except Exception as e:
-        print(e)
-        abort(404)
+        return bad_request(e)
     if customer:
         name = customer.name
         db.session.delete(customer)
         db.session.commit()
     else:
-        print("Could not find customer to delete")
-        abort(404)
+        return bad_request("Could not find customer to delete")
     flash('Successfully deleted customer: ' + name)
     return jsonify({'success': "Successfully deleted customer: " + name}), 200
