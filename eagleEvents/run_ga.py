@@ -5,14 +5,18 @@ from eagleEvents.models import Event, SeatingPreference, db
 
 
 def run():
+    event1 = "1c87aab94e44497e944b4c90728582e7"
+    event2 = "938244a3f20e4dfe8095b595783b1c50"
+    event3 = "fe18e325a7124420a788b389a8390d0f"
     start = time.time()
-    tables, logbook, best, total_likes, total_dislikes = get_seating_chart_tables(Event.query.get('938244a3f20e4dfe8095b595783b1c50'), log_output=True, collect_stats=True)
+    tables, logbook, best, total_likes, total_dislikes = get_seating_chart_tables(Event.query.get(event1), log_output=True, collect_stats=True)
     end = time.time()
     print(logbook)
     print("Execution time: {time}".format(time=end-start))
     print("Number of likes: {likes}\nNumber of dislikes: {dislikes}".format(
         likes=total_likes, dislikes=total_dislikes))
-    print("Ending best Pareto front: {a} dislikes, {b} likes".format(a=best.fitness.values[0], b=best.fitness.values[1]))
+    print("Ending best seating chart: {a} dislikes, {b} likes".format(a=best.fitness.values[0], b=best.fitness.values[1]))
+
     #for t in tables:
     #    print("Table {number}".format(number=t.number))
     #    for g in t.guests:

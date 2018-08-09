@@ -12,8 +12,8 @@ from concurrent.futures import ProcessPoolExecutor, ThreadPoolExecutor
 from numpy import max, mean, min, std
 from multiprocessing import Pool
 
-INIT_PCT_GUESS, CXPB, MUTPB, INDPB, TOURNSIZE = 0, 0.5, 0.5, 0.2, 6
-HALL_OF_FAME_SIZE = 30
+INIT_PCT_GUESS, CXPB, MUTPB, INDPB, TOURNSIZE = 0.5, 0.4, 0.6, 0.4, 5
+HALL_OF_FAME_SIZE = 40
 
 creator.create("FitnessMulti", base.Fitness, weights=(-0.2, 1.0))
 creator.create("Individual", list, fitness=creator.FitnessMulti)
@@ -22,18 +22,26 @@ toolbox = base.Toolbox()
 
 
 # Crossover algo
-# See http://www.rubicite.com/Tutorials/GeneticAlgorithms/CrossoverOperators/Order1CrossoverOperator.aspx
 def table_crossover(ind1, ind2):
     size = min([len(ind1), len(ind2)])
-    num1, num2 = random.sample(range(0, size), 2)
-    start = min([num1, num2])
-    stop = max([num1, num2])
+    num1, num2, in_out = random.sample(range(0, size), 3)
+    low = min([num1, num2])
+    high = max([num1, num2])
 
     swaps = {}
     child1, child2 = toolbox.clone(ind1), toolbox.clone(ind2)
-    for i in range(start, stop):
-        if child1[i] != child2[i] and child1[i] != -1:
-            swaps[child1[i]] = child2[i]
+    if in_out % 2 == 0:
+        for i in range(low, high):
+            if child1[i] != child2[i] and child1[i] != -1:
+                swaps[child1[i]] = child2[i]
+    else:
+        for i in range(0, low):
+            if child1[i] != child2[i] and child1[i] != -1:
+                swaps[child1[i]] = child2[i]
+        for i in range(high, size):
+            if child1[i] != child2[i] and child1[i] != -1:
+                swaps[child1[i]] = child2[i]
+
     for k, v in swaps.items():
         first_1, second_1 = child1.index(k), child1.index(v)
         first_2, second_2 = child2.index(k), child2.index(v)
@@ -97,13 +105,25 @@ def evaluate(indiv_and_else):
     like_score = 0
     tables_to_check = range(num_tables)
     # if not valid_seating(individual):
-    #     print("Invalid seating...")
-    #     return 100, 0
+    #    print("Invalid seating...")
+    #    return 100, 0
     for t in tables_to_check:
         guests_at_table = individual[t*table_size:(t + 1)*table_size]
         dislike_score += count_dislikes_in_list(guest_lookup, guests_at_table)
         like_score += count_likes_in_list(guest_lookup, guests_at_table)
     return dislike_score, like_score
+
+
+def valid_seating(individual):
+    valid = True
+    seen = set()
+    for i in individual:
+        if i != -1 and i in seen:
+            valid = False
+        seen.add(i)
+    if len(seen) != max(individual) + 1:
+        valid = False
+    return valid
 
 
 # Update fitness value for seating chart
@@ -220,13 +240,13 @@ def get_seating_chart_tables(event, log_output=False, collect_stats=False):
     table_size = event.table_size.size
 
     # Default size
-    NIND, NGEN = 250, 100
+    NIND, NGEN = 300, 100
 
     # Lower size if large num of guests
     if len(event._guests) > 1500:
-        NIND, NGEN = 150, 50
-    elif len(event._guests) > 600:
-        NIND, NGEN = 200, 75
+        NIND, NGEN = 100, 50
+    elif len(event._guests) > 700:
+        NIND, NGEN = 225, 75
 
     lookup_and_size = [{"size": table_size, "lookup": guest_lookup, "indiv": []} for i in
                             range(NIND)]
@@ -309,11 +329,7 @@ def guest_list_to_nested_dict(guests):
             pref_dict = dict()
             for pref in guest.seating_preferences:
                 if pref.other_guest is None:
-                    continue #FIXME: remove this before I commit
-                    #raise ValueError("Cannot find other_guest with id {other_id} for seating preference {pref_id} on guest {guest_id}".format(
-                    #    other_id=pref.other_guest_id,
-                    #    pref_id=pref.id,
-                    #    guest_id=guest.id))
+                    continue
                 pref_dict[pref.other_guest.number] = pref.preference.value
         else:
             pref_dict = None
@@ -326,20 +342,8 @@ def should_terminate(hall_of_fame, generation_number, total_likes, NGEN):
     return found_optimal_solution or generation_number > NGEN
 
 
-def valid_seating(individual):
-    valid = True
-    seen = set()
-    for i in individual:
-        if i != -1 and i in seen:
-            valid = False
-        seen.add(i)
-    if len(seen) != max(individual) + 1:
-        valid = False
-    return valid
-
-
-def init_population(pcls, ind_init, ind_guess_func, n, pct_heuristic):
+def init_population(pcls, ind_init, ind_guess, n, pct_heuristic):
     global toolbox
-    heuristics = list([creator.Individual(ind_guess_func()) for _ in range(floor(n * pct_heuristic))])
-    randoms = list(creator.Individual(toolbox.indices()) for _ in range(n - len(heuristics)))
+    heuristics = list([creator.Individual(table_crossover(ind_guess, toolbox.indices())[0]) for _ in range(floor(n * pct_heuristic))])
+    randoms = list(creator.Individual(table_crossover(ind_guess, toolbox.indices())[1]) for _ in range(n - len(heuristics)))
     return heuristics + randoms
