@@ -42,7 +42,7 @@ def modify_customer(customer_id):
     else:
         errors = Customer.validate_and_save(customer, request.form)
         if len(errors) == 0:
-            flash("{name} updated".format(name=customer.name), "error")
+            flash("{name} updated".format(name=customer.name), "success")
             return redirect(url_for('customers.list_customers'))
         else:
             for e in errors:
