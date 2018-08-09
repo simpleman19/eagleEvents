@@ -1,6 +1,6 @@
 from uuid import UUID
 
-from flask import Blueprint, request, jsonify, abort, flash, g
+from flask import Blueprint, request, jsonify, flash, g
 from eagleEvents.models import db, Customer, Company
 from eagleEvents.auth import multi_auth
 from eagleEvents.routes.api import bad_request, validation_error
@@ -85,8 +85,8 @@ def delete_customer(customer_id):
     name = ""
     try:
         customer = Customer.query.get(customer_id)
-    except Exception as e:
-        return bad_request(e)
+    except Exception:
+        return bad_request('Error deleting customer, exception thrown')
     if customer:
         name = customer.name
         db.session.delete(customer)
