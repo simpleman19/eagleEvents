@@ -32,15 +32,17 @@ def get_customer(customer_id):
 
     return jsonify(response), 200
 
+
 @customers_api_blueprint.route('', methods=['POST'])
+@customers_api_blueprint.route('<customer_id>', methods=['PUT'])
 @multi_auth.login_required
-def post_customer():
+def add_update_customer(customer_id=None):
     try:
         customer_data = request.json
     except Exception:
         return bad_request('Needs json')
 
-    if 'id' in customer_data:
+    if 'id' in customer_data and request.method == 'POST':
         return bad_request('Cannot specify id')
 
     if 'number' in customer_data:
@@ -56,10 +58,25 @@ def post_customer():
     except Exception:
         return bad_request('Error finding company, exception thrown')
 
-    customer = Customer(company)
+    if request.method == 'POST':
+        customer = Customer(company)
+    else:
+        try:
+            customer = Customer.query.get(customer_id)
+            if customer is None:
+                return bad_request('Error finding customer')
+        except Exception:
+            return bad_request('Error finding customer, exception thrown')
+
     errors = Customer.validate_and_save(customer, customer_data)
 
     if len(errors) > 0:
         return validation_error(errors)
 
-    return jsonify({'id': customer.id, 'number': customer.number}), 200
+    response = jsonify({'id': customer.id, 'number': customer.number})
+
+    if request.method == 'POST':
+        return response, 201
+    else:
+        return response, 200
+
