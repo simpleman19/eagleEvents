@@ -1,11 +1,37 @@
-from uuid import UUID
-
 from flask import Blueprint, request, jsonify, flash, g
 from eagleEvents.models import db, Customer, Company
 from eagleEvents.auth import multi_auth
 from eagleEvents.routes.api import bad_request, validation_error
 
 customers_api_blueprint = Blueprint('customers_api', __name__, url_prefix='/api/customer')
+
+
+@customers_api_blueprint.route('', methods=['GET'])
+@multi_auth.login_required
+def get_customers():
+    response = {
+        'customers': []
+    }
+    try:
+        customers = g.current_user.company.customers
+        if customers is not None:
+            for customer in customers:
+                response['customers'].append({
+                    'id': customer.id,
+                    'number': customer.number,
+                    'name': customer.name,
+                    'phoneNumber': customer.phone_number,
+                    'email': customer.email,
+                    'eventIds': [e.id for e in customer.events]
+                })
+        else:
+            return bad_request('Error getting customers')
+    except Exception as e:
+        print(e)
+        return bad_request('Error getting customers, exception thrown')
+
+    return jsonify(response), 200
+
 
 @customers_api_blueprint.route('<customer_id>', methods=['GET'])
 @multi_auth.login_required
@@ -22,8 +48,7 @@ def get_customer(customer_id):
                 'name': customer.name,
                 'phoneNumber': customer.phone_number,
                 'email': customer.email,
-                'eventIds': [e.id for e in customer.events],
-                'companyId': customer.company_id
+                'eventIds': [e.id for e in customer.events]
             }
         else:
             return bad_request('Error finding customer')
