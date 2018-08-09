@@ -48,11 +48,8 @@ def add_update_customer(customer_id=None):
     if 'number' in customer_data:
         return bad_request('Cannot specify number')
 
-    if not('companyId' in customer_data):
-        return bad_request('Need companyId')
-
     try:
-        company = Company.query.get(customer_data['companyId'])
+        company = Company.query.get(g.current_user.company)
         if company is None:
             return bad_request('Error finding company')
     except Exception:
@@ -87,7 +84,7 @@ def delete_customer(customer_id):
     customer = None
     name = ""
     try:
-        customer = Customer.query.filter_by(id=customer_id, company=g.current_user.company).one_or_none()
+        customer = Customer.query.get(customer_id)
     except Exception as e:
         return bad_request(e)
     if customer:
