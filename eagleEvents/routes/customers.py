@@ -21,11 +21,13 @@ def add_customer():
         return render_template('add-update-customer.html.j2', customer=customer,
                                cancel_redirect=url_for('customers.list_customers'))
     else:
-        is_valid = validate_and_save(customer, request)
-        if is_valid:
+        errors = Customer.validate_and_save(customer, request)
+        if len(errors) == 0:
             flash("{name} added".format(name=customer.name), "success")
             return redirect(url_for('customers.list_customers'))
         else:
+            for e in errors:
+                flash(e, 'error')
             return render_template('add-update-customer.html.j2', customer=customer,
                                    cancel_redirect=url_for('customers.list_customers'))
 
@@ -38,26 +40,15 @@ def modify_customer(customer_id):
         return render_template('add-update-customer.html.j2', customer=customer,
                                cancel_redirect=url_for('customers.list_customers'))
     else:
-        is_valid = validate_and_save(customer, request)
-        if is_valid:
+        errors = Customer.validate_and_save(customer, request.form)
+        if len(errors) == 0:
             flash("{name} updated".format(name=customer.name), "error")
             return redirect(url_for('customers.list_customers'))
         else:
+            for e in errors:
+                flash(e, 'error')
             return render_template('add-update-customer.html.j2', customer=customer,
                                    cancel_redirect=url_for('customers.list_customers'))
-
-
-def validate_and_save(customer, request):
-    customer.name = request.form['name']
-    customer.email = request.form['email']
-    customer.phone_number = request.form['phone']
-    if customer.name is None or len(customer.name) == 0:
-        flash("Name is required", "error")
-        return False
-    else:
-        db.session.add(customer)
-        db.session.commit()
-        return True
 
 
 @customers_blueprint.route('/deleteCustomer/<id>', methods=['DELETE'])
