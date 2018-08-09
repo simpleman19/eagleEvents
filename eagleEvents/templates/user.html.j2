@@ -36,7 +36,7 @@
     function buildList() {
         $('#loading').modal('show');
         let userTable = document.getElementById('listTable-body');
-            fetch('/api/user/users', {
+            fetch('/api/user/users?', {
             credentials: "same-origin",
             method: "GET",
         }).catch(error => console.error('Error:', error))

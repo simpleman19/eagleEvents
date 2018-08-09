@@ -10,41 +10,87 @@
                    <div class="form-group row">
                         <label for="example-text-input" class="col-2 col-form-label">Name</label>
                             <div class="col-10">
-                                <input name="name" class="form-control" type="text" value="{{user.name if user.name != None}}" id="example-text-input">
+                                <input name="name" class="form-control" type="text" id="name">
                             </div>
                     </div>
                 <div class="form-group row">
                     <label for="example-email-input" class="col-2 col-form-label">Username</label>
                         <div class="col-10">
-                             <input name="username" type="text" class="form-control" id="inlineFormInputGroup" placeholder="" value="{{user.username if user.username != None}}">
+                             <input name="username" type="text" class="form-control" id="username" placeholder="">
                         </div>
                 </div> 
                     <div class="form-group row">
                         <label for="exampleInputPassword1" class="col-2 col-form-label">Password</label>
                             <div class="col-10">
-                                <input name="password" class="form-control" type="password" value="" id="example-tel-input">
+                                <input name="password" class="form-control" type="password" id="password">
                             </div>
                     </div>
                    <div class="form-group row">
                         <div class="col-10">
                             <div class="form-check">
                                 <label class="form-check-label">
-                                    <input name="is_admin" class="form-check-input" type="checkbox" {{'checked="checked"' if user.is_admin}}> Admin
+                                    <input id="isAdmin" name="is_admin" class="form-check-input" type="checkbox"> Admin
                                 </label>
                             </div>
                             <div class="form-check">
                                 <label class="form-check-label">
-                                    <input name="is_active" class="form-check-input" type="checkbox" {{'checked="checked"' if user.is_active}}> Active
+                                    <input id="isActive" name="is_active" class="form-check-input" type="checkbox"> Active
                                 </label>
                             </div>
                         </div>
                     </div>
                 <div class="buttons">
-                    <button class="btn btn-lg btn-primary btn-save" type="submit">Save</button>
+                    <button class="btn btn-lg btn-primary btn-save" type="button" onclick="saveUser()">Save</button>
                     <a class="btn btn-lg btn-danger btn-cancel" href="{{cancel_redirect}}">Cancel</a>
                 </div>
             </form><!-- /form -->
         </div><!-- /card-container -->
     </div><!-- /container -->  
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+    <script>
+
+   function buildInfo() {
+        fetch('/api/user/?userId=' + "{{ userid }}", {
+        credentials: "same-origin",
+        method: "GET",
+        }).catch(error => console.error('Error:', error))
+          .then(res => res.json())
+          .then(json => {
+              document.getElementById('name').value = json.name;
+              document.getElementById('username').value = json.username;
+
+              if (json.admin) {
+                  document.getElementById('isAdmin').checked = "checked";
+              }
+              if (json.active){
+                  document.getElementById('isActive').checked = "checked";
+              }
+          });
+    }
+
+   function saveUser() {
+    $('#loading').modal('show');
+    payload = {
+        'id': "{{ userid }}",
+        'name': document.getElementById('name').value,
+        'username': document.getElementById('username').value,
+        'password': document.getElementById('password').value,
+        'admin': document.getElementById('isAdmin').checked,
+        'active': document.getElementById('isActive').checked
+    };
+    fetch('/api/user/save', {
+        credentials: "same-origin",
+        headers: {
+            'Content-Type': "application/json",
+        },
+        method: "POST",
+        body: JSON.stringify( payload )
+    }).catch(error => console.error('Error:', error))
+      .then(res => {
+          location.href = "{{ cancel_redirect }}"
+      });
+    $('#loading').modal('hide');
+    }
+
+   window.onload = buildInfo;
+    </script>
 {% endblock %}
