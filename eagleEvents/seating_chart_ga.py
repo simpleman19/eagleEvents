@@ -12,7 +12,7 @@ from concurrent.futures import ProcessPoolExecutor, ThreadPoolExecutor
 from numpy import max, mean, min, std
 from multiprocessing import Pool
 
-INIT_PCT_GUESS, CXPB, MUTPB, INDPB, TOURNSIZE = 0.5, 0.4, 0.6, 0.4, 5
+INIT_PCT_GUESS, CXPB, MUTPB, INDPB, TOURNSIZE = 0.5, 0.4, 0.5, 0.4, 5
 HALL_OF_FAME_SIZE = 40
 
 creator.create("FitnessMulti", base.Fitness, weights=(-0.2, 1.0))
@@ -244,7 +244,7 @@ def get_seating_chart_tables(event, log_output=False, collect_stats=False):
 
     # Lower size if large num of guests
     if len(event._guests) > 1500:
-        NIND, NGEN = 100, 50
+        NIND, NGEN = 100, 45
     elif len(event._guests) > 700:
         NIND, NGEN = 225, 75
 
@@ -266,26 +266,29 @@ def get_seating_chart_tables(event, log_output=False, collect_stats=False):
         logbook.chapters["like"].header = "avg", "std", "min", "max"
 
     # Create seed
-    heuristic = []
-    for guest_number in random.sample(guest_numbers, len(guest_numbers)):
-        if guest_number == Table.EMPTY_SEAT:
+    seed = []
+    for i in range(50):
+        heuristic = []
+        for guest_number in random.sample(guest_numbers, len(guest_numbers)):
+            if guest_number == Table.EMPTY_SEAT:
+                heuristic.append(guest_number)
+                continue
+            if guest_number in heuristic:
+                continue
             heuristic.append(guest_number)
-            continue
-        if guest_number in heuristic:
-            continue
-        heuristic.append(guest_number)
-        pref_dict = guest_lookup[guest_number]
-        if pref_dict is None:
-            continue
-        for other_guest_num, seating_pref_value in pref_dict.items():
-            if seating_pref_value == SeatingPreference.LIKE.value and not (other_guest_num in heuristic):
-                heuristic.append(other_guest_num)
-    heuristic += [Table.EMPTY_SEAT for _ in range(num_extra_seats)]
+            pref_dict = guest_lookup[guest_number]
+            if pref_dict is None:
+                continue
+            for other_guest_num, seating_pref_value in pref_dict.items():
+                if seating_pref_value == SeatingPreference.LIKE.value and not (other_guest_num in heuristic):
+                    heuristic.append(other_guest_num)
+        heuristic += [Table.EMPTY_SEAT for _ in range(num_extra_seats)]
+        seed.append(heuristic)
 
     toolbox.register("indices", random.sample, table_assignments, len(table_assignments))
     toolbox.register("individual", tools.initIterate, creator.Individual, toolbox.indices)
     toolbox.register("population", tools.initRepeat, list, toolbox.individual)
-    toolbox.register("population_guess", init_population, list, creator.Individual, heuristic)
+    toolbox.register("population_guess", init_population, list, creator.Individual, seed)
 
     pop = toolbox.population_guess(n=NIND, pct_heuristic=INIT_PCT_GUESS)
 
@@ -344,6 +347,6 @@ def should_terminate(hall_of_fame, generation_number, total_likes, NGEN):
 
 def init_population(pcls, ind_init, ind_guess, n, pct_heuristic):
     global toolbox
-    heuristics = list([creator.Individual(table_crossover(ind_guess, toolbox.indices())[0]) for _ in range(floor(n * pct_heuristic))])
-    randoms = list(creator.Individual(table_crossover(ind_guess, toolbox.indices())[1]) for _ in range(n - len(heuristics)))
+    heuristics = list([creator.Individual(table_crossover(random.choice(ind_guess), toolbox.indices())[0]) for _ in range(floor(n * pct_heuristic))])
+    randoms = list(creator.Individual(toolbox.indices()) for _ in range(n - len(heuristics)))
     return heuristics + randoms
