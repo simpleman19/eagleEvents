@@ -32,7 +32,7 @@
 function testPrint2() {
         var eventNum = document.getElementById("event-num-seating-chart").value;
         $.ajax({     
-            url: "/printAttendanceList/" + eventNum,
+            url: "/attendanceList/" + eventNum,
             type: "POST",
             success: function(eventNum) {
             console.log('success ' + eventNum)
