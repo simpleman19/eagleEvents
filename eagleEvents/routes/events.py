@@ -1,4 +1,5 @@
 from eagleEvents.printing.chart import seating_chart_print
+from eagleEvents.printing.card import table_card_print
 from pathlib import Path
 from flask import Blueprint, render_template, flash, request, redirect, url_for, g, jsonify, abort
 from eagleEvents.models.event import Event
@@ -150,12 +151,11 @@ def seating_chart(event_id):
     return render_template('seating-chart.html.j2', tables=sorted(event.tables, key=lambda x: x.number))
 
 
-@events_blueprint.route('/tableCards')
+@events_blueprint.route('/tableCards/<id>', methods=['GET', 'POST'])
 @multi_auth.login_required
-def table_cards():
-    # TODO Table Cards
-    return render_template('test.html.j2', test='table_cards')
-
+def table_cards(id):
+    # Print table cards
+    return table_card_print(id)
 
 @events_blueprint.route('/attendanceList')
 @multi_auth.login_required
