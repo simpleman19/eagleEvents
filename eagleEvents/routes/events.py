@@ -102,7 +102,7 @@ def handle_post(event, new):
     elif button == 'attendance':
         return redirect(url_for('events.attendance_list'))
     elif button == 'table':
-        return redirect(url_for('events.table_cards'))
+        return redirect(url_for('events.table_cards', id=event.id))
     else:
         is_valid = validate_and_save(event, request)
         if is_valid:
@@ -155,6 +155,7 @@ def seating_chart(event_id):
 @multi_auth.login_required
 def table_cards(id):
     # Print table cards
+    print('here-----------')
     return table_card_print(id)
 
 @events_blueprint.route('/attendanceList')
