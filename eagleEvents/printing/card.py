@@ -3,7 +3,7 @@ import os
 import datetime
 from flask import send_from_directory
 from reportlab.lib import colors
-from reportlab.lib.pagesizes import letter, inch
+from reportlab.lib.pagesizes import letter
 from reportlab.platypus import SimpleDocTemplate, TableStyle, Paragraph, PageBreak
 from reportlab.platypus import Table as pdfTable
 from reportlab.lib.styles import getSampleStyleSheet
@@ -25,6 +25,7 @@ def table_card_print(id_event):
     file_name = 'tableCard.pdf'
 
     doc = SimpleDocTemplate(os.path.join(final_directory , file_name), pagesize=letter)
+    doc.title = e.name + "-cards-" + str(e.time.date() + ".pdf")
 
     story = []
     elements = []
