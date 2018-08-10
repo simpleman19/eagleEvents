@@ -100,7 +100,7 @@ def handle_post(event, new):
     elif button == 'seat':
         return redirect(url_for('events.seating_chart', event_id=event.id))
     elif button == 'attendance':
-        return redirect(url_for('events.attendance_list'))
+        return redirect(url_for('events.attendance_list', id=event.id))
     elif button == 'table':
         return redirect(url_for('events.table_cards'))
     else:
@@ -158,11 +158,11 @@ def table_cards():
     return render_template('test.html.j2', test='table_cards')
 
 
-@events_blueprint.route('/attendanceList')
+@events_blueprint.route('/attendanceList/<id>', methods=['GET', 'POST'])
 @multi_auth.login_required
-def attendance_list():
-    # TODO Attendance List
-    return render_template('test.html.j2', test='attendance_list')
+def attendance_list(id):
+    # Print Seating Chart
+    return attendance_list_print(id)
 
 
 @events_blueprint.route('/printSeatingChartTest')
@@ -175,11 +175,6 @@ def print_seating_chartTest():
 def print_seating_chart(id):
     # Print Seating Chart
     return seating_chart_print(id)
-
-@events_blueprint.route('/printAttendanceList/<id>', methods=['GET', 'POST'])
-def print_attendance_list(id):
-    # Print Seating Chart
-    return attendance_list_print(id)
 
 
 @events_blueprint.route('/deleteEvent/<id>', methods=['DELETE'])
