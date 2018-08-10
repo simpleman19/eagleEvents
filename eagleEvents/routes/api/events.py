@@ -6,6 +6,67 @@ from eagleEvents.auth import multi_auth
 
 events_api_blueprint = Blueprint('events_api', __name__, url_prefix='/api/event')
 
+
+@events_api_blueprint.route('', methods=['GET'])
+@multi_auth.login_required
+def get_events():
+    response = {
+        'events': []
+    }
+    try:
+        events = Event.query.filter_by(company=g.current_user.company)
+        if events is not None:
+            for event in events:
+                response['events'].append({
+                    'id': event.id,
+                    'name': event.name,
+                    'venue': event.venue,
+                    'tableSize': event.table_size.size,
+                    'time': event.time.isoformat(),
+                    'totalExpectedGuests': len(event._guests),
+                    'percentExtraSeats': event.percent_extra_seats,
+                    'customerId': event.customer.id,
+                    'plannerId': event.planner.id,
+                    'isDone': event.is_done
+                })
+        else:
+            return bad_request('Error getting events')
+    except Exception:
+        return bad_request('Error getting event, exception thrown')
+
+    return jsonify(response), 200
+
+
+@events_api_blueprint.route('<event_id>', methods=['GET'])
+@multi_auth.login_required
+def get_event(event_id):
+    response = {
+        'event': {}
+    }
+    try:
+        event = Event.query.get(event_id)
+        if event is not None:
+            response['event'] = {
+                'id': event.id,
+                'name': event.name,
+                'venue': event.venue,
+                'tableSize': event.table_size.size,
+                'time': event.time.isoformat(),
+                'totalExpectedGuests': len(event._guests),
+                'percentExtraSeats': event.percent_extra_seats,
+                'customerId': event.customer.id,
+                'plannerId': event.planner.id,
+                'isDone': event.is_done,
+                'guestIds': [g.id for g in event._guests]
+            }
+        else:
+            return bad_request('Error finding event')
+    except Exception:
+        return bad_request('Error finding event, exception thrown')
+
+    return jsonify(response), 200
+
+
 """
     API endpoint to change guest seat
     Method: POST
