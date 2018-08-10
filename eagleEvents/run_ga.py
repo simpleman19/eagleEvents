@@ -9,7 +9,7 @@ def run():
     event2 = "938244a3f20e4dfe8095b595783b1c50"
     event3 = "fe18e325a7124420a788b389a8390d0f"
     start = time.time()
-    tables, logbook, best, total_likes, total_dislikes = get_seating_chart_tables(Event.query.get(event2), log_output=True, collect_stats=True)
+    tables, logbook, best, total_likes, total_dislikes = get_seating_chart_tables(Event.query.get(event2), log_output=False, collect_stats=True)
     end = time.time()
     print(logbook)
     print("Execution time: {time}".format(time=end-start))
@@ -37,7 +37,7 @@ def run_all():
 
             start = time.time()
             tables, logbook, best, total_likes, total_dislikes = get_seating_chart_tables(
-                Event.query.get('3508863751a449b28799cc1b657f5890'), log_output=False, collect_stats=True)
+                event, log_output=False, collect_stats=True)
 
             # Commit tables to DB
             [db.session.add(table) for table in tables]
