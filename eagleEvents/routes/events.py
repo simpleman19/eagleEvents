@@ -204,6 +204,10 @@ def delete_event(id):
 
 
 def validate_and_save(event, request):
+    if float(request.form['extra']) > .99:
+        flash("Percent value must be less than 1", "error")
+        return False
+    regen_seating_chart = False
     event.company = g.current_user.company
     event.planner = User.query.filter_by(id=request.form['planner']).one_or_none()
     event.customer = Customer.query.filter_by(id=request.form['customer']).one_or_none()
@@ -214,8 +218,13 @@ def validate_and_save(event, request):
     # convert it into python datetime
     event.time = datetime.datetime(*[int(v) for v in date_in.replace('T', '-').replace(':', '-').split('-')])
     event.is_done = True if request.form['status'] == "Done" else False
-    event.table_size = TableSize.query.filter_by(id=request.form['table_size']).one_or_none()
-    event.percent_extra_seats = request.form['extra']
+    new_table_size = TableSize.query.filter_by(id=request.form['table_size']).one_or_none()
+    if new_table_size.id != event.table_size_id:
+        regen_seating_chart = True
+    event.table_size = new_table_size
+    if event.percent_extra_seats != request.form['extra']:
+        regen_seating_chart = True
+    event.percent_extra_seats = float(request.form['extra'])
 
     if event.name is None or len(event.name) == 0:
         flash("Name is required", "error")
@@ -226,138 +235,19 @@ def validate_and_save(event, request):
     elif event.time is None or event.time < datetime.datetime.now():
         flash("Valid Date and Time is required", "error")
         return False
-    elif event.percent_extra_seats is None or len(event.percent_extra_seats) == 0:
+    elif event.percent_extra_seats is None:
         flash("Extra Seating Percentage is required", "error")
         return False
-    else:
-        db.session.add(event)
-        db.session.commit()
-        return True
+
+    if regen_seating_chart and len(event._guests) > 0:
+        event.generate_seating_chart()
+
+    db.session.add(event)
+    db.session.commit()
+    return True
 
 
 def convert_time(time):
     time=str(time).replace(" ", "T")
     date = (time[:16]) if len(time) > 16 else time
     return date
-
-
-"""
-    API endpoint to change guest seat
-    Method: POST
-    
-    Allows user to manually move guests between tables and even swap guests if needed
-    
-    Expected JSON to move guest to open seat:
-    {
-        'selectedGuest' : '<UUID>'     # REQUIRED, This is the guest initially selected to move
-        'destinationTable' : '<UUID>'  # REQUIRED, This is the table that the selected guest is moving to
-    }
-    
-    Expected JSON to swap guests
-    {
-        'selectedGuest' : '<UUID>'     # REQUIRED, This is the guest initially selected to move
-        'otherGuest' : '<UUID>'     # REQUIRED, This is used if swapping 2 guests
-    }
-
-    Response JSON:
-    {
-        'error' : '<This field will contain any error messages to show user>'
-        'success' : '<This field will contain any success messages to show user>'
-    }
-"""
-
-
-@events_blueprint.route('/changeSeat', methods=['POST'])
-@multi_auth.login_required
-def change_seats():
-    response = {
-        'error': '',
-        'success': ''
-    }
-    return_code = 500
-    json = request.json
-    # Validate JSON
-    if not json:
-        response['error'] = "Error, invalid json in request"
-        return jsonify(response), 400
-    if not (('selectedGuest' in json and 'destinationTable' in json) or ('selectedGuest' in json and 'otherGuest' in json)):
-        response['error'] = "Missing required fields in request JSON"
-        return jsonify(response), 400
-    try:
-        # Find guest
-        sel_guest: Guest = Guest.query.filter_by(id=json['selectedGuest']).one_or_none()
-        # Find table if not swapping
-        if 'otherGuest' not in json:
-            other_guest = None
-            dest_table: Table = Table.query.filter_by(id=json['destinationTable']).one_or_none()
-        # Find other guests and get table from other guest
-        else:
-            other_guest: Guest = Guest.query.filter_by(id=json['otherGuest']).one_or_none()
-            # Ensure other guest is found before trying to get table
-            if other_guest:
-                dest_table = other_guest.assigned_table
-            else:
-                dest_table = None  # This will break next if statement if table or guest not found
-        # Ensure everything was found in database
-        if sel_guest and dest_table and (other_guest or 'otherGuest' not in json):
-            # Ensure guests and tables are all part of the same event
-            if sel_guest.event_id != dest_table.event_id or (other_guest and sel_guest.event_id != other_guest.event_id):
-                response['error'] = "Guests and tables are not part of the same event"
-                return_code = 400
-                return jsonify(response), return_code
-            if sel_guest.event.company_id != g.current_user.company.id:
-                response['error'] = "You are not authorized to alter an event from another company"
-                return_code = 401
-                return jsonify(response), return_code
-            # If swapping then move other guest
-            if other_guest:
-                other_guest.assigned_table = sel_guest.assigned_table
-
-            # Swap main guests
-            sel_guest.assigned_table = dest_table
-            db.session.commit()
-
-            # Return message depending on whether it was a swap or not
-            if other_guest:
-                response['success'] = "Successfully moved {} to table # {} and {} to table # {}"\
-                    .format(sel_guest.full_name, dest_table.number, other_guest.full_name, other_guest.assigned_table.number)
-            else:
-                response['success'] = "Successfully moved {} to table # {}" \
-                    .format(sel_guest.full_name, dest_table.number)
-            return_code = 200
-        else:
-            response['error'] = 'Error finding table or a guest'
-            return_code = 404
-        return jsonify(response), return_code
-    # If anything threw an exception (Probably a filter_by statement)
-    except Exception:
-        response['error'] = 'Error finding table or a guest, exception thrown'
-        return jsonify(response), 404
-
-
-@events_blueprint.route('/api/table/guests', methods=['GET'])
-@multi_auth.login_required
-def get_guests_for_table():
-    table_id = request.args.get('table')
-    response = {
-        'guests': []
-    }
-    if table_id is not None:
-        try:
-            table = Table.query.filter_by(id=table_id).one_or_none()
-            if table is not None:
-                response['guests'] = [{
-                    'full_name': g.full_name,
-                    'id': str(g.id),
-                    'first_name': g.first_name,
-                    'last_name': g.last_name
-                } for g in table.guests]
-                response['empty_seat'] = table.seating_capacity > len(table.guests)
-                return jsonify(response), 200
-            else:
-                return jsonify({'error': 'Error finding table'}), 404
-        # If anything threw an exception (Probably a sql statement)
-        except Exception:
-            return jsonify({'error': 'Error finding table, exception thrown'}), 404
-    else:
-        abort(404)
