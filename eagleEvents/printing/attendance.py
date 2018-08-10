@@ -23,7 +23,7 @@ def attendance_list_print(id_event):
     file_name = 'attendanceList.pdf'
 
     doc = SimpleDocTemplate(os.path.join(final_directory , file_name), pagesize=letter)
-    doc.title = e.name + "-attendance-" + str(e.time.date());
+    doc.title = e.name + "-attendance-" + str(e.time.date()) + ".pdf"
 
     story = []
     elements = []
