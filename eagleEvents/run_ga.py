@@ -46,6 +46,12 @@ def run_all():
             end = time.time()
             print(logbook)
             print("Execution time: {time}".format(time=end-start))
+            print("Total dislikes: {dislikes}\tTotal likes: {likes}".format(dislikes=total_dislikes,
+                                                                            likes=total_likes))
+            print("Best result: {dislikes} dislikes\t{likes} likes".format(dislikes=best.fitness.values[0],
+                                                                           likes=best.fitness.values[1],))
+            pct_adherence = ((total_dislikes - best.fitness.values[0]) + best.fitness.values[1]) / (total_likes + total_dislikes)
+            print("Best result's adherence to preferences: {pct}%".format(pct=pct_adherence))
         except Exception as e:
             print("Ga threw an exception on event: " + str(event.id))
             print(e)
