@@ -1,6 +1,9 @@
+
+from flask import flash, g
+
 from eagleEvents.seating_chart_ga import get_seating_chart_tables
 from . import db
-from eagleEvents.models import Guest
+from eagleEvents.models import Guest, User, Customer, TableSize
 import uuid, datetime
 from eagleEvents.models import Guest
 from sqlalchemy_utils import UUIDType
@@ -49,3 +52,81 @@ class Event(db.Model):
             db.session.add(t)
         self.tables = new_tables
         db.session.commit()
+
+    """
+    Returns a list of error messages
+    If validation is successful, it saves the customer and returns an empty list
+    """
+    @staticmethod
+    def validate_and_save(event, event_data):
+        errors = []
+
+        try:
+            if float(event_data['extra']) > .99:
+                errors.append("Percent extra seats value must be less than 1")
+                return errors
+        except Exception:
+            errors.append("Percent extra seats is required and must be less than 1")
+            return errors
+        regen_seating_chart = False
+        event.company = g.current_user.company
+        if 'planner' in event_data:
+            try:
+                event.planner = User.query.filter_by(id=event_data['planner']).one_or_none()
+            except Exception:
+                errors.append("Error finding planner")
+        if 'customer' in event_data:
+            try:
+                event.customer = Customer.query.filter_by(id=event_data['customer']).one_or_none()
+            except Exception:
+                errors.append("Error finding customer")
+        else:
+            errors.append("Customer is required")
+        if 'name' in event_data:
+            event.name = event_data['name']
+        if 'venue' in event_data:
+            event.venue = event_data['venue']
+        # get the html form of the datetime
+        if 'time' in event_data:
+            date_in = event_data['time']
+            try:
+                # convert it into python datetime
+                event.time = datetime.datetime(*[int(v) for v in date_in.replace('T', '-').replace(':', '-').split('-')])
+            except Exception:
+                errors.append("Error processing date and time")
+        if 'status' in event_data:
+            event.is_done = True if event_data['status'] == "Done" else False
+        else:
+            errors.append('Status is required')
+        if 'table_size' in event_data:
+            new_table_size = TableSize.query.filter_by(id=event_data['table_size']).one_or_none()
+            if new_table_size is None:
+                errors.append("Error finding table size")
+            else:
+                if new_table_size.id != event.table_size_id:
+                    regen_seating_chart = True
+                event.table_size = new_table_size
+        else:
+            errors.append('Table size required')
+        if 'extra' in event_data:
+            if event.percent_extra_seats != event_data['extra']:
+                regen_seating_chart = True
+            event.percent_extra_seats = float(event_data['extra'])
+
+        if event.name is None or len(event.name) == 0:
+            errors.append("Name is required")
+        elif event.venue is None or len(event.venue) == 0:
+            errors.append("Venue is required")
+        elif event.time is None or event.time < datetime.datetime.now():
+            errors.append("Valid Date and Time is required")
+        elif event.percent_extra_seats is None:
+            errors.append("Extra Seating Percentage is required")
+
+        if len(errors) == 0:
+            if regen_seating_chart and len(event._guests) > 0:
+                event.generate_seating_chart()
+
+            db.session.add(event)
+            db.session.commit()
+
+        return errors

@@ -1,8 +1,89 @@
-from flask import Blueprint, request, jsonify, abort
+from flask import Blueprint, request, jsonify, abort, g, Response
 from eagleEvents.models.table import Table
+from eagleEvents import db
 from eagleEvents.auth import multi_auth
+from eagleEvents.routes.api import bad_request, validation_error
 
 tables_api_blueprint = Blueprint('tables_api', __name__, url_prefix='/api/table')
+
+
+@tables_api_blueprint.route('<table_id>', methods=['GET'])
+@multi_auth.login_required
+def get_table(table_id):
+    response = {
+        'table': {}
+    }
+    try:
+        table = Table.query.get(table_id)
+        if table is not None:
+            response['table'] = {
+                'id': table.id,
+                'number': table.number,
+                'seating_capacity': table.seating_capacity,
+                'event_id': table.event.id
+            }
+        else:
+            return bad_request('Error finding table with id ' + table_id)
+    except Exception:
+        return bad_request('Exception thrown finding table with id ' + table_id)      
+
+    return jsonify(response), 200
+
+
+@tables_api_blueprint.route('', methods=['GET'])
+@multi_auth.login_required
+def get_tables():
+    response = {
+        'tables': []
+    }
+    try:
+        tables =  Table.query.all()
+        if tables is not None:
+            for table in tables:
+                response['tables'].append({
+                    'id': table.id,
+                    'number': table.number,
+                    'seating_capacity': table.seating_capacity,
+                    'event_id': table.event.id
+                })
+        else:
+            return bad_request('Error getting tables')
+    except Exception:
+        return bad_request('Exception thrown getting tables')
+
+    return jsonify(response), 200
+
+
+@tables_api_blueprint.route('<table_id>', methods=['PUT'])
+@multi_auth.login_required
+def update_table(table_id):
+    request_data = request.get_json()
+    new_table = {
+        'id': table_id,
+        'event_id': request_data['event_id'],
+        'number': request_data['number'],
+        'seating_capacity': request_data['seating_capacity']
+    }
+    current_company = g.current_user.company
+    try:
+        table = Table.query.get(table_id)
+        if table is not None:
+            if float(new_table['number']) and new_table['seating_capacity'] in current_company.table_sizes:
+                table.event_id = new_table['event_id']
+                table.number = new_table['number']
+                table.seating_capacity = new_table['seating_capacity']
+                db.session.commit()
+            else:
+                raise ValueError('value(s) for table not allowed')
+        else:
+            return bad_request('Error updating table with id ' + table_id)
+    except Exception:
+        return bad_request('Exception thrown updating table with id ' + table_id)
+    
+    response = Response("", status = 204)
+    return response
+
+    
 
 
 @tables_api_blueprint.route('/guests', methods=['GET'])
