@@ -50,11 +50,17 @@ def seed():
     db.drop_all()
     db.create_all()
     seed_db()
-    
 
+@manager.command
 def run_ga():
     from eagleEvents import run_ga
     run_ga.run()
+
+@manager.command
+def run_ga_all():
+    from eagleEvents import run_ga
+    run_ga.run_all()
+
 
 manager.add_command("livereload", LiveReloadServer)
 

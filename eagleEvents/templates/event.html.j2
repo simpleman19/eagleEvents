@@ -1,17 +1,29 @@
 {% extends "layout.html.j2" %}
 {% block head_content %}
     <title>Eagle Events Events</title>
-{% endblock %}   
+{% endblock %}
 {% block body_content %}
     <h1>Events</h1>
         <div class="container">
             <div class="checkbox">
                 <label>
-                    <input type="checkbox" value="">Show All
+                <input id="showAllCB" type="checkbox" onclick ="showAll()" value="">
+                    Show All
                 </label>
             </div>
+            <br>
+            <br>
+            <button class="btn btn-primary active" id="refreshButton" onclick="refresh()">Refresh</button>
+
             <div class="card card-container-2">
-                <table class="table table-bordered">
+                <div style="margin: 5px">
+                    <input class="form-control" style="display: inline; width: 30%" type="text" id="filter" onkeyup="filter()" placeholder="Filter by events, planner, or date..">
+                    <button type="button" class="btn btn-light"><i class="fa fa-filter" aria-hidden="true"></i></button>
+                </div>
+                <table id="listTable" class="table table-bordered table-hover"
+                data-pagination="true"
+                data-id-field="name"
+                data-page-list="[5, 10, 25, 50, 100, ALL]">
                     <thead>
                         <tr>
                             <th>Name</th>
@@ -20,32 +32,113 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <tr>
-                            <td>Event 1</td>
-                            <td>Eva</td>
-                            <td>04/12/2018</td>
+                        {% for event in events %}
+                        <tr class = "click-row" data-href="modifyEvent/{{event.id}}" id="{{event.id}}">
+                            <td class="name">{{event.name}}</td>
+                            <td>{{event.planner.name}}</td>
+                            <td>{{event.time.date()}}</td>
                         </tr>
-                        <tr>
-                            <td>Event 2</td>
-                            <td>Jacie</td>
-                            <td>08/22/2018</td>
-                        </tr>
-                        <tr>
-                            <td>Event 3</td>
-                            <td>David</td>
-                            <td>01/23/2019</td>
-                        </tr>
+                        {% endfor %}
                     </tbody>
                 </table>
             </div>
                 <div class="buttons-action">
-                <button class="btn btn-lg btn-primary btn-add" type="submit">Add</button>
+                <button id="addEvent" class="btn btn-lg btn-primary btn-add" type="button">Add</button>
             </div>
         </div>
-<script src="https://code.jquery.com/jquery-1.12.4.min.js"></script>
 <script src="/static/bootstable.js"></script>
 
 <script>
-    $('table').SetEditable();
+    $('table').SetEditable({editButton: false, onBeforeDelete: deleteEvent});
+
+    window.onload = onDocumentReload;
+
+    function onDocumentReload() {
+        url = window.location.href;
+        parameter = url.split("?");
+        if (parameter[1] == "show_all=yes") {
+            document.getElementById("showAllCB").checked = true;
+        }
+    }
+
+    function refresh() {
+      $('#deletionModal').modal('hide');
+      $('#loading').modal('show');
+
+      url = window.location.href;
+      window.location = url;
+
+
+      url = window.location.href;
+      window.location = url;
+
+       // Add this after api conversion
+       //$('#loading').modal('show');
+    }
+
+    $(".click-row").click(function() {
+        window.location = $(this).data("href");
+    });
+
+    $("#addEvent").click(function() {
+        window.location.href = "/addEvent";
+    });
+
+    function showAll() {
+        if(document.getElementById("showAllCB").checked)
+        {
+            window.location.href = "/listEvents?show_all=yes";
+        }
+        else
+        {
+            window.location.href = "/listEvents";
+        }
+    }
+
+    function deleteEvent(row) {
+      document.getElementById('itemToDelete').innerHTML = document.getElementById(row[0].id).getElementsByClassName("name")[0].innerHTML;
+      document.getElementById('deleteDeletionModal').onclick = function() { doDeletion(row); };
+      document.getElementById('cancelDeletionModal').onclick = function() { refresh(row); };
+      $('#deletionModal').modal('show');
+    }
+
+    function doDeletion(row) {
+      $('#deletionModal').modal('hide');
+      $('#loading').modal('show');
+      fetch('/api/event/' + row[0].id, {
+        credentials: "same-origin",
+        headers: {
+            'Content-Type': "application/json",
+        },
+        method: "DELETE",
+        }).catch(error => console.error('Error:', error)).then(refresh);
+    }
+
+    function filter() {
+        var input, filter, table, tr, tdName, tdPlanner, tdDate, i;
+        input = document.getElementById("filter");
+        filter = input.value.toUpperCase();
+        table = document.getElementById("listTable");
+        tr = table.getElementsByTagName("tr");
+
+        for (i = 0; i < tr.length; i++) {
+            tdName = tr[i].getElementsByTagName("td")[0];
+            tdPlanner = tr[i].getElementsByTagName("td")[1];
+            tdDate = tr[i].getElementsByTagName("td")[2];
+
+            if (tdName || tdPlanner || tdDate) {
+                if (tdName.innerHTML.toUpperCase().indexOf(filter) > -1 ||
+                tdPlanner.innerHTML.toUpperCase().indexOf(filter) > -1 ||
+                tdDate.innerHTML.toUpperCase().indexOf(filter) > -1) {
+                    tr[i].style.display = "";
+                } else {
+                    tr[i].style.display = "none";
+                }
+            }
+        }
+    }
+
+
+</script>
 </script>
 {% endblock %}

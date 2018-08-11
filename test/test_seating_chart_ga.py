@@ -1,6 +1,7 @@
 import math
 
 import pytest
+from deap import creator
 from numpy import count_nonzero, array_equal
 
 from eagleEvents.seating_chart_ga import SeatingChartGA
@@ -93,6 +94,29 @@ def test_when_initializing_with_odd_percent_then_it_returns_a_list_containing_en
     count = len(list(filter(lambda x: x == Table.EMPTY_SEAT, result)))
     assert count == num_empty_seats
 
+@pytest.mark.filterwarnings('ignore::RuntimeWarning')
+def test_when_constructing_then_it_uses_the_correct_count_of_like_preferences(monkeypatch):
+    e = mock_event(monkeypatch)
+    db = mock_db(monkeypatch)
+    mock_guests = []
+    for x in range(10):
+        g = Guest(db)
+        g.number = x
+        mock_guests.append(g)
+
+    # First guest likes 5 people
+    mock_seating_prefs = []
+    for x in range(5):
+        mock_seating_prefs.append(SeatingPreferenceTable(mock_guests[0], mock_guests[x + 1], SeatingPreference.LIKE))
+    monkeypatch.setattr(mock_guests[0], "seating_preferences", mock_seating_prefs)
+
+    monkeypatch.setattr(e, "_guests", mock_guests)
+
+    ga = SeatingChartGA(e)
+
+
+    assert ga.total_like_preferences == 5
+
 ##
 # Population
 ##
@@ -153,6 +177,34 @@ def test_when_populating_with_odd_percent_then_it_returns_individuals_containing
     assert count == num_empty_seats
 
 
+@pytest.mark.filterwarnings('ignore::RuntimeWarning')
+def test_when_calling_get_individual_guess_then_it_returns_individuals_containing_all_guest_numbers(monkeypatch):
+    e = mock_event(monkeypatch)
+    guest_numbers = [x.number for x in e._guests]
+
+    ga = SeatingChartGA(e)
+    ga.initialization()
+    ga.population()
+    result = ga.toolbox.population_guess(n=100, pct_heuristic=1)
+
+    all_in_list_once(guest_numbers, result[25])
+
+
+@pytest.mark.filterwarnings('ignore::RuntimeWarning')
+def test_when_calling_get_individual_guess_then_it_returns_individuals_containing_enough_empty_seats(monkeypatch):
+    e = mock_event(monkeypatch)
+    monkeypatch.setattr(e, "percent_extra_seats", .83)
+    num_empty_seats = get_empty_seat_count(e)
+    ga = SeatingChartGA(e)
+    ga.initialization()
+    ga.population()
+
+    result = ga.toolbox.population_guess(n=100, pct_heuristic=1)
+
+    count = len(list(filter(lambda x: x == Table.EMPTY_SEAT, result[25])))
+    assert count == num_empty_seats
+
+
 ##
 # Evaluation
 ##
@@ -187,6 +239,35 @@ def test_when_calling_count_dislikes_at_table_then_it_returns_correct_count(monk
 
     assert result == len(individual_without_empty_seats) - 1
 
+@pytest.mark.filterwarnings('ignore::RuntimeWarning')
+def test_when_calling_count_likes_at_table_then_it_returns_correct_count(monkeypatch):
+    e = mock_event(monkeypatch)
+    db = mock_db(monkeypatch)
+    mock_guests = []
+    for x in range(10):
+        g = Guest(db)
+        g.number = x
+        mock_guests.append(g)
+
+    # First guest likes 5 people
+    mock_seating_prefs = []
+    for x in range(5):
+        mock_seating_prefs.append(SeatingPreferenceTable(mock_guests[0], mock_guests[x+1], SeatingPreference.LIKE))
+    monkeypatch.setattr(mock_guests[0], "seating_preferences", mock_seating_prefs)
+
+    monkeypatch.setattr(e, "_guests", mock_guests)
+
+    ga = SeatingChartGA(e)
+    ga.initialization()
+    ga.population()
+    ga.evaluation()
+
+    individual = ga.toolbox.population(n=1)[0]
+
+    result = ga.count_likes_in_list(individual)
+
+    assert result == 5
+
 
 @pytest.mark.filterwarnings('ignore::RuntimeWarning')
 def test_when_calling_evaluate_it_returns_a_tuple_containing_the_count_of_dislikes_at_all_tables(monkeypatch):
@@ -197,7 +278,7 @@ def test_when_calling_evaluate_it_returns_a_tuple_containing_the_count_of_dislik
     ga.population()
     ga.evaluation()
 
-    def mock_count(list):
+    def mock_count(_):
         return 2
     monkeypatch.setattr(ga, "count_dislikes_in_list", mock_count)
 
@@ -206,10 +287,49 @@ def test_when_calling_evaluate_it_returns_a_tuple_containing_the_count_of_dislik
 
     assert score[0] == 2 * ga.num_tables
 
+@pytest.mark.filterwarnings('ignore::RuntimeWarning')
+def test_when_calling_evaluate_it_returns_a_tuple_containing_the_count_of_likes_at_all_tables(monkeypatch):
+    e = mock_event(monkeypatch)
+
+    ga = SeatingChartGA(e)
+    ga.initialization()
+    ga.population()
+    ga.evaluation()
+
+    def mock_count(_):
+        return 5
+    monkeypatch.setattr(ga, "count_likes_in_list", mock_count)
+
+    individual = ga.toolbox.population(n=1)[0]
+    score = ga.evaluate(individual)
+
+    assert score[1] == 5 * ga.num_tables
+
 
 ##
 # Crossover / Mutate
 ##
+
+@pytest.mark.filterwarnings('ignore::RuntimeWarning')
+def test_when_calling_ordered_crossover_it_returns_crossovered_individuals(monkeypatch):
+    e = mock_event(monkeypatch)
+    db = mock_db(monkeypatch)
+
+    ga = SeatingChartGA(e)
+    ga.initialization()
+    ga.population()
+    ga.evaluation()
+    ga.crossover()
+
+    ind1 = creator.Individual([1, 2, 3, 4, 5, 6])
+    ind2 = creator.Individual([6, 5, 4, 3, 2, 1])
+
+    child1, child2 = ga.toolbox.mate(ind1, ind2)
+
+    assert(len(child1) == len(child2) == len(ind1) == len(ind2))
+
+    all_in_list_once([1, 2, 3, 4, 5, 6], child1)
+    all_in_list_once([1, 2, 3, 4, 5, 6], child2)
 
 
 @flaky(max_runs=5,min_passes=1)
@@ -232,6 +352,7 @@ def test_when_calling_crossover_and_mutate_it_returns_a_mated_population(monkeyp
     ga.crossover()
     ga.mutation()
 
+    monkeypatch.setattr(ga, "NIND", 10)
     monkeypatch.setattr(ga, "CXPB", 1)
     monkeypatch.setattr(ga, "MUTPB", 0)
 
@@ -264,6 +385,7 @@ def test_when_calling_crossover_and_mutate_it_returns_a_mutated_population(monke
 
     monkeypatch.setattr(ga, "CXPB", 0)
     monkeypatch.setattr(ga, "MUTPB", 1)
+    monkeypatch.setattr(ga, "NIND", 10)
 
     population = ga.toolbox.population(n=10)
     mutated = ga.crossover_and_mutate(population)
@@ -284,6 +406,7 @@ def test_when_calling_should_terminate_it_returns_true_after_NGEN(monkeypatch):
     ga = SeatingChartGA(e)
     ga.selection()
     monkeypatch.setattr(ga, "NGEN", 10)
+    monkeypatch.setattr(ga, "hall_of_fame", [])
 
     assert not (ga.should_terminate([], -1))
     assert not (ga.should_terminate([], 0))
@@ -306,6 +429,7 @@ def test_when_calling_do_generation_it_returns_offspring_with_fitness_values(mon
     def mock_count(list):
         return (1,)
     monkeypatch.setattr(ga, "evaluate", mock_count)
+    monkeypatch.setattr(ga, "NIND", 5)
 
     ga.setup()
 
@@ -338,7 +462,7 @@ def test_when_calling_do_generation_it_returns_offspring_not_in_the_parent_popul
     def mock_count(list):
         return float(random()),
     monkeypatch.setattr(ga, "evaluate", mock_count)
-
+    monkeypatch.setattr(ga, "NIND", 5)
     ga.setup()
 
     population = ga.toolbox.population(n=5)
@@ -368,26 +492,6 @@ def test_when_calling_do_generations_it_uses_should_terminate_to_terminate(monke
     ga.do_generations()
 
     assert was_called
-
-
-##
-# Concurrency
-##
-
-@pytest.mark.filterwarnings('ignore::RuntimeWarning')
-def test_when_calling_pooled_map_it_returns_the_same_list_as_a_serial_map(monkeypatch):
-    e = mock_event(monkeypatch)
-    ga = SeatingChartGA(e)
-
-    shared_memory_value = 2
-    def shared_memory_function(x):
-        return (x + shared_memory_value),
-    shared_memory_array = range(1000)
-
-    expected_result = list(map(shared_memory_function, shared_memory_array))
-    result = list(ga.pooled_map(shared_memory_function, shared_memory_array))
-
-    assert array_equal(expected_result, result)
 
 
 ##

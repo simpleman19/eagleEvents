@@ -21,12 +21,12 @@ multi_optional_auth = MultiAuth(basic_optional_auth, token_optional_auth)
 def verify_password(username, password):
     if not username or not password:
         if request.form and request.form['username']:
-            user = User.query.filter_by(username=request.form['username']).one_or_none()
+            user = User.query.filter_by(username=request.form['username'], is_active=True).one_or_none()
             if user and user.verify_password(request.form['password']):
                 g.current_user = user
                 return True
         return False
-    user = User.query.filter_by(username=username).one_or_none()
+    user = User.query.filter_by(username=username, is_active=True).one_or_none()
     if user is None or not user.verify_password(password):
         return False
     g.current_user = user
@@ -49,7 +49,7 @@ def password_error():
 def verify_optional_password(username, password):
     if not username or not password:
         if request.method == 'POST' and request.form['username']:
-            user = User.query.filter_by(username=request.form['username']).one_or_none()
+            user = User.query.filter_by(username=request.form['username'], is_active=True).one_or_none()
             if user.verify_password(request.form['password']):
                 g.current_user = user
                 return True
@@ -69,7 +69,7 @@ def verify_token(token):
         print('Decode Token Error')
         return False
     user_id = decoded['user_id']
-    user = User.query.filter_by(id=user_id).one_or_none()
+    user = User.query.filter_by(id=user_id, is_active=True).one_or_none()
     if user is None:
         return False
     g.current_user = user
@@ -135,7 +135,7 @@ def create_token():
 @auth_blueprint.route('/loginAsAdmin', methods=['GET'])
 def login_as_admin():
     if app.config['DEBUG']:
-        g.current_user = User.query.filter_by(is_admin=True).first()
+        g.current_user = User.query.filter_by(is_admin=True, is_active=True).first()
         token = create_token()
         resp = redirect(url_for('main.home'))
         resp.set_cookie('Bearer', token, expires=datetime.now() + timedelta(hours=app.config['JWT_EXPIRATION_HOURS']))
