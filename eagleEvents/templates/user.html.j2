@@ -16,19 +16,14 @@
                             <th>Active</th>
                         </tr>
                     </thead>
-                    <tbody>
-                        {% for user in users %}
-                        <tr class = "click-row" data-href="modifyEventPlanner/{{ user.id }}">
-                            <td>{{user.name}}</td>
-                            <td>{{user.username}}</td>
-                            <td><input type="checkbox" value="" {{'checked="checked"' if user.is_active}} disabled></td>
-                        </tr>
-                        {% endfor %}
+                    <tbody id="listTable-body" onload="buildList()">
                     </tbody>
                 </table>
             </div>
                 <div class="buttons-action">
-            <input type="button" class="btn btn-primary active btn-add" onclick="window.location.href='/addEventPlanner'" value="Add"/>
+                {% if g.current_user.is_admin %}
+                    <input type="button" class="btn btn-primary active btn-add" onclick="window.location.href='/addEventPlanner'" value="Add"/>
+                {% endif %}
         </div>
     </div>
 <script>
@@ -38,11 +33,40 @@
         window.location = url;
     }
 
-    {% if g.current_user.is_admin %} 
-      $(".click-row").click(function() {
-          window.location = $(this).data("href");
-      });
-    {% endif %}
+    function buildList() {
+        $('#loading').modal('show');
+        let userTable = document.getElementById('listTable-body');
+            fetch('/api/user/users?', {
+            credentials: "same-origin",
+            method: "GET",
+        }).catch(error => console.error('Error:', error))
+          .then(res => res.json())
+          .then(json => {
+            userTable.innerHTML = '';
+            for(i=0; i <= json.users.length -1; i++){
+                let tr = userTable.insertRow();
+                tr.class = "click-row";
+                tr.insertCell().innerHTML = json.users[i].name;
+                tr.insertCell().innerHTML = json.users[i].username;
+                var checkbox = document.createElement('input')
+                checkbox.type = "checkbox";
+                if (json.users[i].active){
+                    checkbox.checked = "checked";
+                }
+                checkbox.disabled = true;
+                let td = tr.insertCell()
+                td.appendChild(checkbox);
+                let userId = json.users[i].id;
+                {% if g.current_user.is_admin %}
+                    tr.addEventListener('click', function(){
+                        location.href = "/modifyEventPlanner/" + userId;
+                    });
+                {% endif %}
+            }
+          });
+        $('#loading').modal('hide');
+    }
 
+    window.onload = buildList;
 </script>
 {% endblock %}

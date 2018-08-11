@@ -1,17 +1,21 @@
 from eagleEvents.printing.chart import seating_chart_print
 from eagleEvents.printing.card import table_card_print
+from eagleEvents.printing.attendance import attendance_list_print
+import datetime
+import os
 from pathlib import Path
+
 from flask import Blueprint, render_template, flash, request, redirect, url_for, g, jsonify, abort
-from eagleEvents.models.event import Event
-from eagleEvents.models.customer import Customer
-from eagleEvents.models.user import User
-from eagleEvents.models.table import Table
-from eagleEvents.models.company import TableSize
-from eagleEvents.models.guest import Guest
-from eagleEvents.auth import multi_auth
-from eagleEvents import db
-import os, config, datetime
 from werkzeug.utils import secure_filename
+
+from eagleEvents import db
+from eagleEvents.auth import multi_auth
+from eagleEvents.models.company import TableSize
+from eagleEvents.models.customer import Customer
+from eagleEvents.models.event import Event
+from eagleEvents.models.guest import Guest
+from eagleEvents.models.user import User
+from eagleEvents.printing.chart import seating_chart_print
 
 events_blueprint = Blueprint('events', __name__)
 
@@ -87,11 +91,13 @@ def handle_post(event, new):
     button = request.form.get('button')
     imported = True if Guest.query.filter_by(event_id=event.id).count() > 0 else False
     if button == 'save':
-        is_valid = validate_and_save(event, request)
-        if is_valid:
+        errors = Event.validate_and_save(event, request.form)
+        if len(errors) == 0:
             flash("{name} added".format(name=event.name), "success")
             return redirect(url_for('events.list_events'))
         else:
+            for error in errors:
+                flash(error, 'error')
             return render_template('add-update-event.html.j2', event=event, sizes=sizes, planner=event.planner,
                                    customers=customer_list, planners=planner_list, new=new, imported=imported,
                                    date=convert_time(event.time), cancel_redirect=url_for('events.list_events'))
@@ -100,14 +106,17 @@ def handle_post(event, new):
     elif button == 'seat':
         return redirect(url_for('events.seating_chart', event_id=event.id))
     elif button == 'attendance':
-        return redirect(url_for('events.attendance_list'))
+        return redirect(url_for('events.attendance_list', id=event.id))
     elif button == 'table':
         return redirect(url_for('events.table_cards', id=event.id))
     else:
-        is_valid = validate_and_save(event, request)
-        if is_valid:
+        errors = Event.validate_and_save(event, request.form)
+        if len(errors) == 0:
             upload_file(event, request)
             imported = True
+        else:
+            for error in errors:
+                flash(error, 'error')
         return render_template('add-update-event.html.j2', event=event, sizes=sizes, planner=event.planner,
                                customers=customer_list, planners=planner_list, new=new, imported=imported,
                                date=convert_time(event.time), cancel_redirect=url_for('events.list_events'))
@@ -158,11 +167,11 @@ def table_cards(id):
     print('here-----------')
     return table_card_print(id)
 
-@events_blueprint.route('/attendanceList')
+@events_blueprint.route('/attendanceList/<id>', methods=['GET', 'POST'])
 @multi_auth.login_required
-def attendance_list():
-    # TODO Attendance List
-    return render_template('test.html.j2', test='attendance_list')
+def attendance_list(id):
+    # Print Seating Chart
+    return attendance_list_print(id)
 
 
 @events_blueprint.route('/printSeatingChartTest')
@@ -175,71 +184,6 @@ def print_seating_chartTest():
 def print_seating_chart(id):
     # Print Seating Chart
     return seating_chart_print(id)
-
-
-@events_blueprint.route('/deleteEvent/<id>', methods=['DELETE'])
-@multi_auth.login_required
-def delete_event(id):
-    event = None
-    name = ""
-    try:
-        event = Event.query.filter_by(id=id, company=g.current_user.company).one_or_none()
-    except Exception as e:
-        print(e)
-        abort(404)
-    if event:
-        name = event.name
-        db.session.delete(event)
-        db.session.commit()
-    else:
-        print("Could not find event to delete")
-        abort(404)
-    flash('Successfully deleted event: ' + name)
-    return jsonify({'success': "Successfully deleted event: " + name}), 200
-
-
-def validate_and_save(event, request):
-    if float(request.form['extra']) > .99:
-        flash("Percent value must be less than 1", "error")
-        return False
-    regen_seating_chart = False
-    event.company = g.current_user.company
-    event.planner = User.query.filter_by(id=request.form['planner']).one_or_none()
-    event.customer = Customer.query.filter_by(id=request.form['customer']).one_or_none()
-    event.name = request.form['name']
-    event.venue = request.form['venue']
-    # get the html form of the datetime
-    date_in = request.form['time']
-    # convert it into python datetime
-    event.time = datetime.datetime(*[int(v) for v in date_in.replace('T', '-').replace(':', '-').split('-')])
-    event.is_done = True if request.form['status'] == "Done" else False
-    new_table_size = TableSize.query.filter_by(id=request.form['table_size']).one_or_none()
-    if new_table_size.id != event.table_size_id:
-        regen_seating_chart = True
-    event.table_size = new_table_size
-    if event.percent_extra_seats != float(request.form['extra']):
-        regen_seating_chart = True
-    event.percent_extra_seats = float(request.form['extra'])
-
-    if event.name is None or len(event.name) == 0:
-        flash("Name is required", "error")
-        return False
-    elif event.venue is None or len(event.venue) == 0:
-        flash("Venue is required", "error")
-        return False
-    elif event.time is None or event.time < datetime.datetime.now():
-        flash("Valid Date and Time is required", "error")
-        return False
-    elif event.percent_extra_seats is None:
-        flash("Extra Seating Percentage is required", "error")
-        return False
-
-    if regen_seating_chart and len(event._guests) > 0:
-        event.generate_seating_chart()
-
-    db.session.add(event)
-    db.session.commit()
-    return True
 
 
 def convert_time(time):
