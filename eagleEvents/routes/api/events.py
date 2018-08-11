@@ -11,24 +11,38 @@ events_api_blueprint = Blueprint('events_api', __name__, url_prefix='/api/event'
 @events_api_blueprint.route('', methods=['GET'])
 @multi_auth.login_required
 def get_events():
-    planner_id=request.args.get('planner')
+    planner_id = request.args.get('planner')
+    customer_id = request.args.get('customer')
+
     response = {
         'events': []
     }
 
     if planner_id:
         try:
-            planner = User.query.filter_by(id=planner_id, company=g.current_user.company).one_or_none()
+            planner = User.query.get(planner_id)
             if planner is None:
                 return bad_request('Error finding planner')
         except Exception:
             return bad_request('Error finding planner, exception thrown')
 
+    if customer_id:
+        try:
+            customer = Customer.query.get(customer_id)
+            if customer is None:
+                return bad_request('Error finding customer')
+        except Exception:
+            return bad_request('Error finding customer, exception thrown')
+
     try:
+        params = {
+            'company': g.current_user.company
+        }
         if planner_id is not None:
-            events = Event.query.filter_by(company=g.current_user.company, planner=planner).all()
-        else:
-            events = Event.query.filter_by(company=g.current_user.company).all()
+            params['planner'] = planner
+        if customer_id is not None:
+            params['customer'] = customer
+        events = Event.query.filter_by(**params).all()
 
         if events is not None:
             for event in events:
@@ -41,7 +55,7 @@ def get_events():
                     'totalExpectedGuests': len(event._guests),
                     'percentExtraSeats': event.percent_extra_seats,
                     'customerId': event.customer.id,
-                    'plannerId': event.planner.id,
+                    'plannerId': (event.planner.id if event.planner is not None else None),
                     'isDone': event.is_done
                 })
         else:
@@ -221,8 +235,7 @@ def delete_event(event_id):
     name = ""
     try:
         event = Event.query.get(event_id)
-    except Exception as e:
-        print(e)
+    except Exception:
         return bad_request('Error deleting event, exception thrown')
     if event:
         name = event.name
