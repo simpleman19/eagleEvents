@@ -1,7 +1,7 @@
 from flask import Blueprint, request, jsonify, abort, g
 from eagleEvents.models.guest import Guest
 from eagleEvents.models.table import Table
-from eagleEvents.models import db, Event, User
+from eagleEvents.models import db, Event, User, Customer
 from eagleEvents.auth import multi_auth
 from eagleEvents.routes.api import bad_request, validation_error
 
@@ -80,6 +80,41 @@ def get_event(event_id):
         return bad_request('Error finding event, exception thrown')
 
     return jsonify(response), 200
+
+
+@events_api_blueprint.route('', methods=['POST'])
+@events_api_blueprint.route('<event_id>', methods=['PUT'])
+@multi_auth.login_required
+def add_update_event(event_id=None):
+    try:
+        event_data = request.json
+    except Exception:
+        return bad_request('Needs json')
+
+    if 'id' in event_data and request.method == 'POST':
+        return bad_request('Cannot specify id')
+
+    if request.method == 'POST':
+        event = Event(Customer(g.current_user.company))
+    else:
+        try:
+            event = Event.query.get(event_id)
+            if event is None:
+                return bad_request('Error finding event')
+        except Exception:
+            return bad_request('Error finding event, exception thrown')
+
+    errors = Event.validate_and_save(event, event_data)
+
+    if len(errors) > 0:
+        return validation_error(errors)
+
+    response = jsonify({'id': event.id})
+
+    if request.method == 'POST':
+        return response, 201
+    else:
+        return response, 200
 
 
 """
