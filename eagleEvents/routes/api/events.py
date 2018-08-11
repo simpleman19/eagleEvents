@@ -1,10 +1,154 @@
-from flask import Blueprint, request, jsonify, abort, g
+from flask import Blueprint, request, jsonify, abort, g, flash
 from eagleEvents.models.guest import Guest
 from eagleEvents.models.table import Table
-from eagleEvents.models import db
+from eagleEvents.models import db, Event, User, Customer
 from eagleEvents.auth import multi_auth
+from eagleEvents.routes.api import bad_request, validation_error
 
 events_api_blueprint = Blueprint('events_api', __name__, url_prefix='/api/event')
+
+
+@events_api_blueprint.route('', methods=['GET'])
+@multi_auth.login_required
+def get_events():
+    planner_id = request.args.get('planner')
+    customer_id = request.args.get('customer')
+
+    response = {
+        'events': []
+    }
+
+    if planner_id:
+        try:
+            planner = User.query.get(planner_id)
+            if planner is None:
+                return bad_request('Error finding planner')
+        except Exception:
+            return bad_request('Error finding planner, exception thrown')
+
+    if customer_id:
+        try:
+            customer = Customer.query.get(customer_id)
+            if customer is None:
+                return bad_request('Error finding customer')
+        except Exception:
+            return bad_request('Error finding customer, exception thrown')
+
+    try:
+        params = {
+            'company': g.current_user.company
+        }
+        if planner_id is not None:
+            params['planner'] = planner
+        if customer_id is not None:
+            params['customer'] = customer
+        events = Event.query.filter_by(**params).all()
+
+        if events is not None:
+            for event in events:
+                response['events'].append({
+                    'id': event.id,
+                    'name': event.name,
+                    'venue': event.venue,
+                    'tableSize': event.table_size.size,
+                    'time': event.time.isoformat(),
+                    'totalExpectedGuests': len(event._guests),
+                    'percentExtraSeats': event.percent_extra_seats,
+                    'customerId': event.customer.id,
+                    'plannerId': (event.planner.id if event.planner is not None else None),
+                    'isDone': event.is_done
+                })
+        else:
+            return bad_request('Error getting events')
+    except Exception:
+        return bad_request('Error getting event, exception thrown')
+
+    return jsonify(response), 200
+
+
+@events_api_blueprint.route('<event_id>', methods=['GET'])
+@multi_auth.login_required
+def get_event(event_id):
+    response = {
+        'event': {}
+    }
+    try:
+        event = Event.query.get(event_id)
+        if event is not None:
+            response['event'] = {
+                'id': event.id,
+                'name': event.name,
+                'venue': event.venue,
+                'tableSize': event.table_size.size,
+                'time': event.time.isoformat(),
+                'totalExpectedGuests': len(event._guests),
+                'percentExtraSeats': event.percent_extra_seats,
+                'customerId': event.customer.id,
+                'plannerId': event.planner.id,
+                'isDone': event.is_done,
+                'guestIds': [g.id for g in event._guests]
+            }
+        else:
+            return bad_request('Error finding event')
+    except Exception:
+        return bad_request('Error finding event, exception thrown')
+
+    return jsonify(response), 200
+
+
+@events_api_blueprint.route('', methods=['POST'])
+@events_api_blueprint.route('<event_id>', methods=['PUT'])
+@multi_auth.login_required
+def add_update_event(event_id=None):
+    try:
+        event_data = request.json
+    except Exception:
+        return bad_request('Needs json')
+
+    if 'id' in event_data and request.method == 'POST':
+        return bad_request('Cannot specify id')
+
+    if request.method == 'POST':
+        event = Event(Customer(g.current_user.company))
+    else:
+        try:
+            event = Event.query.get(event_id)
+            if event is None:
+                return bad_request('Error finding event')
+        except Exception:
+            return bad_request('Error finding event, exception thrown')
+
+    errors = Event.validate_and_save(event, event_data)
+
+    if len(errors) > 0:
+        return validation_error(errors)
+
+    response = jsonify({'id': event.id})
+
+    if request.method == 'POST':
+        return response, 201
+    else:
+        return response, 200
+
+
+@events_api_blueprint.route('<event_id>/generateSeatingChart', methods=['PUT'])
+@multi_auth.login_required
+def generate_seating_chart(event_id):
+    response = {
+        'acknowledged': False
+    }
+    try:
+        event = Event.query.get(event_id)
+        if event is not None:
+            event.generate_seating_chart()
+            response['acknowledged'] = True
+        else:
+            return bad_request('Error finding event')
+    except Exception:
+        return bad_request('Error finding event, exception thrown')
+
+    return jsonify(response), 200
+
 
 """
     API endpoint to change guest seat
@@ -101,3 +245,22 @@ def change_seats():
     except Exception:
         response['error'] = 'Error finding table or a guest, exception thrown'
         return jsonify(response), 404
+
+
+@events_api_blueprint.route('<event_id>', methods=['DELETE'])
+@multi_auth.login_required
+def delete_event(event_id):
+    event = None
+    name = ""
+    try:
+        event = Event.query.get(event_id)
+    except Exception:
+        return bad_request('Error deleting event, exception thrown')
+    if event:
+        name = event.name
+        db.session.delete(event)
+        db.session.commit()
+    else:
+        return bad_request("Could not find event to delete")
+    flash('Successfully deleted event: ' + name)
+    return jsonify({'success': "Successfully deleted event: " + name}), 200

@@ -105,7 +105,7 @@
     function doDeletion(row) {
       $('#deletionModal').modal('hide');
       $('#loading').modal('show');
-      fetch('/deleteEvent/' + row[0].id, {
+      fetch('/api/event/' + row[0].id, {
         credentials: "same-origin",
         headers: {
             'Content-Type': "application/json",
