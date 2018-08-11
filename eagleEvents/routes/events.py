@@ -1,4 +1,5 @@
 from eagleEvents.printing.chart import seating_chart_print
+from eagleEvents.printing.card import table_card_print
 from eagleEvents.printing.attendance import attendance_list_print
 import datetime
 import os
@@ -110,7 +111,7 @@ def handle_post(event, new):
     elif button == 'attendance':
         return redirect(url_for('events.attendance_list', id=event.id))
     elif button == 'table':
-        return redirect(url_for('events.table_cards'))
+        return redirect(url_for('events.table_cards', id=event.id))
     else:
         errors = Event.validate_and_save(event, request.form)
         if len(errors) == 0:
@@ -162,12 +163,11 @@ def seating_chart(event_id):
     return render_template('seating-chart.html.j2', tables=sorted(event.tables, key=lambda x: x.number))
 
 
-@events_blueprint.route('/tableCards')
+@events_blueprint.route('/tableCards/<id>', methods=['GET', 'POST'])
 @multi_auth.login_required
-def table_cards():
-    # TODO Table Cards
-    return render_template('test.html.j2', test='table_cards')
-
+def table_cards(id):
+    # Print table cards
+    return table_card_print(id)
 
 @events_blueprint.route('/attendanceList/<id>', methods=['GET', 'POST'])
 @multi_auth.login_required

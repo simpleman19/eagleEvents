@@ -8,11 +8,28 @@
     <div class="container">
         <label>Event Number:</label>
         <input id="event-num-seating-chart" type=text>
-        <button onclick="testPrint()" class="btn btn-secondary" type="button">Print Seating Chart</button>
+        <button onclick="testPrint()" type="button">Print Seating Chart</button>
+        <button onclick="testPrintCards()" type="button">Print Table Cards</button>
         <button onclick="testPrint2()" class="btn btn-secondary" type="button">Print Attendance List</button>
     </div>
 <script src="https://code.jquery.com/jquery-1.12.4.min.js"></script>
 <script>
+function testPrintCards() {
+        var eventNum = document.getElementById("event-num-seating-chart").value;
+        $.ajax({     
+            url: "/tableCards/" + eventNum,
+            type: "POST",
+            success: function(eventNum) {
+            console.log('success ' + eventNum)
+            },
+        }).then( (data) => {
+          var downloadAttribute = document.createElement('a');
+          downloadAttribute.setAttribute('href',"data:application/octet-stream," + encodeURIComponent(data));
+          downloadAttribute.setAttribute('download',"seatingChart" + eventNum + ".pdf");
+          downloadAttribute.click();
+        });
+}
+
     function testPrint() {
         var eventNum = document.getElementById("event-num-seating-chart").value;
         $.ajax({     

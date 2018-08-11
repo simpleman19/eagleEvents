@@ -39,10 +39,10 @@
                                        onclick="document.getElementById('file').click();" type="button" name="button" value="import">Import Guests</button>
                            <button class="btn btn-lg btn-success btn-block btn-event-function" type="submit" name="button" value="seat"
                                    style={{ "display:none;" if imported == false}}>Seating Chart</button>
-                           <button class="btn btn-lg btn-success btn-block btn-event-function" type="submit" name="button" value="attendance"
+                           <button class="btn btn-lg btn-success btn-block btn-event-function" type="submit" name="button" value="attendance" 
                                    style={{ "display:none;" if imported == false}}>Print Attendance List</button>
                            <button class="btn btn-lg btn-success btn-block btn-event-function" type="submit" name="button" value="table"
-                                   style={{ "display:none;" if imported == false}} >Print Table Cart</button>
+                                   style={{ "display:none;" if imported == false}} >Print Table Cards</button>
                            <input type=file id="file" name="file" onchange="this.form.submit(); $('#loading').modal('show');" style="display:none;"/>
                     </div>
             </div>
