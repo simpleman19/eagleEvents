@@ -88,7 +88,10 @@ def handle_post(event, new):
     if button == 'save':
         is_valid = validate_and_save(event, request)
         if is_valid:
-            flash("{name} added".format(name=event.name), "success")
+            if new:
+                flash("{name} added".format(name=event.name), "success")
+            else:
+                flash("{name} updated".format(name=event.name), "success")
             return redirect(url_for('events.list_events'))
         else:
             return render_template('add-update-event.html.j2', event=event, sizes=sizes, planner=event.planner,
