@@ -8,8 +8,9 @@ def run():
     event1 = "1c87aab94e44497e944b4c90728582e7"
     event2 = "938244a3f20e4dfe8095b595783b1c50"
     event3 = "fe18e325a7124420a788b389a8390d0f"
+    event4 = "5fd34218-fe31-4e9c-96b4-559d034d4f77"
     start = time.time()
-    tables, logbook, best, total_likes, total_dislikes = get_seating_chart_tables(Event.query.get(event2), log_output=False, collect_stats=True)
+    tables, logbook, best, total_likes, total_dislikes = get_seating_chart_tables(Event.query.get(event4), log_output=False, collect_stats=True)
     end = time.time()
     print(logbook)
     print("Execution time: {time}".format(time=end-start))

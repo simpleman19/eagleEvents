@@ -32,7 +32,7 @@ def list_events():
     if show_all is not None:
         events = events_of_company
     else:
-        events = events_of_company.filter_by(planner_id = g.current_user.id)
+        events = events_of_company.filter_by(planner_id = g.current_user.id, is_done = False)
     return render_template('event.html.j2', events=events, currentUser = g.current_user)
 
 
@@ -92,7 +92,10 @@ def handle_post(event, new):
     if button == 'save':
         errors = Event.validate_and_save(event, request.form)
         if len(errors) == 0:
-            flash("{name} added".format(name=event.name), "success")
+            if new:
+                flash("{name} added".format(name=event.name), "success")
+            else:
+                flash("{name} updated".format(name=event.name), "success")
             return redirect(url_for('events.list_events'))
         else:
             for error in errors:
