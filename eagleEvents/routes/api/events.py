@@ -3,6 +3,7 @@ from eagleEvents.models.guest import Guest
 from eagleEvents.models.table import Table
 from eagleEvents.models import db, Event, User
 from eagleEvents.auth import multi_auth
+from eagleEvents.routes.api import bad_request, validation_error
 
 events_api_blueprint = Blueprint('events_api', __name__, url_prefix='/api/event')
 

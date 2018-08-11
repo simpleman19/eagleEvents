@@ -88,11 +88,13 @@ def handle_post(event, new):
     button = request.form.get('button')
     imported = True if Guest.query.filter_by(event_id=event.id).count() > 0 else False
     if button == 'save':
-        is_valid = Event.validate_and_save(event, request.form)
-        if is_valid:
+        errors = Event.validate_and_save(event, request.form)
+        if len(errors) == 0:
             flash("{name} added".format(name=event.name), "success")
             return redirect(url_for('events.list_events'))
         else:
+            for error in errors:
+                flash(error, 'error')
             return render_template('add-update-event.html.j2', event=event, sizes=sizes, planner=event.planner,
                                    customers=customer_list, planners=planner_list, new=new, imported=imported,
                                    date=convert_time(event.time), cancel_redirect=url_for('events.list_events'))
@@ -105,10 +107,13 @@ def handle_post(event, new):
     elif button == 'table':
         return redirect(url_for('events.table_cards'))
     else:
-        is_valid = Event.validate_and_save(event, request.form)
-        if is_valid:
+        errors = Event.validate_and_save(event, request.form)
+        if len(errors) == 0:
             upload_file(event, request)
             imported = True
+        else:
+            for error in errors:
+                flash(error, 'error')
         return render_template('add-update-event.html.j2', event=event, sizes=sizes, planner=event.planner,
                                customers=customer_list, planners=planner_list, new=new, imported=imported,
                                date=convert_time(event.time), cancel_redirect=url_for('events.list_events'))
