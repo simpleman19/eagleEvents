@@ -28,7 +28,7 @@ def list_events():
     if show_all is not None:
         events = events_of_company
     else:
-        events = events_of_company.filter_by(planner_id = g.current_user.id)
+        events = events_of_company.filter_by(planner_id = g.current_user.id, is_done = False)
     return render_template('event.html.j2', events=events, currentUser = g.current_user)
 
 
