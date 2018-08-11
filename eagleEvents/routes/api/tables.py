@@ -60,16 +60,21 @@ def update_table(table_id):
     request_data = request.get_json()
     new_table = {
         'id': table_id,
+        'event_id': request_data['event_id'],
         'number': request_data['number'],
-        'seating_capacity': request_data['seating_capacity'],
-        'event_id': request_data['event_id']
+        'seating_capacity': request_data['seating_capacity']
     }
+    current_company = g.current_user.company
     try:
         table = Table.query.get(table_id)
         if table is not None:
-            table = new_table
-            # db.session.add(table)
-            # db.session.commit()
+            if float(new_table['number']) and new_table['seating_capacity'] in current_company.table_sizes:
+                table.event_id = new_table['event_id']
+                table.number = new_table['number']
+                table.seating_capacity = new_table['seating_capacity']
+                db.session.commit()
+            else:
+                raise ValueError('value(s) for table not allowed')
         else:
             return bad_request('Error updating table with id ' + table_id)
     except Exception:
