@@ -21,7 +21,7 @@ def add_customer():
         return render_template('add-update-customer.html.j2', customer=customer,
                                cancel_redirect=url_for('customers.list_customers'))
     else:
-        errors = Customer.validate_and_save(customer, request)
+        errors = Customer.validate_and_save(customer, request.form)
         if len(errors) == 0:
             flash("{name} added".format(name=customer.name), "success")
             return redirect(url_for('customers.list_customers'))
