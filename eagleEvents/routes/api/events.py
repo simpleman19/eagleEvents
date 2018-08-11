@@ -1,7 +1,7 @@
 from flask import Blueprint, request, jsonify, abort, g
 from eagleEvents.models.guest import Guest
 from eagleEvents.models.table import Table
-from eagleEvents.models import db
+from eagleEvents.models import db, Event, User
 from eagleEvents.auth import multi_auth
 
 events_api_blueprint = Blueprint('events_api', __name__, url_prefix='/api/event')
@@ -10,11 +10,25 @@ events_api_blueprint = Blueprint('events_api', __name__, url_prefix='/api/event'
 @events_api_blueprint.route('', methods=['GET'])
 @multi_auth.login_required
 def get_events():
+    planner_id=request.args.get('planner')
     response = {
         'events': []
     }
+
+    if planner_id:
+        try:
+            planner = User.query.filter_by(id=planner_id, company=g.current_user.company).one_or_none()
+            if planner is None:
+                return bad_request('Error finding planner')
+        except Exception:
+            return bad_request('Error finding planner, exception thrown')
+
     try:
-        events = Event.query.filter_by(company=g.current_user.company)
+        if planner_id is not None:
+            events = Event.query.filter_by(company=g.current_user.company, planner=planner).all()
+        else:
+            events = Event.query.filter_by(company=g.current_user.company).all()
+
         if events is not None:
             for event in events:
                 response['events'].append({
