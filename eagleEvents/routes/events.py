@@ -164,7 +164,6 @@ def seating_chart(event_id):
 @multi_auth.login_required
 def table_cards(id):
     # Print table cards
-    print('here-----------')
     return table_card_print(id)
 
 @events_blueprint.route('/attendanceList/<id>', methods=['GET', 'POST'])
