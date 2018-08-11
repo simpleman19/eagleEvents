@@ -55,6 +55,7 @@ def get_user():
     return jsonify(response), reason_code
 
 
+@user_api_blueprint.route('/save', methods=['PUT'])
 @user_api_blueprint.route('/save', methods=['POST'])
 @multi_auth.login_required
 def post_user():
