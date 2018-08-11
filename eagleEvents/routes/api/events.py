@@ -131,6 +131,25 @@ def add_update_event(event_id=None):
         return response, 200
 
 
+@events_api_blueprint.route('<event_id>/generateSeatingChart', methods=['PUT'])
+@multi_auth.login_required
+def generate_seating_chart(event_id):
+    response = {
+        'acknowledged': False
+    }
+    try:
+        event = Event.query.get(event_id)
+        if event is not None:
+            event.generate_seating_chart()
+            response['acknowledged'] = True
+        else:
+            return bad_request('Error finding event')
+    except Exception:
+        return bad_request('Error finding event, exception thrown')
+
+    return jsonify(response), 200
+
+
 """
     API endpoint to change guest seat
     Method: POST
