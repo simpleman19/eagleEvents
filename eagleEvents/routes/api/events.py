@@ -1,4 +1,4 @@
-from flask import Blueprint, request, jsonify, abort, g
+from flask import Blueprint, request, jsonify, abort, g, flash
 from eagleEvents.models.guest import Guest
 from eagleEvents.models.table import Table
 from eagleEvents.models import db, Event, User, Customer
@@ -212,3 +212,23 @@ def change_seats():
     except Exception:
         response['error'] = 'Error finding table or a guest, exception thrown'
         return jsonify(response), 404
+
+
+@events_api_blueprint.route('<event_id>', methods=['DELETE'])
+@multi_auth.login_required
+def delete_event(event_id):
+    event = None
+    name = ""
+    try:
+        event = Event.query.get(event_id)
+    except Exception as e:
+        print(e)
+        return bad_request('Error deleting event, exception thrown')
+    if event:
+        name = event.name
+        db.session.delete(event)
+        db.session.commit()
+    else:
+        return bad_request("Could not find event to delete")
+    flash('Successfully deleted event: ' + name)
+    return jsonify({'success': "Successfully deleted event: " + name}), 200
