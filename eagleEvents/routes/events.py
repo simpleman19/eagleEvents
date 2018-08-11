@@ -216,7 +216,7 @@ def validate_and_save(event, request):
     if new_table_size.id != event.table_size_id:
         regen_seating_chart = True
     event.table_size = new_table_size
-    if event.percent_extra_seats != request.form['extra']:
+    if event.percent_extra_seats != float(request.form['extra']):
         regen_seating_chart = True
     event.percent_extra_seats = float(request.form['extra'])
 
