@@ -1,6 +1,7 @@
+
 from flask import flash, g
 
-from eagleEvents.seating_chart_ga import SeatingChartGA
+from eagleEvents.seating_chart_ga import get_seating_chart_tables
 from . import db
 from eagleEvents.models import Guest, User, Customer, TableSize
 import uuid, datetime
@@ -38,12 +39,13 @@ class Event(db.Model):
         self.generate_seating_chart()
 
     def generate_seating_chart(self):
+
         # delete old tables
         for t in self.tables:
             db.session.delete(t)
         db.session.commit()
 
-        new_tables = SeatingChartGA(self).get_seating_chart_tables()
+        new_tables = get_seating_chart_tables(self)
 
         # add new tables
         for t in new_tables:

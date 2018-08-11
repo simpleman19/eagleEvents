@@ -90,11 +90,14 @@ class Company(db.Model):
                     print('Guest was not found: ', g1, g2)
         db.session.commit()
         os.remove(file_name)
+        stop = timeit.default_timer()
+        print('Import Complete', stop - start)
         if not os.path.isfile(file_name):
             print(file_name, ' removed')
+        start = timeit.default_timer()
         event.generate_seating_chart()
         stop = timeit.default_timer()
-        print('Import Complete', stop-start)
+        print('Seating Chart Generated', stop-start)
 
 
 class TableSize(db.Model):
