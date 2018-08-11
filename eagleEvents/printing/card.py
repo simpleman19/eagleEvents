@@ -25,7 +25,7 @@ def table_card_print(id_event):
     file_name = 'tableCard.pdf'
 
     doc = SimpleDocTemplate(os.path.join(final_directory , file_name), pagesize=letter)
-    doc.title = e.name + "-cards-" + str(e.time.date() + ".pdf")
+    doc.title = e.name + "-cards-" + str(e.time.date()) + ".pdf"
 
     story = []
     elements = []
