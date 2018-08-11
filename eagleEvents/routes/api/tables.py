@@ -56,6 +56,10 @@ def get_prefs_for_table():
 
     for g1 in table1.guests:
         for g2 in table2.guests:
+            if str(g1.id) == guest1:
+                guest_actual = g1
+            elif str(g2.id) == guest1:
+                guest_actual = g2
             if g1.likes(g2) or g2.likes(g1):
                 if str(g1.id) == guest1 or str(g1.id) == guest2 or str(g2.id) == guest1 or str(g2.id) == guest2:
                     response['prefs'].append({
@@ -68,4 +72,11 @@ def get_prefs_for_table():
                         'message': "Warning: " + g1.first_name + " " + g1.last_name + " and " \
                                    + g2.first_name + " " + g2.last_name + " should not sit together."
                     })
+    for g in table1.guests:
+        if guest_actual.id != g.id and (g.likes(guest_actual) or guest_actual.likes(g)):
+            response['prefs'].append({
+                        'message': "Warning: " + guest_actual.first_name + " " + guest_actual.last_name + " and "\
+                                   + g.first_name + " " + g.last_name + " would like to sit together."
+                    })            
+
     return jsonify(response)
