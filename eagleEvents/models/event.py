@@ -7,7 +7,6 @@ from eagleEvents.models import Guest, User, Customer, TableSize
 import uuid, datetime
 from eagleEvents.models import Guest
 from sqlalchemy_utils import UUIDType
-from sqlalchemy.sql import exists
 from typing import List
 
 
@@ -126,10 +125,8 @@ class Event(db.Model):
         if len(errors) == 0:
             if regen_seating_chart and len(event._guests) > 0:
                 event.generate_seating_chart()
-            if db.session.query(exists().where(Event.id==event.id)):
-                db.session.commit()
-            else:
-                db.session.add(event)
-                db.session.commit()
+          
+            db.session.add(event)
+            db.session.commit()
 
         return errors

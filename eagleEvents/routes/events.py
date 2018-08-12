@@ -113,10 +113,11 @@ def handle_post(event, new):
         if len(errors) == 0:
             upload_file(event, request)
             imported = True
+            return redirect(url_for('events.modify_event', event_id=event.id))
         else:
             for error in errors:
                 flash(error, 'error')
-        return render_template('add-update-event.html.j2', event=event, sizes=sizes, planner=event.planner,
+            return render_template('add-update-event.html.j2', event=event, sizes=sizes, planner=event.planner,
                                customers=customer_list, planners=planner_list, new=new, imported=imported,
                                date=convert_time(event.time), cancel_redirect=url_for('events.list_events'))
 
