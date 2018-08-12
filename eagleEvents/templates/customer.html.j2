@@ -1,17 +1,15 @@
 {% extends "layout.html.j2" %}
+{% set active_page = "listCustomers" %}
 {% block head_content %}
     <title>Eagle Events Customers</title>
-{% endblock %}   
+{% endblock %}
 {% block body_content %}
     <h1>Customers</h1>
-        <div class="container">
-            <div class="checkbox">
-                <label>
-                    <input type="checkbox" value="">Show All
-                </label>
-            </div>
+    <div class="container">
+            <button class="btn btn-primary active" id="refreshButton" onclick="refresh()">Refresh</button>
+        </div>
             <div class="card card-container-2">
-                <table class="table table-bordered">
+                <table class="table table-bordered table-hover">
                     <thead>
                         <tr>
                             <th>Name</th>
@@ -20,32 +18,57 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <tr>
-                            <td>John</td>
-                            <td>(000)-000-0000</td>
-                            <td>jhon@example.com</td>
+                        {% for customer in customers %}
+                        <tr class = "click-row" data-href="modifyCustomer/{{ customer.id }}" id="{{ customer.id }}">
+                            <td class="name">{{customer.name}}</td>
+                            <td>{{customer.phone_number}}</td>
+                            <td>{{customer.email}}</td>
                         </tr>
-                        <tr>
-                            <td>Mary</td>
-                            <td>(000)-000-0000</td>
-                            <td>Mary@example.com</td>
-                        </tr>
-                        <tr>
-                            <td>July</td>
-                            <td>(000)-000-0000</td>
-                            <td>July@example.com</td>
-                        </tr>
+                        {% endfor %}
                     </tbody>
                 </table>
             </div>
-                <div class="buttons-action">
-                <button class="btn btn-lg btn-primary btn-add" type="submit">Add</button>
+            <div class="buttons-action">
+                <button class="btn btn-lg btn-primary btn-add" onclick="window.location.href='/addCustomer'" type="button">Add</button>
             </div>
         </div>
-<script src="https://code.jquery.com/jquery-1.12.4.min.js"></script>
 <script src="static/bootstable.js"></script>
 <script>
-    $('table').SetEditable();
+    $('table').SetEditable({onBeforeDelete: deleteCustomer});
+
+    function deleteCustomer(row) {
+      document.getElementById('itemToDelete').innerHTML = document.getElementById(row[0].id).getElementsByClassName("name")[0].innerHTML;
+      document.getElementById('deleteDeletionModal').onclick = function() { doDeletion(row); };
+      document.getElementById('cancelDeletionModal').onclick = function() { refresh(row); };
+      $('#deletionModal').modal('show');
+    }
+
+    function doDeletion(row) {
+      $('#deletionModal').modal('hide');
+      $('#loading').modal('show');
+      fetch('/deleteCustomer/' + row[0].id, {
+        credentials: "same-origin",
+        headers: {
+            'Content-Type': "application/json",
+        },
+        method: "DELETE",
+        }).catch(error => console.error('Error:', error)).then(refresh);
+    }
+
+
+    function refresh() {
+      $('#deletionModal').modal('hide');
+      $('#loading').modal('show');
+      
+      url = window.location.href;
+      window.location = url;
+
+       // Add this after api conversion
+       //$('#loading').modal('show');
+    }
+
+    $(".click-row").click(function() {
+        window.location = $(this).data("href");
+    });
 </script>
 {% endblock %}
-

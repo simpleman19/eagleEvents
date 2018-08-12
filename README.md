@@ -9,7 +9,7 @@ Steps to get running
 6. `pip3 install -r requirements.txt` (Should install all dependencies)
 7. `python manage.py runserver` (Should have a link in terminal to connect to app)
 
-If you want to run with live reloading to allow for auto refresh of pages
+If you want to run with live reTableSize.query.filter_by(company_id=user_company_id).all() to allow for auto refresh of pages
 
 `python manage.py livereload`
 

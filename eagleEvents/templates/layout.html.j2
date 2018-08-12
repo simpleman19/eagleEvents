@@ -7,6 +7,10 @@
     <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous">
     <link rel="stylesheet" href="/static/style.css">
     <link rel="stylesheet" href="/static/normalize.css">
+    <!-- jQuery library -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <!-- Bootstable library -->
+    <script src = "/static/bootstable.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
 
@@ -14,42 +18,53 @@
       <title>Eagle Events Layout</title>
     {% endblock %}
   </head>
-  <body class="main">
       {% block nav_content %}
-
 <div id="topheader">
-  <nav class="navbar navbar-default">
-		<div class="container-fluid">
-			 <div class="navbar-header">
-				  <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
-						<span class="sr-only">Toggle navigation</span>
-						<span class="icon-bar"></span>
-						<span class="icon-bar"></span>
-						<span class="icon-bar"></span>
-				  </button>
-				  <a class="navbar-brand" href="event.html.j2">Eagle Event Planner</a>
-			 </div>
-			 <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
-				  <ul class="nav navbar-nav">
-						<li class="active"><a href="/listEvents">Events<span class="sr-only">(current)</span></a></li>
-						<li><a href="/listCustomers">Customers</a></li>
-						<li><a href="/listEventPlanners">Event Planners</a></li>
-				  </ul>
-				  <ul class="nav navbar-nav navbar-right">
-        <li><a href="#"><span class="glyphicon glyphicon-log-in"></span> Logout</a></li>
-      </ul>
-			 </div>
-		</div>
-  </nav>
-</div>
-
+        <nav class="navbar navbar-default">
+          <div class="container-fluid">
+            <div class="navbar-header">
+              <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#myNavbar">
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+              </button>
+              <a class="navbar-brand" href="/listEvents">Eagle Event Planner</a>
+            </div>
+            <div class="collapse navbar-collapse" id="myNavbar">
+              <ul id="navigation" class="nav navbar-nav">
+                <!-- Creating list variable to tuples of hrefs -->
+                
+                {% set navigation_bar = [
+                    ('/listEvents', 'listEvents', 'Events'),
+                    ('/listCustomers', 'listCustomers', 'Customers'),
+                    ('/listEventPlanners', 'listEventPlanners', 'EventPlanners')
+                ] -%}
+                
+                <!-- Setting default active page to 'listEvents' -->
+                  
+                {% set active_page = active_page|default('listEvents') -%}
+                
+                <!-- Looping through each page to determine which is the active page -->
+                  
+                {% for href, id, caption in navigation_bar %}
+                  <li{% if id == active_page %} class="active"{% endif%}>
+                      <a href="{{ href|e }}">{{ caption|e }}</a></li>
+                {% endfor %}
+                 </ul>
+                <ul class="nav navbar-nav navbar-right">
+                    <li><a href="/logout"><span class="glyphicon glyphicon-log-in"></span> Logout</a></li>
+                </ul>    
+            </div>
+          </div>
+        </nav>
+    </div>
        {% endblock %}
     <div class="container">
-        {% with messages = get_flashed_messages() %}
+        {% with messages = get_flashed_messages(with_categories=True) %}
             {% if messages %}
                 <ul class=flashes>
-                    {% for message in messages %}
-                        <li>{{ message }}</li>
+                    {% for category, message in messages %}
+                        <li class="{{category if category != None}}">{{ message }}</li>
                     {% endfor %}
                 </ul>
             {% endif %}
@@ -57,11 +72,43 @@
         {% block body_content %}
         {% endblock %}
     </div>
-
       <footer>
       {% block footer_content %}
 
         {% endblock %}
+
+        <!-- Loading Modal -->
+        <div class="modal fade" id="loading" tabindex="-1" role="dialog" aria-labelledby="loadingModal" aria-hidden="true" data-backdrop="static">
+          <div class="modal-dialog" role="document">
+            <div class="modal-content">
+              <div class="modal-body">
+                <img class="loading-icon" src="/static/image/loading.gif" alt="Loading...">
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Deletion Modal -->
+        <div class="modal fade" id="deletionModal" tabindex="-1" role="dialog" aria-labelledby="deletionModal" aria-hidden="true" data-backdrop="static">
+          <div class="modal-dialog" role="document">
+            <div class="modal-content">
+              <div class="modal-header">
+                Deletion confirmation
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+              </div>
+                  <div class="modal-body">
+                    <div class="container-table">
+                      <div class="row">
+                        <p style="text-align: center;">Are you sure that you wish to delete: <span id="itemToDelete"></span></p>
+                      </div>
+                    </div>
+                </div>
+              <div class="modal-footer">
+                  <button id="deleteDeletionModal" class="btn btn-lg btn-danger btn-delete" type="button">Delete</button>
+                  <button id="cancelDeletionModal" class="btn btn-lg btn-primary btn-cancel" type="button">Cancel</button>
+              </div>
+          </div>
+        </div>
       </footer>
       <script>
     $( '#topheader .navbar-nav a' ).on( 'click', function () {

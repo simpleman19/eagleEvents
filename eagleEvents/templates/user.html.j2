@@ -1,17 +1,15 @@
 {% extends "layout.html.j2" %}
+{% set active_page = "listEventPlanners" %}
 {% block head_content %}
     <title>Eagle Events Users</title>
-{% endblock %}   
+{% endblock %}
 {% block body_content %}
     <h1>Users</h1>
         <div class="container">
-            <div class="checkbox">
-                <label>
-                    <input type="checkbox" value="">Show All
-                </label>
-            </div>
+            <button class="btn btn-primary active" id="refreshButton" onclick="refresh()">Refresh</button>
+        </div>
             <div class="card card-container-2">
-                <table class="table table-bordered">
+                <table id="listTable" class="table table-bordered table-hover">
                     <thead>
                         <tr>
                             <th>Name</th>
@@ -19,33 +17,57 @@
                             <th>Active</th>
                         </tr>
                     </thead>
-                    <tbody>
-                        <tr>
-                            <td>John</td>
-                            <td>john_1</td>
-                            <td><input type="checkbox" value=""></td>
-                        </tr>
-                        <tr>
-                            <td>Mary</td>
-                            <td>mary_2</td>
-                            <td><input type="checkbox" value=""></td>
-                        </tr>
-                        <tr>
-                            <td>July</td>
-                            <td>july_3</td>
-                            <td><input type="checkbox" value=""></td>
-                        </tr>
+                    <tbody id="listTable-body" onload="buildList()">
                     </tbody>
                 </table>
             </div>
                 <div class="buttons-action">
-                <button class="btn btn-lg btn-primary btn-add" type="submit">Add</button>
-            </div>
+                {% if g.current_user.is_admin %}
+                    <input type="button" class="btn btn-primary active btn-add" onclick="window.location.href='/addEventPlanner'" value="Add"/>
+                {% endif %}
         </div>
-<script src="https://code.jquery.com/jquery-1.12.4.min.js"></script>
-<script src="static/bootstable.js"></script>
+    </div>
 <script>
-    $('table').SetEditable();
+
+    function refresh() {
+        url = window.location.href;
+        window.location = url;
+    }
+
+    function buildList() {
+        $('#loading').modal('show');
+        let userTable = document.getElementById('listTable-body');
+            fetch('/api/user/users?', {
+            credentials: "same-origin",
+            method: "GET",
+        }).catch(error => console.error('Error:', error))
+          .then(res => res.json())
+          .then(json => {
+            userTable.innerHTML = '';
+            for(i=0; i <= json.users.length -1; i++){
+                let tr = userTable.insertRow();
+                tr.class = "click-row";
+                tr.insertCell().innerHTML = json.users[i].name;
+                tr.insertCell().innerHTML = json.users[i].username;
+                var checkbox = document.createElement('input')
+                checkbox.type = "checkbox";
+                if (json.users[i].active){
+                    checkbox.checked = "checked";
+                }
+                checkbox.disabled = true;
+                let td = tr.insertCell()
+                td.appendChild(checkbox);
+                let userId = json.users[i].id;
+                {% if g.current_user.is_admin %}
+                    tr.addEventListener('click', function(){
+                        location.href = "/modifyEventPlanner/" + userId;
+                    });
+                {% endif %}
+            }
+          });
+        $('#loading').modal('hide');
+    }
+
+    window.onload = buildList;
 </script>
 {% endblock %}
-

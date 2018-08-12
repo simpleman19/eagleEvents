@@ -28,6 +28,6 @@ class User(db.Model):
         if self.password is None or self.password == "":
             self.password = bcrypt.hashpw(new_password.encode('utf-8'), bcrypt.gensalt())
             return True
-        elif bcrypt.checkpw(old_password.encode('utf-8'), self.password):
+        else:
             self.password = bcrypt.hashpw(new_password.encode('utf-8'), bcrypt.gensalt())
             return False

@@ -25,12 +25,22 @@ def create_app(config_name=None):
     from .routes.event_planners import event_planners_blueprint
     from .routes.customers import customers_blueprint
     from .routes.events import events_blueprint
+    from .routes.api.events import events_api_blueprint
+    from .routes.api.tables import tables_api_blueprint
+    from .routes.api.customers import customers_api_blueprint
+    from .routes.api.company import company_api_blueprint
+    from .routes.api.users import user_api_blueprint
     from .auth import auth_blueprint
 
     app.register_blueprint(main_blueprint)
     app.register_blueprint(event_planners_blueprint)
     app.register_blueprint(customers_blueprint)
     app.register_blueprint(events_blueprint)
+    app.register_blueprint(events_api_blueprint)
+    app.register_blueprint(tables_api_blueprint)
+    app.register_blueprint(customers_api_blueprint)
+    app.register_blueprint(company_api_blueprint)
+    app.register_blueprint(user_api_blueprint)
     app.register_blueprint(auth_blueprint, url_prefix='/auth')
 
     return app
