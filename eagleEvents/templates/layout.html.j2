@@ -13,17 +13,13 @@
     <script src = "/static/bootstable.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
-    <script>
-    $(".nav a").on("click", function(){
-    $(".nav").find(".active").removeClass("active");
-    $(this).parent().addClass("active");});
-    </script>
 
     {% block head_content %}
       <title>Eagle Events Layout</title>
     {% endblock %}
   </head>
       {% block nav_content %}
+<div id="topheader">
         <nav class="navbar navbar-default">
           <div class="container-fluid">
             <div class="navbar-header">
@@ -35,17 +31,33 @@
               <a class="navbar-brand" href="/listEvents">Eagle Event Planner</a>
             </div>
             <div class="collapse navbar-collapse" id="myNavbar">
-              <ul class="nav navbar-nav">
-                <li class="active"><a href="/listEvents">Events</a></li>
-                <li><a href="/listCustomers">Customers</a></li>
-                <li><a href="/listEventPlanners">Event Planners</a></li>
-              </ul>
-              <ul class="nav navbar-nav navbar-right">
-                <li><a href="/logout"><span class="glyphicon glyphicon-log-in"></span> Logout</a></li>
-              </ul>
+              <ul id="navigation" class="nav navbar-nav">
+                <!-- Creating list variable to tuples of hrefs -->
+                
+                {% set navigation_bar = [
+                    ('/listEvents', 'listEvents', 'Events'),
+                    ('/listCustomers', 'listCustomers', 'Customers'),
+                    ('/listEventPlanners', 'listEventPlanners', 'EventPlanners')
+                ] -%}
+                
+                <!-- Setting default active page to 'listEvents' -->
+                  
+                {% set active_page = active_page|default('listEvents') -%}
+                
+                <!-- Looping through each page to determine which is the active page -->
+                  
+                {% for href, id, caption in navigation_bar %}
+                  <li{% if id == active_page %} class="active"{% endif%}>
+                      <a href="{{ href|e }}">{{ caption|e }}</a></li>
+                {% endfor %}
+                 </ul>
+                <ul class="nav navbar-nav navbar-right">
+                    <li><a href="/logout"><span class="glyphicon glyphicon-log-in"></span> Logout</a></li>
+                </ul>    
             </div>
           </div>
         </nav>
+    </div>
        {% endblock %}
     <div class="container">
         {% with messages = get_flashed_messages(with_categories=True) %}
@@ -98,5 +110,11 @@
           </div>
         </div>
       </footer>
+      <script>
+    $( '#topheader .navbar-nav a' ).on( 'click', function () {
+	$( '#topheader .navbar-nav' ).find( 'li.active' ).removeClass( 'active' );
+	$( this ).parent( 'li' ).addClass( 'active' );
+});
+    </script>
   </body>
 </html>

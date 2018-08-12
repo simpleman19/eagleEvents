@@ -23,6 +23,26 @@ body, html {
     padding-bottom: 30%;
 }
 
+/*-------------Navbar------------*/
+
+#topheader .navbar-nav li > a {
+	text-transform: capitalize;
+	color: #004770;
+	transition: background-color .2s, color .2s;
+	
+	&:hover,
+	&:focus {
+		background-color: #004770;
+		color: #fff;
+	}
+}
+
+#topheader .navbar-nav li.active > a {
+	background-color: #004770;
+	color: #fff;
+}
+
+
 #bEdit{
     display: none;
 }
