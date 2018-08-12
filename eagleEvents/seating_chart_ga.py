@@ -315,7 +315,7 @@ def get_seating_chart_tables(event, log_output=False, collect_stats=False):
     tables = []
     for t in range(num_tables):
         table = Table(event)
-        table.number = t + 1
+        table.number = 0
         guest_numbers_at_table = winner[t * event.table_size.size: (t + 1) * event.table_size.size]
         table.guests = list(filter(lambda g: g.number in guest_numbers_at_table, event._guests))
         tables.append(table)
