@@ -1,6 +1,5 @@
 from flask import Blueprint, redirect, render_template, request, url_for, g, flash, abort, jsonify
 
-from eagleEvents import db
 from eagleEvents.auth import multi_auth
 from eagleEvents.models import Customer
 customers_blueprint = Blueprint('customers', __name__)

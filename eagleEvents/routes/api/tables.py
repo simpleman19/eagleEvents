@@ -2,7 +2,7 @@ from flask import Blueprint, request, jsonify, abort, g, Response
 from eagleEvents.models.table import Table
 from eagleEvents import db
 from eagleEvents.auth import multi_auth
-from eagleEvents.routes.api import bad_request, validation_error
+from eagleEvents.routes.api import bad_request
 
 tables_api_blueprint = Blueprint('tables_api', __name__, url_prefix='/api/table')
 
@@ -83,14 +83,11 @@ def update_table(table_id):
     response = Response("", status = 204)
     return response
 
-    
-
 
 @tables_api_blueprint.route('/guests', methods=['GET'])
 @multi_auth.login_required
 def get_guests_for_table():
     table_id = request.args.get('table')
-    selected_guest = request.args.get('selGuest')
     response = {
         'guests': [],
         'tables': [],

@@ -151,7 +151,6 @@ def upload_file(event, request):
 @events_blueprint.route('/seatingChart/<event_id>', methods=['GET', 'POST'])
 @multi_auth.login_required
 def seating_chart(event_id):
-    # TODO Seating Chart
     # UI Seating Chart
     event = None
     try:
@@ -168,6 +167,7 @@ def seating_chart(event_id):
 def table_cards(id):
     # Print table cards
     return table_card_print(id)
+
 
 @events_blueprint.route('/attendanceList/<id>', methods=['GET', 'POST'])
 @multi_auth.login_required

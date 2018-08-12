@@ -91,6 +91,10 @@
               if (!json['error']) {
                   location.href = "{{ cancel_redirect }}";
               }
+              else{
+                  url = window.location.href;
+                  window.location = url;
+              }
           });
     $('#loading').modal('hide');
     }
