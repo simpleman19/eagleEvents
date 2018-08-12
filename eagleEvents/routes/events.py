@@ -117,6 +117,7 @@ def handle_post(event, new):
         if len(errors) == 0:
             upload_file(event, request)
             imported = True
+            return redirect(url_for('events.modify_event', event_id=event.id))
         else:
             for error in errors:
                 flash(error, 'error')

@@ -125,7 +125,7 @@ class Event(db.Model):
         if len(errors) == 0:
             if regen_seating_chart and len(event._guests) > 0:
                 event.generate_seating_chart()
-
+          
             db.session.add(event)
             db.session.commit()
 
