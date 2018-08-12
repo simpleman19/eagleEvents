@@ -20,6 +20,9 @@ creator.create("Individual", list, fitness=creator.FitnessMulti)
 
 toolbox = base.Toolbox()
 
+import pyximport; pyximport.install()
+import my_cython_helpers
+
 
 # Crossover algo
 def table_crossover(ind1, ind2):
@@ -66,54 +69,6 @@ def count_preferences(guest_dict, seating_preference):
     return count
 
 
-def count_preferences_in_list(guest_lookup, guest_numbers, preference_number):
-    count = 0
-    for i in range(len(guest_numbers)):
-        if guest_numbers[i] == Table.EMPTY_SEAT:
-            continue
-        guest_preferences = guest_lookup[guest_numbers[i]]
-        if guest_preferences is None or len(guest_preferences) == 0:
-            continue
-        for j in range(len(guest_numbers)):
-            if i == j:
-                continue
-            if guest_numbers[j] == Table.EMPTY_SEAT:
-                continue
-            if not (guest_numbers[j] in guest_preferences):
-                continue
-            pref = guest_preferences[guest_numbers[j]]
-            if not (pref is None) and pref == preference_number:
-                count += 1
-    return count
-
-
-def count_dislikes_in_list(guest_lookup, guest_numbers):
-    return count_preferences_in_list(guest_lookup, guest_numbers, SeatingPreference.DISLIKE.value)
-
-
-def count_likes_in_list(guest_lookup, guest_numbers):
-    return count_preferences_in_list(guest_lookup, guest_numbers, SeatingPreference.LIKE.value)
-
-
-# Seating chart evaluation
-def evaluate(indiv_and_else):
-    table_size = indiv_and_else['size']
-    guest_lookup = indiv_and_else['lookup']
-    individual = indiv_and_else['indiv']
-    num_tables = int(ceil(len(individual) / table_size))
-    dislike_score = 0
-    like_score = 0
-    tables_to_check = range(num_tables)
-    # if not valid_seating(individual):
-    #    print("Invalid seating...")
-    #    return 100, 0
-    for t in tables_to_check:
-        guests_at_table = individual[t*table_size:(t + 1)*table_size]
-        dislike_score += count_dislikes_in_list(guest_lookup, guests_at_table)
-        like_score += count_likes_in_list(guest_lookup, guests_at_table)
-    return dislike_score, like_score
-
-
 def valid_seating(individual):
     valid = True
     seen = set()
@@ -130,7 +85,7 @@ def valid_seating(individual):
 def update_fitnesses(lookup_and_size, population):
     for item, indiv in zip(lookup_and_size, population):
         item["indiv"] = indiv
-    fitnesses = toolbox.map(evaluate, lookup_and_size)
+    fitnesses = toolbox.map(my_cython_helpers.evaluate, lookup_and_size)
     for ind, fit in zip(population, fitnesses):
         ind.fitness.values = fit
 
@@ -142,7 +97,7 @@ def update_stats(mstats, logbook, generation_number, population):
 
 
 # Register functions for DEAP
-toolbox.register("evaluate", evaluate)
+toolbox.register("evaluate", my_cython_helpers.evaluate)
 toolbox.register("select", tools.selTournament, tournsize=TOURNSIZE, fit_attr="fitness")
 toolbox.register("mate", table_crossover)
 toolbox.register("mutate", tools.mutShuffleIndexes, indpb=INDPB)
