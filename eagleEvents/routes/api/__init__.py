@@ -7,3 +7,4 @@ def bad_request(message):
 
 def validation_error(errors):
     return jsonify({'error': 'Invalid data', 'errors': errors})
+

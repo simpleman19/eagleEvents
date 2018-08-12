@@ -18,6 +18,26 @@ class Customer(db.Model):
     def __init__(self, company: 'Company'):
         self.company = company
 
+    """
+    Returns a list of error messages
+    If validation is successful, it saves the customer and returns an empty list
+    """
+    @staticmethod
+    def validate_and_save(customer, customer_data):
+        errors = []
+        if 'name' in customer_data:
+            customer.name = customer_data['name']
+        if 'email' in customer_data:
+            customer.email = customer_data['email']
+        if 'phone' in customer_data:
+            customer.phone_number = customer_data['phone']
+        if customer.name is None or len(customer.name) == 0:
+            errors.append("Name is required")
+        else:
+            db.session.add(customer)
+            db.session.commit()
+        return errors
+
 
 # This auto generates customer numbers on insert
 @event.listens_for(Customer, 'after_insert')
